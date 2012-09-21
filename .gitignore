@@ -1,0 +1,14 @@
+##
+## Development meta files
+##
+*.*~*
+*.*~
+.project
+.DS_Store
+./nbproject
+.buildpath
+.project
+nbproject
+nbproject/*
+./.settings/
+/projects/demo-pt/.mind/
