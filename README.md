@@ -1,7 +1,4 @@
-
-
-
-available types of slides:
+Available types of slides:
 * opening : the first slide
 * content : normal content
 * section : a section division or title
