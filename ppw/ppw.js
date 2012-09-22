@@ -144,7 +144,7 @@ window.PPW= (function($, _d){
     var _testResolution= function(){
         var el= $('#PPW-resolution-test-element');
         el.css({
-            width: _d.getElementById('PPW-tool-screen').offsetWidth-6+'px', // chrome has a bug with clientWidth in fullscreen
+            width: _b.offsetWidth-6+'px', // chrome has a bug with clientWidth in fullscreen
             height: _b.clientHeight-6+'px',
             display: 'block'
         });
@@ -176,33 +176,96 @@ This message should be in the center of the screen\n\nClick ok when finished");
         $('#ppw-message-box').show();
     };
     
+    /**
+     * Initializes and shows the camera.
+     * 
+     * This mathod askes for permition to use the camera, shows it ans enable
+     * the binding events to it(such as gestures and clicks)
+     */
     var _startCamera= function(){
+        
+        var video = _d.querySelector('#ppw-video-element'),
+            el= $('#ppw-camera-tool');
+                
         if(!_conf.cameraLoaded){
             _w.URL = _w.URL || _w.webkitURL;
             _n.getUserMedia  = _n.getUserMedia || _n.webkitGetUserMedia ||
                                _n.mozGetUserMedia || _n.msGetUserMedia;
 
-            var video = _d.querySelector('#ppw-video-element');
-
             if (_n.getUserMedia) {
                 _n.getUserMedia({audio: true, video: true}, function(stream) {
                   video.src = _w.URL.createObjectURL(stream);
                   _conf.cameraLoaded= true;
-                  $('#ppw-camera-tool').draggable()
-                                       .resizable({
-                                           handles: "se, sw, se, sw, n, e, s, w"
-                                       });
+                  
+                  el.draggable()
+                    .resizable({
+                        handles: "se, sw, ne, nw, n, e, s, w"
+                    })
+                    .bind('dblclick', function(){
+
+                        var that= $(this), oldie= [];
+
+                        if(that.data('fullscreened')){
+                            oldie= that.data('oldprops');
+                            that.data('fullscreened', true)
+                                .show()
+                                .animate({
+                                     width: oldie[2]+'px',
+                                     height: oldie[3]+'px',
+                                     left: oldie[0]+'px',
+                                     top: oldie[1]+'px'
+                                 }, 500)
+                                 .data('fullscreened', false);
+                        }else{
+                            that.data('fullscreened', true)
+                                .data('oldprops', [
+                                     this.offsetLeft,
+                                     this.offsetTop,
+                                     this.offsetWidth,
+                                     this.offsetHeight
+                                ])
+                                .animate({
+                                     width: _b.offsetWidth+'px',
+                                     height: _b.offsetHeight+'px',
+                                     left: '0px',
+                                     top: '0px'
+                                 }, 500);
+                        }
+                    }).css({
+                        left: _b.offsetWidth - el[0].offsetWidth-10,
+                        top: 0-el[0].offsetHeight
+                    }).animate({top: '0px'}, 500);
+                    
+                    $('#ppw-camera-hide-trigger').bind('click', _pauseCamera);
+
                 }, function(){
                     alert("Could NOT start the video!");
                 });
             }else{
                 alert("Could NOT start the video!");
             }
+        }else{
+            _d.querySelector('#ppw-video-element').play();
+            if(el[0].offsetTop <0){
+                el.css({
+                            left: _b.offsetWidth - el[0].offsetWidth-10,
+                            top: 0-el[0].offsetHeight
+                       }).animate({top: '0px'}, 500);
+            }
         }
     };
+    
+    /**
+     * Pauses the camera and hides it.
+     */
     var _pauseCamera= function(){
+        
+        var el= null;
+        
         if(_conf.cameraLoaded){
-            
+            el= $('#ppw-camera-tool');
+            _d.querySelector('#ppw-video-element').pause();
+            el.animate({top: -el[0].offsetHeight - 30})
         }
     };
     
