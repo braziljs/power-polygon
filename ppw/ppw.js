@@ -193,8 +193,15 @@ This message should be in the center of the screen\n\nClick ok when finished");
                                _n.mozGetUserMedia || _n.msGetUserMedia;
 
             if (_n.getUserMedia) {
-                _n.getUserMedia({audio: true, video: true}, function(stream) {
-                  video.src = _w.URL.createObjectURL(stream);
+                
+                _n.getUserMedia({video: true}, function(stream) {
+                    
+                  try{
+                      stream= _w.URL.createObjectURL(stream);
+                  }catch(e){}
+
+                  video.src = stream;
+                  video.play();
                   _conf.cameraLoaded= true;
                   
                   el.draggable()
@@ -238,8 +245,9 @@ This message should be in the center of the screen\n\nClick ok when finished");
                     
                     $('#ppw-camera-hide-trigger').bind('click', _pauseCamera);
 
-                }, function(){
+                }, function(data){
                     alert("Could NOT start the video!");
+                    console.error("[PPW Error]: Could now open the camera!", data);
                 });
             }else{
                 alert("Could NOT start the video!");
@@ -289,6 +297,17 @@ This message should be in the center of the screen\n\nClick ok when finished");
     };
     
     /**
+     * Opens the presentation tool.
+     * 
+     * This tool shows the current slide and its notes, as well as the next
+     * slide and its notes.
+     * Also, the time remaning/lapsed and the shortcut keys.
+     */
+    var _openPresentationTool= function(){
+        
+    };
+    
+    /**
      * Verifies if the browser is online or not.
      */
     var _testConnection= function(){
@@ -322,6 +341,7 @@ This message should be in the center of the screen\n\nClick ok when finished");
         testConnection: _testConnection,
         enterFullScreen: _enterFullScreen,
         testResolution: _testResolution,
+        openPresentationTool: _openPresentationTool,
         testAudio: _testAudio,
         startCamera: _startCamera
     };
