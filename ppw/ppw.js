@@ -31,7 +31,8 @@ window.PPW= (function($, _d){
         _conf= {
             loadSteps: 5,
             curLoaded: 0,
-            cameraLoaded: false
+            cameraLoaded: false,
+            presentationTool: null
         },
         // user defined settings
         _settings= {
@@ -161,9 +162,10 @@ This message should be in the center of the screen\n\nClick ok when finished");
         if(_b.requestFullScreen)
             _b.requestFullScreen();
         else if(_b.webkitRequestFullScreen)
-                _b.webkitRequestFullScreen();
-             else if(_b.mozRequestFullScreen)
-                     _b.mozRequestFullScreen()
+                _b.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+             else if(_b.mozRequestFullScreen){
+                     _b.mozRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+                  }
                   else 
                     alert("Your browser does not support Fullscreen from JavaScript!\nPlease, start your fullscreen with your keyboard!");
     }
@@ -194,7 +196,7 @@ This message should be in the center of the screen\n\nClick ok when finished");
 
             if (_n.getUserMedia) {
                 
-                _n.getUserMedia({video: true}, function(stream) {
+                _n.getUserMedia({audio: false, video: true}, function(stream) {
                     
                   try{
                       stream= _w.URL.createObjectURL(stream);
@@ -304,7 +306,10 @@ This message should be in the center of the screen\n\nClick ok when finished");
      * Also, the time remaning/lapsed and the shortcut keys.
      */
     var _openPresentationTool= function(){
-        
+        _conf.presentationTool= window.open(_settings.PPWSrc+'/_tools/presentation-tool.html', 'PPW-Presentation-tool');
+        _conf.presentationTool.onload= function(){
+            _conf.presentationTool.PresentationTool.init($, window.PPW);
+        };
     };
     
     /**
