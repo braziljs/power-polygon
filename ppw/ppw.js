@@ -164,6 +164,7 @@ This message should be in the center of the screen\n\nClick ok when finished");
         else if(_b.webkitRequestFullScreen)
                 _b.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
              else if(_b.mozRequestFullScreen){
+                     // TODO: fix this for firefox!!
                      _b.mozRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
                   }
                   else 
@@ -306,7 +307,13 @@ This message should be in the center of the screen\n\nClick ok when finished");
      * Also, the time remaning/lapsed and the shortcut keys.
      */
     var _openPresentationTool= function(){
-        _conf.presentationTool= window.open(_settings.PPWSrc+'/_tools/presentation-tool.html', 'PPW-Presentation-tool');
+        var toolSrc= _settings.PPWSrc+'/_tools/presentation-tool.html',
+            toolName= 'PPW-Presentation-tool',
+            toolProps= "width=780,height=520,left=40,top=10";
+            
+        _conf.presentationTool= window.open(toolSrc,
+                                            toolName,
+                                            toolProps);
         _conf.presentationTool.onload= function(){
             _conf.presentationTool.PresentationTool.init($, window.PPW);
         };

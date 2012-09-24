@@ -24,10 +24,12 @@
                 createAboutSlide: true, // automatically creates the ABOUT ME slide(s)
                 useExternalSlides: true, // load slides with ajax(demands an http server)
                 preloadSlides: true, // load all the slides before starting
+                PPWSrc: "../../ppw/", // where is(relatively) the source of PowerPolygonWeb
                 
                 // presentation data
-                PPWSrc: "../../ppw/",
                 theme: "default",
+                duration: 60, // the expected duration in minutes
+                alertAt: [10, 30, 40, 50], // in minutes
                 slides: [
                     {
                         type: 'opening',
