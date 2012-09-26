@@ -22,37 +22,177 @@
                 background-color: #c0c9c9;
             }
             
-            .header{
+            #header{
                 background: black;
                 color: white;
-                
+                font-size: 32px;
+                text-align: center;
+                padding-top: 4px;
+            }
+            
+            #notes{
+                background-color: white;
+                margin: 4px;
+                border-radius: 3px;
+                padding: 6px;
+                width: 100%;
+                float: left;
+            }
+            #notes .title{
+                font-weight: bold;
+            }
+            .notes-list{
+                font-size: 30px;
+            }
+            .notes-list ul{
+                margin: -6px;
+                list-style-position: inside;
+                padding: 0px;
+            }
+            .notes-list li{
+                padding: 10px;
+                font-size: 34px;
+            }
+            .notes-list li:nth-child(2n){
+                background-color: #f0f0f0;
+            }
+            
+            #right-panel{
+                width: 200px;
+                height: 100%;
+                box-shadow: 0px 0px 20px black;
+                float: right;
             }
             
             
+            
+            
+            .slide-counter{
+                border: solid 1px white;
+                border-radius: 3px;
+                margin: 4px;
+                text-align: center;
+                font-size: 36px;
+                letter-spacing: -5px;
+            }
+            .slide-counter span{
+                letter-spacing: 0px;
+            }
+            
+            .slide-counter span:nth-child(1){
+                font-weight: bold;
+                font-size: 60px;
+                margin-right: -14px;
+            }
+            
+            .slide-percent-container{
+                width: 170px;
+                height: 10px;
+                border: solid 1px white;
+                background-color: white;
+                overflow: hidden;
+                margin: auto;
+                margin-bottom: 4px;
+                margin-top: -4px;
+                border-radius: 4px;
+            }
+            #slide-percent-bar{
+                height: 100%;
+                width: 32%;
+                background-color: green;
+                border-radius: 0px 4px 4px 0px;
+            }
+            
+            .slide-next-title{
+                margin: 4px;
+                border: solid 1px white;
+                background-color: gray;
+                padding: 4px;
+                font-size: 32px;
+                color: white;
+                text-align: justify;
+            }
+            .slide-next-title span{
+                font-size: 24px;
+                color: black;
+            }
+            
+            #timer{
+                position: absolute;
+                bottom: -10px;
+                right: 4px;
+                font-size: 40px;
+            }
+            #timer span{
+                font-weight: bold;
+                font-size: 70px;
+                text-shadow: -1px 0px 2px black;
+                color: white;
+            }
+            
+            
+            
+            #timeAlertElement{
+                position: absolute;
+                left: 0px;
+                top: 0px;
+                width: 100%;
+                height: 100%;
+                text-align: center;
+                font-weight: bold;
+                color: red;
+                /*text-shadow: 0px 0px 40px black;*/
+                font-size: 600px;
+                display: none;
+            }
         </style>
     </head>
     <body>
         <div id="header">PPW: Current slide title</div>
-        <div id="body">PPW: Current slide title</div>
-        <div id="right-panel">PPW: Current slide title</div>
-        <!--<div id="slide-notes">
-            <ul type="circle">
-                <li>Some note here to test the screen style</li>
-                <li>Another idea should be typed here!</li>
-                <li>Remember to say THIS</li>
-                <li>Blah!</li>
-                <li>Ok, now it's got boring already</li>
-            </ul>
-        </div>-->
-        <!--<div id="footer">
-            <div id="next-slide">
-                Next <span>The next slide title</span>
+        <div id="notes">
+            <div class="title">
+                Notes
             </div>
+            <div class="notes-list">
+                <ul type="disc">
+                    <li>Some note here to test the screen style</li>
+                    <li>Another idea should be typed here!</li>
+                    <li>Remember to say THIS</li>
+                    <li>Blah!</li>
+                    <li>Ok, now it's got boring already</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div id="right-panel">
+            <div class="slide-counter">
+                <span>
+                    12
+                </span>
+                /
+                <span>
+                    43
+                </span>
+                <div class="slide-percent-container">
+                    <div id="slide-percent-bar">
+                    </div>
+                </div>
+            </div>
+            <div class="slide-next-title">
+                <span>Next: </span>Next slide's title
+            </div>
+            
+            <div class="addons-container">
+            </div>
+            
             <div id="timer">
                 <span>556</span>min
             </div>
-        </div>-->
-        <!--<div id="timeAlertElement">30</div>-->
+        </div>
+        
+        <div id="timeAlertElement">30</div>
+        
+        
         <script>
             
             window.PresentationTool= (function(_d){
@@ -73,38 +213,55 @@
                     },
                     adjustScreen: function(){
                         verifyInstance();
+                        
+                        var notesEl= document.getElementById('notes'),
+                            bar= document.getElementById('right-panel'),
+                            tt= document.getElementById('header');
+                        
+                        notesEl.style.width= (document.body.clientWidth - bar.offsetWidth - 22) + 'px';
+                        notesEl.style.height= (document.body.clientHeight - tt.offsetHeight - 22) + 'px';
+                        
                     },
                     triggerPresentationToolLoadEvent: function(){
                         ppw.triggerPresentationToolLoadEvent(window);
                     },
                     alertTime: function(t){
-                        var el= null;
+                        var el= null,
+                            notesEl= document.getElementById('notes');
+                            
                         verifyInstance();
                         
                         el= $(document.querySelector('#timeAlertElement'));
-                        /*
-                        el.show()
+                        
+                        el.html(t)
+                          .show()
                           .css({
                             fontSize: '600px',
-                            marginTop: '-100px'
+                            marginTop: '0px',
+                            marginLeft: '0px',
+                            'webkitTransform': 'translate(0px, -100px)', // fixing bug in chrome with big font sizes
+                            opacity: 1
                         }).animate({
                             fontSize: '700px',
-                            marginTop: '-150px',
+                            marginTop: '-40px',
                             opacity: 1
                         }, 400, function(){
                             $(this).animate({
                                 fontSize: '600px',
-                                marginTop: '-100px'
+                                marginTop: '0px'
                             }, 400, function(){
                                 setTimeout(function(){
-                                    $(document.querySelector('#timeAlertElement')).animate({
-                                        fontSize: '400px',
-                                        marginTop: '0px',
+                                    $(document.querySelector('#timeAlertElement')).css('webkitTransform', 'none')
+                                        .animate({
+                                        marginTop: notesEl.offsetHeight+'px',
+                                        marginLeft: (notesEl.offsetWidth/2)+'px',
+                                        'webkitTransform': 'translate(0px, -300px)', // fixing bug in chrome with big font sizes
+                                        fontSize: '70px',
                                         opacity: 0
-                                    }, 2000);
-                                }, 500);
+                                    }, 1000);
+                                }, 1000);
                             });
-                        });*/
+                        });
                     }
                 }
             })(document);

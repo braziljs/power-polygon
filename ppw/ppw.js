@@ -423,16 +423,27 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         var toolSrc= _settings.PPWSrc+'/_tools/presentation-tool.html',
             toolName= 'PPW-Presentation-tool',
             toolProps= "width=780,height=520,left=40,top=10";
-            
-        _conf.presentationTool= window.open(toolSrc,
-                                            toolName,
-                                            toolProps);
-        _conf.presentationTool.onload= function(){
-            _conf.presentationTool.PresentationTool.init($, window.PPW);
-            
-        };
+        
+        if(!_conf.presentationTool){
+            _conf.presentationTool= window.open(toolSrc,
+                                                toolName,
+                                                toolProps);
+            _conf.presentationTool.onload= function(){
+                _conf.presentationTool.PresentationTool.init($, window.PPW);
+
+            };
+        }else{
+            _conf.presentationTool.focus();
+        }
     };
     
+    /**
+     * Triggers the very specific event to the Presentation Tool.
+     * 
+     * This method triggers the event that defines the load of the Presentation
+     * Tool, leting addons to know that, and also offering access to its
+     * document.
+     */
     var _triggerPresentationToolLoadEvent= function(win){
         _triggerEvent('onpresentationtoolloaded', win);
     };
