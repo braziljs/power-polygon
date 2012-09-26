@@ -20,8 +20,6 @@ window.PPW= (function($, _d){
     
     "use strict";
     
-    
-    
     /**************************************************
      *                PRIVATE VARIABLES               *
      **************************************************/
@@ -48,16 +46,99 @@ window.PPW= (function($, _d){
         _w= window;
     
     
+    /**
+     * Available listeners.
+     * Used by addons.
+     */
+    var _listeners= {
+        onstart: [],
+        onfinish: [],
+        onload: [],
+        onnext: [],
+        onprev: [],
+        ongoto: [],
+        onfullscreen: [],
+        onshowcamera: [],
+        onhidecamera: [],
+        onslidetypechange: []
+    }
+    
     
     /**************************************************
      *                PRIVATE METHODS                 *
      **************************************************/
     
     /**
+     * Adds an event listener to PPW.
+     * 
+     * Used by addons or external scripts, as well as internal methods calls.
+     */
+    var _addListener= function(evt, fn){
+        if(_listeners[evt])
+            _listeners[evt].push(fn);
+    }
+    
+    var _removeListener= function(evt, fn){
+        var i= 0, curEvt= null;
+        
+        if(curEvt= _listeners[evt]){
+            i= curEvt.length;
+            try{
+                do{
+                    if(curEvt[i] == fn){
+                        curEvt[i]= false;
+                    }
+                }while(i--);
+            }catch(e){
+                console.log("[PPW][Event Callback error]: ", e);
+            }
+        }
+    };
+    
+    /**
+     * Triggers an event.
+     * 
+     * Used only internaly.
+     */
+    var _triggerEvent= function(evt, args){
+        var i= 0, curEvt= null;
+        
+        if(curEvt= _listeners[evt]){
+            i= curEvt.length;
+            try{
+                do{
+                    if(curEvt[i])
+                        curEvt[i](args);
+                }while(i--);
+            }catch(e){
+                console.log("[PPW][Event Callback error]: ", e);
+            }
+        }
+    }
+    
+    /**
+     * Extends the PPW object.
+     * 
+     * Used by addons to register themselves and then, to
+     * be able to receive events and the presentation data.
+     */
+    var _extend= function(id, conf){
+        var prop= null;
+        
+        for(prop in conf){
+            if(_listeners[prop] && typeof conf[prop] == 'function'){
+                _addListener(prop, conf[prop]);
+            }
+        }
+    }
+    
+    /**
      * Method called by the user to define the presentation settings.
      */
     var _init= function(conf){
         $.extend(_settings, conf);
+        
+        _triggerEvent('onload', conf);
     };
     
     /**
@@ -132,6 +213,16 @@ window.PPW= (function($, _d){
         $.get(_settings.PPWSrc+"_tools/opening-tool-screen.html", function(data){
             _d.body.innerHTML+= data;
             _setLoadingBarStatus();
+            
+            $('#ppw-goFullScreen-trigger').click(_enterFullScreen);
+            $('#ppw-testResolution-trigger').click(_testResolution);
+            $('#ppw-testAudio-trigger').click(_testAudio);
+            $('#ppw-testCamera-trigger').click(_startCamera);
+            $('#ppw-testConnection-trigger').click(_testConnection);
+            
+            _d.getElementById('ppw-help-icon').src= _settings.PPWSrc+'/_resources/help-icon.png';
+            _d.getElementById('ppw-start-presentation-icon').src= _settings.PPWSrc+'/_resources/start.png';
+            _d.getElementById('ppw-presentation-tool').src= _settings.PPWSrc+'/_resources/tools-icon.png';
         });
         _loadSlide(1);
     };
@@ -149,16 +240,23 @@ window.PPW= (function($, _d){
             height: _b.clientHeight-6+'px',
             display: 'block'
         });
-        alert("This tool helps you to identify the borders of the screen in the projector, reajust it and the resolution, as well as, for example, resize the window if necessary.\n\
-This message should be in the center of the screen\n\nClick ok when finished");
-        el.hide();
+        _showMessage("This tool helps you to identify the borders of the screen in the projector, reajust it and the resolution, as well as, for example, resize the window if necessary.<br/>\
+This message should be in the center of the screen<br/><br/>Click ok when finished", function(){
+            el.hide();
+        });
     };
     
     /**
      * Tries to enter in fullscreen mode.
+     * 
+     * Triggers the event onfullscreen, passing the status: true if ok,
+     * false if could not request the fullscreen on the browser.
      */
     var _enterFullScreen= function(){
-        var fn= null;
+    
+        var fn= null,
+            status= true;
+        
         if(_b.requestFullScreen)
             _b.requestFullScreen();
         else if(_b.webkitRequestFullScreen)
@@ -167,16 +265,28 @@ This message should be in the center of the screen\n\nClick ok when finished");
                      // TODO: fix this for firefox!!
                      _b.mozRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
                   }
-                  else 
+                  else{
+                    status= false;
                     alert("Your browser does not support Fullscreen from JavaScript!\nPlease, start your fullscreen with your keyboard!");
+                  }
+        
+        _triggerEvent('onfullscreen', status);
     }
     
     /**
      * Show a message in a floating box in the center of the screen.
      */
-    var _showMessage= function(msg){
+    var _showMessage= function(msg, fn){
+        var box= $('#ppw-message-box');
         $('#ppw-message-content').html(msg);
-        $('#ppw-message-box').show();
+        box.show()
+           .css({
+               marginLeft: -(box[0].offsetWidth/2)+'px',
+               marginTop: -(box[0].offsetHeight/2)+'px'
+           });
+        
+        if(fn && typeof fn == 'function')
+            $('#ppw-message-box input[type=button]').one('click', fn);
     };
     
     /**
@@ -247,6 +357,7 @@ This message should be in the center of the screen\n\nClick ok when finished");
                     }).animate({top: '0px'}, 500);
                     
                     $('#ppw-camera-hide-trigger').bind('click', _pauseCamera);
+                    _triggerEvent('onshowcamera', video);
 
                 }, function(data){
                     alert("Could NOT start the video!");
@@ -278,6 +389,7 @@ This message should be in the center of the screen\n\nClick ok when finished");
             _d.querySelector('#ppw-video-element').pause();
             el.animate({top: -el[0].offsetHeight - 30})
         }
+        _triggerEvent('onhidecamera');
     };
     
     /**
@@ -293,10 +405,10 @@ This message should be in the center of the screen\n\nClick ok when finished");
             el= _d.getElementById('ppw-audioTestElement');
         }
         el.play();
-        _showMessage("Playing audio<br/><img src='"+_settings.PPWSrc+"/_resources/loadingBar.gif' style='position: relative; left: 50%; margin-left: -100px;' width='200' />");
-        $('#ppw-message-box input[type=button]').one('click', function(){
-            _d.getElementById('ppw-audioTestElement').pause();
-        })
+        _showMessage("Playing audio<br/><img src='"+_settings.PPWSrc+"/_resources/loadingBar.gif' style='position: relative; left: 50%; margin-left: -100px;' width='200' />",
+                     function(){
+                        _d.getElementById('ppw-audioTestElement').pause();
+                     });
     };
     
     /**
@@ -355,7 +467,10 @@ This message should be in the center of the screen\n\nClick ok when finished");
         testResolution: _testResolution,
         openPresentationTool: _openPresentationTool,
         testAudio: _testAudio,
-        startCamera: _startCamera
+        extend: _extend,
+        startCamera: _startCamera,
+        addListener: _addListener,
+        removeListener: _removeListener
     };
     
 })(jQuery, document);

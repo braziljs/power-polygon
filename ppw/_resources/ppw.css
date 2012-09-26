@@ -21,6 +21,7 @@ html, body {
     background-color: #c0c9c9;
     height: 100%;
     width: 100%;
+    font-family: sans-serif, Arial, Tahoma;
 }
 #PPW-tool-screen a, #PPW-tool-screen a:active, #PPW-tool-screen a:visited{
     color: black;
@@ -78,8 +79,12 @@ html, body {
     margin-top: 25px;
     cursor: default;
 }
-#ppw-tool-screen-menu .tests a{
+#ppw-tool-screen-menu .tests span{
     margin: 0px 10px 0px 10px;
+    cursor: pointer
+}
+#ppw-tool-screen-menu .tests span:hover{
+    text-decoration: underline;
 }
 
 #ppw-message-box{
@@ -89,7 +94,8 @@ html, body {
     top: 50%;
     margin-left: -125px;
     min-height: 40px;
-    width: 250px;
+    min-width: 250px;
+    max-width: 400px;
     border: solid 1px black;
     border-radius: 6px;
     box-shadow: -5px -5px 40px black;
