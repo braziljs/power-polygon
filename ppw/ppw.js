@@ -60,7 +60,8 @@ window.PPW= (function($, _d){
         onfullscreen: [],
         onshowcamera: [],
         onhidecamera: [],
-        onslidetypechange: []
+        onslidetypechange: [],
+        onpresentationtoolloaded: []
     }
     
     
@@ -428,7 +429,12 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
                                             toolProps);
         _conf.presentationTool.onload= function(){
             _conf.presentationTool.PresentationTool.init($, window.PPW);
+            
         };
+    };
+    
+    var _triggerPresentationToolLoadEvent= function(win){
+        _triggerEvent('onpresentationtoolloaded', win);
     };
     
     /**
@@ -470,7 +476,8 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         extend: _extend,
         startCamera: _startCamera,
         addListener: _addListener,
-        removeListener: _removeListener
+        removeListener: _removeListener,
+        triggerPresentationToolLoadEvent: _triggerPresentationToolLoadEvent
     };
     
 })(jQuery, document);

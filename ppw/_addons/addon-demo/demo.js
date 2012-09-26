@@ -10,7 +10,12 @@ window.PPW.extend("demo", (function(){
         onfullscreen: function(){ console.log("DEMO PLUGIN FullScreen"); },
         onshowcamera: function(){ console.log("DEMO PLUGIN SHOWING CAMERA"); },
         onhidecamera: function(){ console.log("DEMO PLUGIN HIDING CAMERA"); },
-        onslidetypechange: function(){ console.log("DEMO PLUGIN CHANGING SLIDE TYPE"); }
+        onslidetypechange: function(){ console.log("DEMO PLUGIN CHANGING SLIDE TYPE"); },
+        
+        onpresentationtoolloaded: function(win){
+            console.log("DEMO PLUGIN LOADED THE PRESENTATION TOOL");
+            win.document.getElementById('header').innerHTML+= "ABCBBA";
+        }
     };
     
 })());

@@ -54,36 +54,44 @@ html, body {
 #ppw-tool-screen-menu{
     height: 260px;
 }
-#ppw-tool-screen-menu div{
+#ppw-menu-icon-list{
+    height: 170px;
+}
+#ppw-menu-icon-list div{
     width: 33%;
     float: left;
     margin: auto;
     text-align: center;
     margin-top: 40px;
+    margin-bottom: 0px;
     border: solid 1px transparent;
     border-radius: 7px;
     cursor: pointer;
 }
-#ppw-tool-screen-container div img{
+#ppw-menu-icon-list img{
     margin: auto;
     clear: both;
 }
 
-#ppw-tool-screen-menu div:not(.tests):hover{
+#ppw-menu-icon-list div:hover{
     border: solid 1px black;
     background-color: #f0f9f9;
 }
-#ppw-tool-screen-menu .tests{
+#ppw-tests{
     width: 100% !IMPORTANT;
     margin: auto;
     margin-top: 25px;
     cursor: default;
 }
-#ppw-tool-screen-menu .tests span{
-    margin: 0px 10px 0px 10px;
-    cursor: pointer
+#ppw-tests span{
+    padding: 0px 10px 0px 10px;
+    cursor: pointer;
+    border-right: solid 1px black;
 }
-#ppw-tool-screen-menu .tests span:hover{
+#ppw-tests span:last-child{
+    border-right: none !IMPORTANT;
+}
+#ppw-tests span:hover{
     text-decoration: underline;
 }
 
@@ -170,6 +178,10 @@ html, body {
     padding-bottom: 2px;
 }
 
+#ppw-addons-container{
+    border: dashed 1px #E0F9F9;
+    padding: 2px;
+}
 
 .glass{
     -webkit-background-origin: border-box;

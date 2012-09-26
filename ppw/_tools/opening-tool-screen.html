@@ -2,25 +2,28 @@
     <div id="ppw-tool-screen-container" class="glass">
         <h1>PowerPolygon Web</h1>
         <div id="ppw-tool-screen-menu">
-            <div onclick="window.open('http://powerpolygon.com/');">
-                <img width="120" id="ppw-help-icon" /><br/>
-                Help
+            <div id="ppw-menu-icon-list">
+                <div onclick="window.open('http://powerpolygon.com/');">
+                    <img width="120" id="ppw-help-icon" /><br/>
+                    Help
+                </div>
+                <div onclick="PPW.startPresentation();">
+                    <img width="120" id="ppw-start-presentation-icon" /><br/>
+                    Start Presentation
+                </div>
+                <div onclick="PPW.openPresentationTool();">
+                    <img width="120" id="ppw-presentation-tool" /><br/>
+                    Open presentation Tool
+                </div>
             </div>
-            <div onclick="PPW.startPresentation();">
-                <img width="120" id="ppw-start-presentation-icon" /><br/>
-                Start Presentation
+            <div id="ppw-tests">
+                <span id="ppw-goFullScreen-trigger" class="ppw-test-menu-item">Go Fullscreen</span>
+                <span id="ppw-testResolution-trigger" class="ppw-test-menu-item">Test Resolution</span>
+                <span id="ppw-testAudio-trigger" class="ppw-test-menu-item">Test Audio</span>
+                <span id="ppw-testCamera-trigger" class="ppw-test-menu-item">Test camera</span>
+                <span id="ppw-testConnection-trigger" class="ppw-test-menu-item">Test Connection</span>
             </div>
-            <div onclick="PPW.openPresentationTool();">
-                <img width="120" id="ppw-presentation-tool" /><br/>
-                Open presentation Tool
-            </div>
-            <div class="tests">
-                <span id="ppw-goFullScreen-trigger">Go Fullscreen</span>
-                <span id="ppw-testResolution-trigger">Test Resolution</span>
-                <span id="ppw-testAudio-trigger">Test Audio</span>
-                <span id="ppw-testCamera-trigger">Test camera</span>
-                <span id="ppw-testConnection-trigger">Test Connection</span>
-            </div>
+            <div id="ppw-addons-container">adads</div>
         </div>
         <div class="footer">
             <a href="http://github.com/braziljs/powerpolygon" target="_blank">Powered by PowerPolygon</a>
