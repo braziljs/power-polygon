@@ -96,7 +96,7 @@ html, body {
 }
 
 .ppw-menu-start-icon{
-    background: url(start-icon.png) no-repeat -40px -0px #aad0aa;
+    background: url(start-icon.png) no-repeat -40px -0px #b9e0b9;
     color: white;
     font-size: 30px;
     font-weight: bold;
@@ -107,7 +107,7 @@ html, body {
     -moz-box-sizing: border-box;
 }
 .ppw-menu-start-icon:hover{
-    background-color: #b9e0b9;
+    background-color: #aad0aa;
 }
 
 
@@ -168,6 +168,7 @@ html, body {
 
 #ppw-message-box{
     position: absolute;
+    font-family: sans-serif, Arial, Tahoma;
     z-index: 9999999999999999;
     left: 50%;
     top: 50%;
@@ -175,14 +176,29 @@ html, body {
     min-height: 40px;
     min-width: 250px;
     max-width: 400px;
-    border: solid 1px black;
+    
+    border: solid 4px black;
+    border-style: double;
+    
     border-radius: 6px;
     box-shadow: -5px -5px 40px black;
     background-color: #f0f9f9;
     display: none;
     padding: 6px;
+    
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
 }
-#ppw-message-box input[type=button]{
+ppw-message-content{
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+#ppw-message-box-ok-button{
+    clear: both;
+    margin-top: 20px;
+}
+#ppw-message-box-ok-button input[type=button]{
+    clear: both;
     position: relative;
     left: 50%;
     width: 80px;
@@ -259,14 +275,18 @@ html, body {
 #ppw-slides-loader-bar{
     width: 250px;
     background: url(top-bg.jpg);
-    height: 50px;
+    height: 60px;
     margin: auto;
-    padding: 4px;
+    padding: 10px;
     border: solid 1px gray;
     border-radius: 0px 0px 12px 12px;
+    
+    margin-top: -61px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
 }
 #ppw-slides-loader-bar-loading-container{
-    width: 200px;
+    width: 220px;
     height: 16px;
     overflow: hidden;
     background: white;
@@ -276,9 +296,22 @@ html, body {
 }
 #ppw-slides-loader-bar-loading-container div{
     height: 100%;
-    width: 40%;
+    width: 0%;
     background: url(loadingBar.gif) no-repeat;
     background-size: 100% 100%;
+}
+
+#ppw-settings-form input{
+    float: right;
+}
+#ppw-settings-form label{
+    float: left;
+    height: 20px;
+    clear: both;
+}
+#ppw-settings-form h3{
+    margin: 0px;
+    line-height: 12px;
 }
 
 .glass{

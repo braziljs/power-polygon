@@ -12,7 +12,7 @@
                 <div class="ppw-menu-open-icon" onclick="PPW.openPresentationTool();">
                     Presentation Tool
                 </div>
-                <div class="ppw-menu-conf-icon" onclick="">
+                <div class="ppw-menu-conf-icon" onclick="PPW.showConfiguration();">
                     Settings
                 </div>
             </div>
@@ -55,7 +55,9 @@
 
 <div id="ppw-message-box">
     <div id="ppw-message-content"></div>
-    <input type="button" value="Close" onclick="document.getElementById('ppw-message-box').style.display= 'none';" />
+    <div id="ppw-message-box-ok-button">
+        <input type="button" value="Close" onclick="document.getElementById('ppw-message-box').style.display= 'none';" />
+    </div>
 </div>
 <div id="ppw-camera-tool">
     <video id="ppw-video-element" autoplay="autoplay"></video>

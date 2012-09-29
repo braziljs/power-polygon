@@ -29,8 +29,12 @@ window.PPW= (function($, _d){
         _conf= {
             loadSteps: 5,
             curLoaded: 0,
+            preloadedSlidesCounter: 0,
             cameraLoaded: false,
-            presentationTool: null
+            presentationTool: null,
+            defaults: {
+                duration: 50
+            }
         },
         // user defined settings
         _settings= {
@@ -51,17 +55,19 @@ window.PPW= (function($, _d){
      * Used by addons.
      */
     var _listeners= {
-        onstart: [],
-        onfinish: [],
-        onload: [],
-        onnext: [],
-        onprev: [],
-        ongoto: [],
-        onfullscreen: [],
-        onshowcamera: [],
-        onhidecamera: [],
-        onslidetypechange: [],
-        onpresentationtoolloaded: []
+        onstart                 : [],
+        onfinish                : [],
+        onload                  : [],
+        onnext                  : [],
+        onprev                  : [],
+        ongoto                  : [],
+        onfullscreen            : [],
+        onshowcamera            : [],
+        onhidecamera            : [],
+        onslidetypechange       : [],
+        onpresentationtoolloaded: [],
+        onclosesettings         : [],
+        onopensettings          : []
     }
     
     
@@ -138,7 +144,6 @@ window.PPW= (function($, _d){
      */
     var _init= function(conf){
         $.extend(_settings, conf);
-        
         _triggerEvent('onload', conf);
     };
     
@@ -151,7 +156,6 @@ window.PPW= (function($, _d){
         _conf.curLoaded++;
         var perc= _conf.curLoaded * 100 / _conf.loadSteps;
         
-        //$('#PPW-loadingbar').animate({width: perc+'%'}, 500); // someone tell me WHY IN THE HELL this line does not work? please?
         $('#PPW-loadingbar').css({width: perc+'%'});
         if(perc >= 100){
             $('#PPW-lock-loading').fadeOut();
@@ -201,6 +205,53 @@ window.PPW= (function($, _d){
     };
     
     /**
+     * Advances one step in the slides preload bar.
+     */
+    var _slidePreloaderNext= function(){
+        var l= _settings.slides.length,
+            perc= 0, fn;
+        _conf.preloadedSlidesCounter++;
+        
+        perc= _conf.preloadedSlidesCounter * 100 / l;
+        
+        if(_conf.preloadedSlidesCounter == l){
+            fn= function(){
+                window.setTimeout(function(){
+                    $('#ppw-slides-loader-bar').stop().animate({
+                        marginTop: '-61px'
+                    }, 500);
+                }, 1000);
+            };
+        }
+        
+        $('#ppw-slides-loader-bar-loading-container>div').stop().animate({
+            width: perc+'%'
+        }, 100, fn);
+    };
+    
+    /**
+     * Preloads the slides before the presentation.
+     */
+    var _preloadSlides= function(){
+        var slides= _settings.slides,
+            l= slides.length,
+            i= 0,
+            el= null;
+        
+        for(; i<l; i++){
+            el= $('section#'+slides[i].id);
+            if(!el.length){
+                $.get('slides/'+slides[i].id+'/index.html',
+                      function(data){
+                          console.log(data);
+                          _slidePreloaderNext();
+                      });
+            }
+        }
+        console.log(_settings.slides);
+    };
+    
+    /**
      * Creates the spash screen.
      * 
      * This screen ofers access to useful tools before the presentation begins.
@@ -221,9 +272,10 @@ window.PPW= (function($, _d){
             $('#ppw-testCamera-trigger').click(_startCamera);
             $('#ppw-testConnection-trigger').click(_testConnection);
             
-            _d.getElementById('ppw-help-icon').src= _settings.PPWSrc+'/_resources/help-icon.png';
-            _d.getElementById('ppw-start-presentation-icon').src= _settings.PPWSrc+'/_resources/start.png';
-            _d.getElementById('ppw-presentation-tool').src= _settings.PPWSrc+'/_resources/tools-icon.png';
+            $('#ppw-slides-loader-bar').stop().animate({
+                marginTop: '0px'
+            }, 500, _preloadSlides);
+            
         });
         _loadSlide(1);
     };
@@ -457,6 +509,39 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         else
             alert("There is a problem with the internet connection! Or your browser does not support the onLine API");
     };
+    
+    /**
+     * Shows the current settings for the talk, with some options.
+     * 
+     * This method triggers two events that can be used by addons to add
+     * their own settings to this showbox.
+     */
+    var _showConfiguration= function(){
+        var msg= "",
+            fn= function(){
+                var parsed= "";
+                
+                _triggerEvent('onclosesettings');
+                _settings.shortcutsEnable= _d.getElementById('ppw-shortcutsEnable').checked? true: false;
+                _settings.duration= parseInt(_d.getElementById('ppw-talk-duration').value, 10)||_conf.defaults.duration;
+                parsed= _d.getElementById('ppw-alert-at').value.replace(/ /g, '').split(',');
+                parsed= parsed.filter(function(el){
+                    return !isNaN(el)||false;
+                });
+                _settings.alertAt= parsed;
+            }
+            
+        
+        msg= "<form id='ppw-settings-form'>\
+                    <h3>Settings</h3><br/>\
+                    <label>Enable shortcuts: </label><input type='checkbox' id='ppw-shortcutsEnable' "+(_settings.shortcutsEnable? 'checked=checked': '')+" /><br/>\
+                    <label>Duration: </label><input type='integer' id='ppw-talk-duration' value='"+_settings.duration+"' /><br/>\
+                    <label>Alert at: </label><input type='string' id='ppw-alert-at' value='"+_settings.alertAt+"'placeholder='Comma separated minutes' /><br/>\
+              </form>";
+        _showMessage(msg, fn);
+        _triggerEvent('onopensettings');
+    };
+    
     /**************************************************
      *                 SLIDE METHODS                  *
      **************************************************/
@@ -476,19 +561,20 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
      *                 PUBLIC OBJECT                  *
      **************************************************/
     return {
-        version: _version,
-        init: _init,
-        setLoadingBarStatus: _setLoadingBarStatus,
-        testConnection: _testConnection,
-        enterFullScreen: _enterFullScreen,
-        testResolution: _testResolution,
-        openPresentationTool: _openPresentationTool,
-        testAudio: _testAudio,
-        extend: _extend,
-        startCamera: _startCamera,
-        addListener: _addListener,
-        removeListener: _removeListener,
-        triggerPresentationToolLoadEvent: _triggerPresentationToolLoadEvent
+        version                         : _version,
+        init                            : _init,
+        setLoadingBarStatus             : _setLoadingBarStatus,
+        testConnection                  : _testConnection,
+        enterFullScreen                 : _enterFullScreen,
+        testResolution                  : _testResolution,
+        openPresentationTool            : _openPresentationTool,
+        testAudio                       : _testAudio,
+        extend                          : _extend,
+        startCamera                     : _startCamera,
+        addListener                     : _addListener,
+        removeListener                  : _removeListener,
+        triggerPresentationToolLoadEvent: _triggerPresentationToolLoadEvent,
+        showConfiguration               : _showConfiguration
     };
     
 })(jQuery, document);

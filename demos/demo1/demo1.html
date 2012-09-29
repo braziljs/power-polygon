@@ -22,10 +22,12 @@
                         description: "A nice guy!"
                     }
                 ],
-                createAboutSlide: true, // automatically creates the ABOUT ME slide(s)
-                useExternalSlides: true, // load slides with ajax(demands an http server)
-                preloadSlides: true, // load all the slides before starting
+                /*createAboutSlide: true, // automatically creates the ABOUT ME slide(s)
+                useExternalSlides: true, // load slides with ajax
+                preloadSlides: true, // load all the slides before starting*/
                 PPWSrc: "../../ppw/", // where is(relatively) the source of PowerPolygonWeb
+                shortcutsEnable: true, // enables or not, the shortcuts
+                friendlyURL: 'title', // may be false(also, num), id(slide' id) or title(slide's first h1)
                 
                 // presentation data
                 theme: "default",
@@ -34,10 +36,29 @@
                 slides: [
                     {
                         type: 'opening',
-                        id: 'first', // also used as source
+                        id: 'cover', // also used as source
                         notes: [
                             "this is the very first slide",
                             "and has only these two useless notes"
+                        ]
+                    },
+                    {
+                        type: 'content',
+                        id: 'subject-a',
+                        notes: [
+                            "First note",
+                            "Second useless note"
+                        ]
+                    },
+                    {
+                        type: 'title',
+                        id: 'another-title'
+                    },
+                    {
+                        type: 'content',
+                        id: 'subject-b',
+                        notes: [
+                            "Another of those notes"
                         ]
                     }
                 ],
