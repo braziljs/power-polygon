@@ -19,7 +19,7 @@ html, body {
     -moz-box-sizing: border-box;
     left: 0px;
     top: 0px;
-    z-index: 9999999999999998;
+    z-index: 999999995;
     /*background-color: #c0c9c9;*/
     background: url(ppw-gray-bg.png);
     height: 100%;
@@ -169,7 +169,7 @@ html, body {
 #ppw-message-box{
     position: absolute;
     font-family: sans-serif, Arial, Tahoma;
-    z-index: 9999999999999999;
+    z-index: 999999996;
     left: 50%;
     top: 50%;
     margin-left: -125px;
@@ -248,7 +248,7 @@ ppw-message-content{
     overflow: visible;
     /*border: solid 1px black;
     box-shadow: 0px 0px 20px black;*/
-    z-index: 9999999999999999;
+    z-index: 999999996;
 }
 #ppw-camera-tool video{
     width: 100%;

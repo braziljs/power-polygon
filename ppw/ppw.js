@@ -27,7 +27,7 @@ window.PPW= (function($, _d){
         _version= '2.0.0',
         // internal configuration properties
         _conf= {
-            loadSteps: 5,
+            loadSteps: 6,
             curLoaded: 0,
             preloadedSlidesCounter: 0,
             cameraLoaded: false,
@@ -67,7 +67,8 @@ window.PPW= (function($, _d){
         onslidetypechange       : [],
         onpresentationtoolloaded: [],
         onclosesettings         : [],
-        onopensettings          : []
+        onopensettings          : [],
+        onthemeloaded           : []
     }
     
     
@@ -158,8 +159,64 @@ window.PPW= (function($, _d){
         
         $('#PPW-loadingbar').css({width: perc+'%'});
         if(perc >= 100){
+            _triggerEvent('onthemeloaded');
             $('#PPW-lock-loading').fadeOut();
         }
+    };
+    
+    /**
+     * Loads the theme's files.
+     * 
+     * This method loads the theme' manifes.json file, and then, its
+     * dependences.
+     */
+    var _loadTheme= function(){
+        $.getJSON(_settings.PPWSrc+'/_themes/'+_settings.theme+'/manifest.json', function(data, status){
+            
+            var dependences= false,
+                i= 0,
+                l= 0,
+                url= '';
+            
+            if(status == 'success'){
+                _conf.themeData= data;
+                dependences= _conf.themeData.dependences||[];
+                if(dependences.css){
+                    _conf.loadSteps+= dependences.css.length;
+                    l= dependences.css.length;
+                    
+                    for(i= 0; i<l; i++){
+                        url= _settings.PPWSrc+'/_themes/'+
+                             _settings.theme+'/'+dependences.css[i];
+                                
+                        $("head").append($("<link rel='stylesheet' href='"+
+                                            url+"' type='text/css' media='screen' />")
+                                        .bind('load',
+                                              function(){
+                                                  _setLoadingBarStatus();
+                                              }));
+                    }
+                }
+                if(dependences.js){
+                    
+                    _conf.loadSteps+= dependences.js.length;
+                    l= dependences.js.length;
+                    
+                    for(i= 0; i<l; i++){
+                        $.getScript(_settings.PPWSrc+'/_themes/'+
+                                    _settings.theme+'/'+dependences.js[i],
+                                    function(data, status, xhr){
+                                        _setLoadingBarStatus();
+                                    });
+                    }
+                }
+                
+                //alert(_settings.theme);
+            }else{
+                console.error("[PPW][Theme data] Could not load manifest.json! Theme: " + _settings.theme);
+            }
+            _setLoadingBarStatus();
+        });
     };
     
     /**
@@ -169,7 +226,7 @@ window.PPW= (function($, _d){
      * styles.
      */
     var _preparePPW= function(){
-        $b.append("<div id='PPW-lock-loading' style='position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; background-color: #f0f9f9; padding: 10px; font-family: Arial;'>\
+        $b.append("<div id='PPW-lock-loading' style='position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; background-color: #f0f9f9; padding: 10px; font-family: Arial; z-index: 999999999;'>\
                     Loading Contents<br/><div id='PPW-loadingbarParent'><div/><div id='PPW-loadingbar'><div/></div>");
         $('#PPW-loadingbarParent').css({
             width: '260px',
@@ -202,6 +259,7 @@ window.PPW= (function($, _d){
              PPW.setLoadingBarStatus();
          });
          
+         _loadTheme();
     };
     
     /**
@@ -231,24 +289,57 @@ window.PPW= (function($, _d){
     
     /**
      * Preloads the slides before the presentation.
+     * 
+     * If the slide is not present in the document, it loades it via ajax.
+     * After loading each slide, it puts its content into a new section and
+     * tries to execute its JavaScript
      */
     var _preloadSlides= function(){
         var slides= _settings.slides,
             l= slides.length,
             i= 0,
-            el= null;
+            el= null,
+            nEl= null;
         
         for(; i<l; i++){
             el= $('section#'+slides[i].id);
             if(!el.length){
-                $.get('slides/'+slides[i].id+'/index.html',
-                      function(data){
-                          console.log(data);
-                          _slidePreloaderNext();
-                      });
+                nEl= _d.createElement("section");
+                nEl.id= slides[i].id;
+                _d.body.appendChild(nEl);
+                
+                $.ajax(
+                    {
+                        url: 'slides/'+slides[i].id+'/index.html',
+                        success: (function(slide){
+                                    return function(data, status, xhr){
+                                                var el= _d.getElementById(slide.id);
+                                                el.innerHTML= data;
+                                                $(el).find("script").each(function(i, scr){
+
+                                                    var f= new Function(scr.innerText);
+
+                                                    try{
+                                                        f();
+                                                    }catch(e){
+                                                        console.error("[PPW][Script loaded from slide] There was an error on a script, loaded in one of your slides!", e)
+                                                    }
+                                                });
+                                                _slidePreloaderNext();
+                                            }
+                                })(slides[i]),
+                        error: (function(slide){
+                            return function(){
+                                console.error("[PPW][Slide loading]: Slide not found!", slide);
+                                _slidePreloaderNext();
+                            }
+                        })(slides[i])
+                    });
+            }else{
+                _d.body.appendChild(el[0]);
+                _slidePreloaderNext();
             }
         }
-        console.log(_settings.slides);
     };
     
     /**
@@ -262,7 +353,8 @@ window.PPW= (function($, _d){
         // preparing ppw
         _preparePPW();
         
-        $.get(_settings.PPWSrc+"_tools/opening-tool-screen.html", function(data){
+        $.get(_settings.PPWSrc+"_tools/opening-tool-screen.html", {}, function(data){
+            
             _d.body.innerHTML+= data;
             _setLoadingBarStatus();
             
@@ -543,6 +635,21 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
     };
     
     /**************************************************
+     *               PRESENTATION CORE                *
+     **************************************************/
+    var _startPresentation= function(){
+        $('#ppw-tool-screen-container').animate({
+            marginTop: '-460px'
+        }, 200, function(){
+            $('#PPW-tool-screen').fadeOut();
+        })
+    };
+    
+    var _addAction= function(fn){
+        
+    };
+    
+    /**************************************************
      *                 SLIDE METHODS                  *
      **************************************************/
     var _loadSlide= function(slideNumber){
@@ -574,7 +681,9 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         addListener                     : _addListener,
         removeListener                  : _removeListener,
         triggerPresentationToolLoadEvent: _triggerPresentationToolLoadEvent,
-        showConfiguration               : _showConfiguration
+        showConfiguration               : _showConfiguration,
+        startPresentation               : _startPresentation,
+        addAction                       : _addAction
     };
     
 })(jQuery, document);
