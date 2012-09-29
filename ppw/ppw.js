@@ -244,18 +244,18 @@ window.PPW= (function($, _d){
         $("<link/>", {
             rel: "stylesheet",
             type: "text/css",
-            href: _settings.PPWSrc+"/_resources/ppw.css",
+            href: _settings.PPWSrc+"/_styles/ppw.css",
             onload: "PPW.setLoadingBarStatus()"
          }).appendTo("head");
         
         $("<link/>", {
             rel: "stylesheet",
             type: "text/css",
-            href: _settings.PPWSrc+"/_resources/jquery-ui-1.8.23.custom.css",
+            href: _settings.PPWSrc+"/_styles/jquery-ui-1.8.23.custom.css",
             onload: "PPW.setLoadingBarStatus()"
          }).appendTo("head");
          
-         $.getScript(_settings.PPWSrc+"/_resources/jquery-ui-1.8.23.custom.min.js", function(){
+         $.getScript(_settings.PPWSrc+"/_scripts/jquery-ui-1.8.23.custom.min.js", function(){
              PPW.setLoadingBarStatus();
          });
          
@@ -353,7 +353,7 @@ window.PPW= (function($, _d){
         // preparing ppw
         _preparePPW();
         
-        $.get(_settings.PPWSrc+"_tools/opening-tool-screen.html", {}, function(data){
+        $.get(_settings.PPWSrc+"_tools/splash-screen.html", {}, function(data){
             
             _d.body.innerHTML+= data;
             _setLoadingBarStatus();
@@ -363,6 +363,7 @@ window.PPW= (function($, _d){
             $('#ppw-testAudio-trigger').click(_testAudio);
             $('#ppw-testCamera-trigger').click(_startCamera);
             $('#ppw-testConnection-trigger').click(_testConnection);
+            _d.querySelector('#ppw-talk-title').innerHTML= _settings.title;
             
             $('#ppw-slides-loader-bar').stop().animate({
                 marginTop: '0px'
@@ -544,13 +545,13 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         var el= _d.getElementById('ppw-audioTestElement');
         if(!el){
             $b.append("<audio id='ppw-audioTestElement' loop='loop' style='display: none;'>\
-                                <source src='"+_settings.PPWSrc+"/_resources/water.mp3'/>\
-                                <source src='"+_settings.PPWSrc+"/_resources/water.ogg'/>\
+                                <source src='"+_settings.PPWSrc+"/_audios/water.mp3'/>\
+                                <source src='"+_settings.PPWSrc+"/_audios/water.ogg'/>\
                                </audio>");
             el= _d.getElementById('ppw-audioTestElement');
         }
         el.play();
-        _showMessage("Playing audio<br/><img src='"+_settings.PPWSrc+"/_resources/loadingBar.gif' style='position: relative; left: 50%; margin-left: -100px;' width='200' />",
+        _showMessage("Playing audio<br/><img src='"+_settings.PPWSrc+"/_images/loadingBar.gif' style='position: relative; left: 50%; margin-left: -100px;' width='200' />",
                      function(){
                         _d.getElementById('ppw-audioTestElement').pause();
                      });
@@ -638,10 +639,10 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
      *               PRESENTATION CORE                *
      **************************************************/
     var _startPresentation= function(){
-        $('#ppw-tool-screen-container').animate({
+        $('#PPW-splash-screen-container').animate({
             marginTop: '-460px'
         }, 200, function(){
-            $('#PPW-tool-screen').fadeOut();
+            $('#PPW-splash-screen').fadeOut();
         })
     };
     

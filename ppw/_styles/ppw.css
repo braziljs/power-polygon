@@ -13,7 +13,7 @@ html, body {
     margin: 0px;
     padding: 0px;
 }
-#PPW-tool-screen{
+#PPW-splash-screen{
     position: absolute;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -21,17 +21,17 @@ html, body {
     top: 0px;
     z-index: 999999995;
     /*background-color: #c0c9c9;*/
-    background: url(ppw-gray-bg.png);
+    background: url(../_images/ppw-gray-bg.png);
     height: 100%;
     width: 100%;
     font-family: sans-serif, Arial, Tahoma;
 }
-#PPW-tool-screen a, #PPW-tool-screen a:active, #PPW-tool-screen a:visited{
+#PPW-splash-screen a, #PPW-splash-screen a:active, #PPW-splash-screen a:visited{
     color: black;
     font-family: sans-serif, Arial, Tahoma;
 }
 
-#ppw-tool-screen-container{
+#PPW-splash-screen-container{
     border-bottom: dashed 1px black;
     width: 100%;
     
@@ -39,7 +39,7 @@ html, body {
     position: relative;
     top: 0px;
     /*background-color: #e0f9f9;*/
-    background: url(top-bg.jpg);
+    background: url(../_images/top-bg.jpg);
     box-shadow: 0px 0px 70px black;
 }
 
@@ -49,13 +49,13 @@ html, body {
     bottom: 4px;
 }
 
-#ppw-tool-screen-container h1{
+#PPW-splash-screen-container h1{
     padding-top: 20px;
     text-align: center;
     text-transform: uppercase;
     font-family: sans-serif, Arial, Tahoma, Verdana;
 }
-#ppw-tool-screen-menu{
+#PPW-splash-screen-menu{
     height: 232px;
 }
 #ppw-menu-icon-list{
@@ -81,7 +81,7 @@ html, body {
     transition: all 200ms linear;
 }
 .ppw-menu-help-icon{
-    background: url(help-icon.png) no-repeat -50px 0px #f0aaaa;
+    background: url(../_images/help-icon.png) no-repeat -50px 0px #f0aaaa;
     color: white;
     font-size: 40px;
     font-weight: bold;
@@ -96,7 +96,7 @@ html, body {
 }
 
 .ppw-menu-start-icon{
-    background: url(start-icon.png) no-repeat -40px -0px #b9e0b9;
+    background: url(../_images/start-icon.png) no-repeat -40px -0px #b9e0b9;
     color: white;
     font-size: 30px;
     font-weight: bold;
@@ -112,7 +112,7 @@ html, body {
 
 
 .ppw-menu-open-icon{
-    background: url(tools-icon.png) no-repeat -90px -0px #aaaaff;
+    background: url(../_images/tools-icon.png) no-repeat -90px -0px #aaaaff;
     color: white;
     font-size: 30px;
     font-weight: bold;
@@ -127,7 +127,7 @@ html, body {
 }
 
 .ppw-menu-conf-icon{
-    background: url(config-icon.png) no-repeat -20px -10px #fff;
+    background: url(../_images/config-icon.png) no-repeat -20px -10px #fff;
     color: black;
     font-size: 30px;
     font-weight: bold;
@@ -182,7 +182,7 @@ html, body {
     
     border-radius: 6px;
     box-shadow: -5px -5px 40px black;
-    background-color: #f0f9f9;
+    background-color: #f9f9f9;
     display: none;
     padding: 6px;
     
@@ -274,7 +274,7 @@ ppw-message-content{
 
 #ppw-slides-loader-bar{
     width: 250px;
-    background: url(top-bg.jpg);
+    background: url(../_images/top-bg.jpg);
     height: 60px;
     margin: auto;
     padding: 10px;
@@ -297,7 +297,7 @@ ppw-message-content{
 #ppw-slides-loader-bar-loading-container div{
     height: 100%;
     width: 0%;
-    background: url(loadingBar.gif) no-repeat;
+    background: url(../_images/loadingBar.gif) no-repeat;
     background-size: 100% 100%;
 }
 
