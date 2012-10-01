@@ -10,6 +10,11 @@
         <script src="../../ppw/_addons/remote-slide/demo.js"></script>
     </head>
     <body>
+        
+        <section id="closing">
+            5: closing
+        </section>
+        
         <script>
             window.PPW.init({
                 // basic configurations
@@ -23,10 +28,13 @@
                         description: "A nice guy!"
                     }
                 ],
-                createAboutSlide: true, // automatically creates the ABOUT ME slide(s)
-                useExternalSlides: true, // load slides with ajax(demands an http server)
-                preloadSlides: true, // load all the slides before starting
+                /*createAboutSlide: true, // automatically creates the ABOUT ME slide(s)
+                useExternalSlides: true, // load slides with ajax
+                preloadSlides: true, // load all the slides before starting*/
                 PPWSrc: "../../ppw/", // where is(relatively) the source of PowerPolygonWeb
+                shortcutsEnable: true, // enables or not, the shortcuts
+                friendlyURL: 'id', // may be false or id(slide' id)
+                useSplashScreen: false, // should ppw open the splash screen first?
                 
                 // presentation data
                 theme: "default",
@@ -35,10 +43,36 @@
                 slides: [
                     {
                         type: 'opening',
-                        id: 'first', // also used as source
+                        id: 'cover', // also used as source
                         notes: [
                             "this is the very first slide",
                             "and has only these two useless notes"
+                        ]
+                    },
+                    {
+                        type: 'content',
+                        id: 'subject-a',
+                        notes: [
+                            "First note",
+                            "Second useless note"
+                        ]
+                    },
+                    {
+                        type: 'title',
+                        id: 'another-title'
+                    },
+                    {
+                        type: 'content',
+                        id: 'subject-b',
+                        notes: [
+                            "Another of those notes"
+                        ]
+                    },
+                    {
+                        type: 'closing',
+                        id: 'closing',
+                        notes: [
+                            "The last slide, to thank and ask for questions"
                         ]
                     }
                 ],

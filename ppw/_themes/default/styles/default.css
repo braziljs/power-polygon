@@ -1,0 +1,14 @@
+.ppw-slide-element{
+    opacity: 0;
+}
+.ppw-active-slide-element{
+    opacity: 1;
+}
+
+/**/
+.ppw-previous-slide-element{
+    opacity: 0.4;
+}
+.ppw-next-slide-element{
+    opacity: 0.4;
+}

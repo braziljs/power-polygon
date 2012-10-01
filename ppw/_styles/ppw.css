@@ -1,0 +1,325 @@
+/* 
+    Document   : ppw
+    Created on : Sep 20, 2012
+    Author     : Felipe N. Moura <felipenmoura@gmail.com>
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+html, body { 
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    margin: 0px;
+    padding: 0px;
+}
+
+#PPW-splash-screen{
+    position: absolute;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    left: 0px;
+    top: 0px;
+    z-index: 999999995;
+    /*background-color: #c0c9c9;*/
+    background: url(../_images/ppw-gray-bg.png);
+    height: 100%;
+    width: 100%;
+    font-family: sans-serif, Arial, Tahoma;
+}
+#PPW-splash-screen a, #PPW-splash-screen a:active, #PPW-splash-screen a:visited{
+    color: black;
+    font-family: sans-serif, Arial, Tahoma;
+}
+
+#PPW-splash-screen-container{
+    border-bottom: dashed 1px black;
+    width: 100%;
+    
+    margin: auto;
+    position: relative;
+    top: 0px;
+    /*background-color: #e0f9f9;*/
+    background: url(../_images/top-bg.jpg);
+    box-shadow: 0px 0px 70px black;
+}
+
+.ppw-powered-by{
+    position: absolute;
+    right: 6px;
+    bottom: 4px;
+}
+
+#PPW-splash-screen-container h1{
+    padding-top: 20px;
+    text-align: center;
+    text-transform: uppercase;
+    font-family: sans-serif, Arial, Tahoma, Verdana;
+}
+#PPW-splash-screen-menu{
+    height: 232px;
+}
+#ppw-menu-icon-list{
+    height: 230px;
+    width: 540px;
+    margin: auto;
+}
+#ppw-menu-icon-list div{
+    width: 250px;
+    height: 100px;
+    border: solid 1px gray;
+    margin: 8px;
+    margin-bottom: 8px;
+    box-shadow: 0px 0px 20px gray;
+    text-shadow: 0px 0px 2px black;
+    
+    float: left;
+    border-radius: 7px;
+    cursor: pointer;
+    
+    -webkit-transition: all 200ms linear;
+    -moz-transition: all 200ms linear;
+    transition: all 200ms linear;
+}
+.ppw-menu-help-icon{
+    background: url(../_images/help-icon.png) no-repeat -50px 0px #f0aaaa;
+    color: white;
+    font-size: 40px;
+    font-weight: bold;
+    text-align: right;
+    padding-right: 10px;
+    padding-top: 30px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+.ppw-menu-help-icon:hover{
+    background-color: #ff9090;
+}
+
+.ppw-menu-start-icon{
+    background: url(../_images/start-icon.png) no-repeat -40px -0px #b9e0b9;
+    color: white;
+    font-size: 30px;
+    font-weight: bold;
+    text-align: right;
+    padding-right: 10px;
+    padding-top: 30px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+.ppw-menu-start-icon:hover{
+    background-color: #aad0aa;
+}
+
+
+.ppw-menu-open-icon{
+    background: url(../_images/tools-icon.png) no-repeat -90px -0px #aaaaff;
+    color: white;
+    font-size: 30px;
+    font-weight: bold;
+    text-align: right;
+    padding-right: 10px;
+    padding-top: 20px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+.ppw-menu-open-icon:hover{
+    background-color: #8888ff;
+}
+
+.ppw-menu-conf-icon{
+    background: url(../_images/config-icon.png) no-repeat -20px -10px #fff;
+    color: black;
+    font-size: 30px;
+    font-weight: bold;
+    text-align: right;
+    padding-right: 10px;
+    padding-top: 40px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+.ppw-menu-conf-icon:hover{
+    box-shadow: 0px 0px 10px black !IMPORTANT;
+}
+
+
+/*#ppw-menu-icon-list div:hover{
+    border: solid 1px black;
+    background-color: #f0f9f9;
+}*/
+#ppw-tests{
+    width: 100% !IMPORTANT;
+    height: 30px;
+    margin: auto;
+    padding-top: 20px;
+    cursor: default;
+    text-align: center;
+}
+#ppw-tests span{
+    padding: 0px 10px 0px 10px;
+    cursor: pointer;
+    border-right: solid 1px black;
+}
+#ppw-tests span:last-child{
+    border-right: none !IMPORTANT;
+}
+#ppw-tests span:hover{
+    text-decoration: underline;
+}
+
+#ppw-message-box{
+    position: absolute;
+    font-family: sans-serif, Arial, Tahoma;
+    z-index: 999999996;
+    left: 50%;
+    top: 50%;
+    margin-left: -125px;
+    min-height: 40px;
+    min-width: 250px;
+    max-width: 400px;
+    
+    border: solid 4px black;
+    border-style: double;
+    
+    border-radius: 6px;
+    box-shadow: -5px -5px 40px black;
+    background-color: #f9f9f9;
+    display: none;
+    padding: 6px;
+    
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+ppw-message-content{
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+#ppw-message-box-ok-button{
+    clear: both;
+    margin-top: 20px;
+}
+#ppw-message-box-ok-button input[type=button]{
+    clear: both;
+    position: relative;
+    left: 50%;
+    width: 80px;
+    margin-left: -40px;
+}
+
+
+
+#PPW-resolution-test-element{
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    display: none;
+}
+#PPW-resolution-test-element div{
+    float: left;
+    position: relative;
+    width: 50%;
+    height: 100%;
+}
+#PPW-resolution-test-element div:nth-child(1){
+    background-color: white;
+    color: black;
+    text-align: right;
+}
+#PPW-resolution-test-element div:nth-child(2){
+    background-color: black;
+    color: white;
+}
+#PPW-resolution-test-element div img{
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    margin-left: -150px;
+}
+
+
+#ppw-camera-tool{
+    position: absolute;
+    left: 20px;
+    top: -270px;
+    width: 262px;
+    height: 196px;
+    overflow: visible;
+    /*border: solid 1px black;
+    box-shadow: 0px 0px 20px black;*/
+    z-index: 999999996;
+}
+#ppw-camera-tool video{
+    width: 100%;
+    height: 100%;
+    background-color: black;
+}
+#ppw-camera-hide-trigger{
+    height: 12px;
+    border: solid 1px gray;
+    background-color: #E0F9F9;
+    margin-top: -6px;
+    text-align: center;
+    padding-bottom: 2px;
+}
+
+#ppw-addons-container{
+    width: 100%;
+    text-align: center;
+    margin: 0px;
+    padding: 2px;
+    clear: both;
+}
+
+#ppw-slides-loader-bar{
+    width: 250px;
+    background: url(../_images/top-bg.jpg);
+    height: 60px;
+    margin: auto;
+    padding: 10px;
+    border: solid 1px gray;
+    border-radius: 0px 0px 12px 12px;
+    
+    margin-top: -61px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+#ppw-slides-loader-bar-loading-container{
+    width: 220px;
+    height: 16px;
+    overflow: hidden;
+    background: white;
+    border-radius: 4px;
+    margin: auto;
+    margin-top: 6px;
+}
+#ppw-slides-loader-bar-loading-container div{
+    height: 100%;
+    width: 0%;
+    background: url(../_images/loadingBar.gif) no-repeat;
+    background-size: 100% 100%;
+}
+
+#ppw-settings-form input{
+    float: right;
+}
+#ppw-settings-form label{
+    float: left;
+    height: 20px;
+    clear: both;
+}
+#ppw-settings-form h3{
+    margin: 0px;
+    line-height: 12px;
+}
+
+.glass{
+    -webkit-background-origin: border-box;
+    -moz-background-origin: border;
+    background-origin: border-box;
+    background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(255, 255, 255, .15)), to(rgba(0, 0, 0, .25))), -webkit-gradient(linear, left top, right bottom, color-stop(0, rgba(255, 255, 255, 0)), color-stop(0.5, rgba(255, 255, 255, .15)), color-stop(0.501, rgba(255, 255, 255, 0)), color-stop(1, rgba(255, 255, 255, 0)));
+    background: -moz-linear-gradient(top, rgba(255, 255, 255, .15), rgba(0, 0, 0, .25)), -moz-linear-gradient(left top, rgba(255, 255, 255, 0), rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0));
+    background: linear-gradient(top, rgba(255, 255, 255, .15), rgba(0, 0, 0, .25)), linear-gradient(left top, rgba(255, 255, 255, 0), rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0));
+}

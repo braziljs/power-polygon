@@ -1,0 +1,11 @@
+{
+    "name": "default",
+    "dependences": {
+        "css": [
+            "styles/default.css"
+        ],
+        "js": [
+            "scripts/default.js"
+        ]
+    }
+}

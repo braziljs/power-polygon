@@ -14,7 +14,7 @@ window.PPW.extend("demo", (function(){
         
         onpresentationtoolloaded: function(win){
             console.log("DEMO PLUGIN LOADED THE PRESENTATION TOOL");
-            win.document.getElementById('header').innerHTML+= "ABCBBA";
+            //win.document.getElementById('header').innerHTML+= "ABCBBA";
         }
     };
     
