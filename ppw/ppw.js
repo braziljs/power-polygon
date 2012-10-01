@@ -53,6 +53,7 @@ window.PPW= (function($, _d, console){
         _b= null,
         // $b references to the $(document.body)
         $b= null,
+        // caching global variables into local ones
         _l= location,
         _n= navigator,
         _h= history,
@@ -345,7 +346,6 @@ window.PPW= (function($, _d, console){
                         if(k>=0 && k<10){
                             _d.getElementById('ppw-go-to-slide').value+= k;
                         }
-                        return false;
                     }
                 }
             }
@@ -369,11 +369,15 @@ window.PPW= (function($, _d, console){
         });
         
         _w.addEventListener('popstate', function(){
-            console.log('popstated');
+            
         }, false);
         _w.addEventListener('hashchange', function(){
-            console.log("hashchanged");
+            if(_h.state)
+                _goToSlide(_getCurrentSlideFromURL());
         }, false);
+    
+        /*if(_h.state)
+            _goToSlide(_getCurrentSlideFromURL());*/
     };
     
     /**
@@ -831,6 +835,7 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         
         _conf.currentSlide= idx;
         _setHistoryStateTo(idx);
+        
     };
     
     /**
@@ -844,7 +849,7 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         idx= !_settings.friendlyURL || _settings.friendlyURL == 'num'?
                 idx:
                 _settings.slides[idx].id;
-        
+            
         if(_l.hash != _settings.hashSeparator+idx){
             _h.pushState({}, idx, _settings.hashSeparator+idx);
             _d.title= idx;
@@ -858,9 +863,10 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
     var _constructor= function(){
         _createSplashScreen();
         _conf.currentSlide= _getCurrentSlideFromURL();
-        if(_conf.currentSlide !== 0){
-            _setHistoryStateTo(_conf.currentSlide);
-        }
+        //if(_conf.currentSlide !== 0){
+            //_setHistoryStateTo(_conf.currentSlide);
+            _goToSlide(_conf.currentSlide);
+        //}
     };
     $(_d).ready(_constructor);
     
