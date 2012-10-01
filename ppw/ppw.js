@@ -35,6 +35,12 @@ window.PPW= (function($, _d, console){
             defaults: {
                 duration: 50
             },
+            cons: {
+                CLASS_SLIDE             : 'ppw-slide-element',
+                CLASS_ACTIVE_SLIDE      : 'ppw-active-slide-element',
+                CLASS_PREVIOUS_SLIDE    : 'ppw-previous-slide-element',
+                CLASS_NEXT_SLIDE        : 'ppw-next-slide-element'
+            },
             currentSlide: 0,
             presentationStarted: false
         },
@@ -289,7 +295,7 @@ window.PPW= (function($, _d, console){
         
         if(_conf.preloadedSlidesCounter == l){
             fn= function(){
-                window.setTimeout(function(){
+                _w.setTimeout(function(){
                     $('#ppw-slides-loader-bar').stop().animate({
                         marginTop: '-61px'
                     }, 500);
@@ -358,10 +364,13 @@ window.PPW= (function($, _d, console){
             switch(evt.keyCode){
                 case 18: // alt
                     s= _d.getElementById('ppw-go-to-slide');
-                    if(s || s === 0)
-                        s= parseInt(s.value, 10)||0;
-                    _closeMessage();
-                    _goToSlide(s);
+                    if(s){
+                        if(s.value){
+                            s= parseInt(s.value, 10)||0;
+                            _goToSlide(s);
+                        }
+                        _closeMessage();
+                    }
                     return false; 
                     break;
             }
@@ -375,9 +384,6 @@ window.PPW= (function($, _d, console){
             if(_h.state)
                 _goToSlide(_getCurrentSlideFromURL());
         }, false);
-    
-        /*if(_h.state)
-            _goToSlide(_getCurrentSlideFromURL());*/
     };
     
     /**
@@ -428,10 +434,12 @@ window.PPW= (function($, _d, console){
                             }
                         })(slides[i])
                     });
+                el= $('section#'+slides[i].id);
             }else{
                 _d.body.appendChild(el[0]);
                 _slidePreloaderNext();
             }
+            el.addClass(_conf.cons.CLASS_SLIDE);
         }
     };
     
@@ -836,6 +844,7 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         _conf.currentSlide= idx;
         _setHistoryStateTo(idx);
         
+        _setSlideClasses(idx);
     };
     
     /**
@@ -855,6 +864,32 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
             _d.title= idx;
         }
         
+    };
+    
+    /**
+     * Sets the classes for the slides.
+     * 
+     * This method applies the correct css classes to each slide(defined as
+     * section html elements in DOM).
+     */
+    var _setSlideClasses= function(idx){
+        
+        if(!idx)
+            idx= _conf.currentSlide;
+        
+        // setting the active slide class
+        $("."+_conf.cons.CLASS_ACTIVE_SLIDE).removeClass(_conf.cons.CLASS_ACTIVE_SLIDE);
+        
+        $('#'+_settings.slides[idx].id).addClass(_conf.cons.CLASS_ACTIVE_SLIDE);
+        // setting the previous slide class
+        $("."+_conf.cons.CLASS_PREVIOUS_SLIDE).removeClass(_conf.cons.CLASS_PREVIOUS_SLIDE);
+        if(_settings.slides[idx-1])
+            $('#'+_settings.slides[idx-1].id).addClass(_conf.cons.CLASS_PREVIOUS_SLIDE);
+        
+        // setting the next slide class
+        $("."+_conf.cons.CLASS_NEXT_SLIDE).removeClass(_conf.cons.CLASS_NEXT_SLIDE);
+        if(_settings.slides[idx+1])
+            $('#'+_settings.slides[idx+1].id).addClass(_conf.cons.CLASS_NEXT_SLIDE);
     };
     
     /**************************************************
