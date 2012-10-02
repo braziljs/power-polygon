@@ -1,6 +1,6 @@
 {
     "name": "default",
-    "dependences": {
+    "dependencies": {
         "css": [
             "styles/default.css"
         ],

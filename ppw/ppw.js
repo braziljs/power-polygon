@@ -4,7 +4,7 @@
  * This file contains the JavaScript library correspondent to the PowerPolygon
  * basic functionality.
  * 
- * @dependences jQuery
+ * @dependencies jQuery
  * 
  * @author Felipe N. Moura <felipenmoura@gmail.com>
  * @namespace PPW
@@ -23,8 +23,10 @@ window.PPW= (function($, _d, console){
     /**************************************************
      *                PRIVATE VARIABLES               *
      **************************************************/
+    
     var _self = this,
         _version= '2.0.0',
+        
         // internal configuration properties
         _conf= {
             loadSteps: 5,
@@ -33,17 +35,36 @@ window.PPW= (function($, _d, console){
             cameraLoaded: false,
             presentationTool: null,
             defaults: {
-                duration: 50
+                duration: 50,
+                alertAt: [30, 40],
+                theme: 'default',
+                slideType: 'content'
             },
             cons: {
                 CLASS_SLIDE             : 'ppw-slide-element',
                 CLASS_ACTIVE_SLIDE      : 'ppw-active-slide-element',
                 CLASS_PREVIOUS_SLIDE    : 'ppw-previous-slide-element',
-                CLASS_NEXT_SLIDE        : 'ppw-next-slide-element'
+                CLASS_NEXT_SLIDE        : 'ppw-next-slide-element',
+                FOCUSABLE_ELEMENT       : 'ppw-focusable',
+                CLICKABLE_ELEMENT       : 'ppw-clickable',
+                /**
+                 * used for the fsPattern settings.
+                 * %id    = slide identifier
+                 * %num   = slide number
+                 */
+                fs: {
+                    SLIDE_ID_DIR         : 'slides/%id/index.html', // default
+                    SLIDE_ID_FILES       : 'slides/%id.html',
+                    SLIDE_ID_MIXED       : '%id.html',
+                    SLIDE_NUM_DIR        : 'slides/%num/index.html',
+                    SLIDE_NUM_FILES      : 'slides/%num.html',
+                    SLIDE_NUM_MIXED      : '%num.html'
+                }
             },
             currentSlide: 0,
             presentationStarted: false
         },
+        
         // user defined settings
         _settings= {
             hashSeparator: '#!/', // the separator to be used on the address bar
@@ -51,7 +72,10 @@ window.PPW= (function($, _d, console){
             shortcutsEnable: true, // enables or not, the shortcuts
             friendlyURL: 'id', // may be false(also, 'num') or id(slide' id)
             useSplashScreen: false, // should ppw open the splash screen first?
-            theme: "default"
+            theme: _conf.defaults.theme,
+            fsPattern: _conf.cons.fs.SLIDE_ID_DIR,
+            alertAt: _conf.defaults.alertAt,
+            duration: _conf.defaults.duration
         },
         // a local reference to the $(document)
         $d= $(_d),
@@ -84,7 +108,12 @@ window.PPW= (function($, _d, console){
         onpresentationtoolloaded: [],
         onclosesettings         : [],
         onopensettings          : [],
-        onthemeloaded           : []
+        onthemeloaded           : [],
+        F10_PRESSED             : [],
+        F9_PRESSED              : [],
+        F8_PRESSED              : [],
+        F7_PRESSED              : [],
+        F6_PRESSED              : []
     }
     
     
@@ -98,24 +127,24 @@ window.PPW= (function($, _d, console){
      * Used by addons or external scripts, as well as internal methods calls.
      */
     var _addListener= function(evt, fn){
-        if(_listeners[evt])
+        if(_listeners[evt]){
             _listeners[evt].push(fn);
+        }
     }
     
+    /**
+     * Removes a listener from the list.
+     */
     var _removeListener= function(evt, fn){
         var i= 0, curEvt= null;
         
         if(curEvt= _listeners[evt]){
             i= curEvt.length;
-            try{
-                do{
-                    if(curEvt[i] == fn){
-                        curEvt[i]= false;
-                    }
-                }while(i--);
-            }catch(e){
-                console.log("[PPW][Event Callback error]: ", e);
-            }
+            do{
+                if(curEvt[i] == fn){
+                    curEvt[i]= false;
+                }
+            }while(i--);
         }
     };
     
@@ -125,14 +154,16 @@ window.PPW= (function($, _d, console){
      * Used only internaly.
      */
     var _triggerEvent= function(evt, args){
+        
         var i= 0, curEvt= null;
         
         if(curEvt= _listeners[evt]){
             i= curEvt.length;
             try{
                 do{
-                    if(curEvt[i])
+                    if(curEvt[i]){
                         curEvt[i](args);
+                    }
                 }while(i--);
             }catch(e){
                 console.log("[PPW][Event Callback error]: ", e);
@@ -157,11 +188,30 @@ window.PPW= (function($, _d, console){
     }
     
     /**
+     * Enables shortcuts for the function keys.
+     * 
+     * The available function keys to be used are F6, F7, F8, F9 and F10.
+     */
+    var _enableFuncKeys= function(){
+        var scList= _settings.shortcuts,
+            sc= null;
+        for(sc in scList){
+            if(typeof scList[sc] == 'function'
+               && _listeners[sc+'_PRESSED']){
+                _addListener(sc+'_PRESSED', scList[sc]);
+            }
+        }
+    };
+    
+    /**
      * Method called by the user to define the presentation settings.
      */
     var _init= function(conf){
         $.extend(_settings, conf);
         _triggerEvent('onload', conf);
+        if(_settings.shortcutsEnable){
+            _enableFuncKeys();
+        }
     };
     
     /**
@@ -184,12 +234,12 @@ window.PPW= (function($, _d, console){
      * Loads the theme's files.
      * 
      * This method loads the theme' manifes.json file, and then, its
-     * dependences.
+     * dependencies.
      */
     var _loadTheme= function(){
         $.getJSON(_settings.PPWSrc+'/_themes/'+_settings.theme+'/manifest.json', function(data, status){
             
-            var dependences= false,
+            var dependencies= false,
                 i= 0,
                 l= 0,
                 url= '';
@@ -197,15 +247,15 @@ window.PPW= (function($, _d, console){
             if(status == 'success'){
                 
                 _conf.themeData= data;
-                dependences= _conf.themeData.dependences||[];
+                dependencies= _conf.themeData.dependencies||[];
                 
-                if(dependences.css){
-                    _conf.loadSteps+= dependences.css.length;
-                    l= dependences.css.length;
+                if(dependencies.css){
+                    _conf.loadSteps+= dependencies.css.length;
+                    l= dependencies.css.length;
                     
                     for(i= 0; i<l; i++){
                         url= _settings.PPWSrc+'/_themes/'+
-                             _settings.theme+'/'+dependences.css[i];
+                             _settings.theme+'/'+dependencies.css[i];
                                 
                         $("head").append($("<link rel='stylesheet' href='"+
                                             url+"' type='text/css' media='screen' />")
@@ -216,14 +266,14 @@ window.PPW= (function($, _d, console){
                     }
                 }
                 
-                if(dependences.js){
+                if(dependencies.js){
                     
-                    _conf.loadSteps+= dependences.js.length;
-                    l= dependences.js.length;
+                    _conf.loadSteps+= dependencies.js.length;
+                    l= dependencies.js.length;
                     
                     for(i= 0; i<l; i++){
                         $.getScript(_settings.PPWSrc+'/_themes/'+
-                                    _settings.theme+'/'+dependences.js[i],
+                                    _settings.theme+'/'+dependencies.js[i],
                                     function(data, status, xhr){
                                         _setLoadingBarStatus();
                                     });
@@ -315,52 +365,81 @@ window.PPW= (function($, _d, console){
         var t= null,
             k= 0;
         
-        if(!_settings.shortcutsEnable)
-            return false;
-        
+        /**
+         * Keyboard events.
+         */
         $d.bind('keydown', function(evt){
-            t= evt.target.tagName.toLowerCase();
+            var t= evt.target.tagName.toLowerCase(),
+                tmpEl= null;
             
-            // if the element is an input or has the focusable class
+            // if the element is an input or has the ppw-focusable class
             // then no shortcut will be executed.
-            if(t == 'input' || t == 'textarea' || t == 'button' || evt.target.className.indexOf('focusable') >=0)
+            if(t == 'input' ||
+               t == 'textarea' ||
+               t == 'button' ||
+               evt.target.className.indexOf(_conf.cons.FOCUSABLE_ELEMENT) >=0)
                 return true;
                 
             switch(evt.keyCode){
                 case 37: // left
                 case 40: // down
                 case  8: // delete/backspace
-                    _goPreviousSlide();
-                    return false;
+                    if(_conf.presentationStarted){
+                        _goPreviousSlide();
+                        evt.preventDefault();
+                        return false;
+                    }
                     break;
+                    
                 case 38: // up
                 case 39: // right
                 case 13: // enter
                 case 32: // enter
-                    _goNextSlide();
-                    return false;
-                    break;
-                case 18: //alt
                     if(_conf.presentationStarted){
-                        _showMessage("Go to slide:<br/><input style='margin: auto;' type='integer' id='ppw-go-to-slide' value='' />", false, true);
+                        _goNextSlide();
+                        evt.preventDefault();
                         return false;
                     }
                     break;
+                    
+                case 18: //alt
+                    if(_settings.shortcutsEnable && _conf.presentationStarted){
+                        _showMessage("Go to slide:<br/><input style='margin: auto;' type='integer' id='ppw-go-to-slide' value='' />", false, true);
+                        evt.preventDefault();
+                        return false;
+                    }
+                    break;
+                
+                case 27: // esc
+                    if(_d.getElementById('ppw-message-box').style.display != 'none'){
+                        _closeMessage();
+                        evt.preventDefault();
+                        return false;
+                    }
+                    break;
+                    
                 default: {
-                    if(evt.altKey && _conf.presentationStarted){
-                        k= evt.keyCode - 48;
-                        if(k>=0 && k<10){
-                            _d.getElementById('ppw-go-to-slide').value+= k;
+                    if(_settings.shortcutsEnable){
+                        if(evt.altKey && _conf.presentationStarted){
+                            k= evt.keyCode - 48;
+                            if(k>=0 && k<10){
+                                _d.getElementById('ppw-go-to-slide').value+= k;
+                                evt.preventDefault();
+                                return false;
+                            }
                         }
                     }
+                    
                 }
             }
             return true;
         });
         
         $d.bind('keyup', function(evt){
+            
             var s= false;
             
+            // Manages the gotoslide box and also function keys
             switch(evt.keyCode){
                 case 18: // alt
                     s= _d.getElementById('ppw-go-to-slide');
@@ -370,13 +449,57 @@ window.PPW= (function($, _d, console){
                             _goToSlide(s);
                         }
                         _closeMessage();
+                        evt.preventDefault();
                     }
-                    return false; 
+                    return false;
+                    break;
+                    
+                case 117: // F6
+                    s= _triggerEvent('F6_PRESSED');
+                    if(!s){
+                        evt.preventDefault();
+                        return false;
+                    }
+                    break;
+                    
+                case 118: // F7
+                    s= _triggerEvent('F7_PRESSED');
+                    if(!s){
+                        evt.preventDefault();
+                        return false;
+                    }
+                    break;
+                    
+                case 119: // F8
+                    s= _triggerEvent('F8_PRESSED');
+                    if(!s){
+                        evt.preventDefault();
+                        return false;
+                    }
+                    break;
+                    
+                case 120: // F9
+                    s= _triggerEvent('F9_PRESSED');
+                    if(!s){
+                        evt.preventDefault();
+                        return false;
+                    }
+                    break;
+                    
+                case 121: // F10
+                    s= _triggerEvent('F10_PRESSED');
+                    if(!s){
+                        evt.preventDefault();
+                        return false;
+                    }
                     break;
             }
             return true;
         });
         
+        /**
+         * History events(POP and HASHCHANGE).
+         */
         _w.addEventListener('popstate', function(){
             
         }, false);
@@ -384,7 +507,46 @@ window.PPW= (function($, _d, console){
             if(_h.state)
                 _goToSlide(_getCurrentSlideFromURL());
         }, false);
+        
+        /**
+         * Mouse events.
+         */
+        $d.bind('click', function(evt){
+            
+            if(_conf.presentationStarted){
+                var t= evt.target,
+                    tag= t.tagName.toLowerCase(),
+                    $t= $(t);
+
+                if(tag != 'a' && tag != 'button' &&
+                   tag != 'input' && tag != 'textarea' &&
+                   !$t.hasClass(_conf.cons.FOCUSABLE_ELEMENT) &&
+                   !$t.hasClass(_conf.cons.CLICKABLE_ELEMENT))
+                {
+                    _goNextSlide();
+                    evt.preventDefault();
+                    return false;
+                }
+            }
+        });
     };
+    
+    /**
+     * Creates the URL to each external slide.
+     * 
+     * External slides' URLs should follow the fsPattern, defined by the user.
+     * This method returns the prepared URL following that pattern.
+     * 
+     * @param String The slide identifier.
+     * @param Integer The slide index in the list of slides.
+     * @return string URL.
+     */
+    var _getSlideURL= function(id, idx){
+        
+        return _settings.fsPattern
+                        .replace(/\%id/i, id)
+                        .replace(/\%num/i, idx);
+    }
     
     /**
      * Preloads the slides before the presentation.
@@ -392,8 +554,9 @@ window.PPW= (function($, _d, console){
      * If the slide is not present in the document, it loades it via ajax.
      * After loading each slide, it puts its content into a new section and
      * tries to execute its JavaScript
+     * 
      */
-    var _preloadSlides= function(fnCallback){
+    var _preloadSlides= function(){
         var slides= _settings.slides,
             l= slides.length,
             i= 0,
@@ -409,7 +572,7 @@ window.PPW= (function($, _d, console){
                 
                 $.ajax(
                     {
-                        url: 'slides/'+slides[i].id+'/index.html',
+                        url: _getSlideURL(slides[i].id, i),
                         success: (function(slide){
                                     return function(data, status, xhr){
                                                 var el= _d.getElementById(slide.id);
@@ -439,7 +602,7 @@ window.PPW= (function($, _d, console){
                 _d.body.appendChild(el[0]);
                 _slidePreloaderNext();
             }
-            el.addClass(_conf.cons.CLASS_SLIDE);
+            el.addClass(_conf.cons.CLASS_SLIDE + " ppw-slide-type-" + (slides[i].type||_conf.defaults.slideType));
         }
     };
     
@@ -469,8 +632,6 @@ window.PPW= (function($, _d, console){
                         </div>\
                       </div>');
 
-        //$('#ppw-message-box-button').click(_closeMessage);
-
         if(_settings.useSplashScreen){
         
             $.get(_settings.PPWSrc+"_tools/splash-screen.html", {}, function(data){
@@ -483,8 +644,10 @@ window.PPW= (function($, _d, console){
                 $('#ppw-testAudio-trigger').click(_testAudio);
                 $('#ppw-testCamera-trigger').click(_startCamera);
                 $('#ppw-testConnection-trigger').click(_testConnection);
-                _d.querySelector('#ppw-talk-title').innerHTML= _settings.title;
-
+                $('#ppw-talk-title').html(_settings.title);
+                
+                $('.ppw-menu-start-icon').click(_startPresentation);
+                
                 $('#ppw-slides-loader-bar').stop().animate({
                     marginTop: '0px'
                 }, 500, _preloadSlides);
@@ -532,7 +695,6 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         else if(_b.webkitRequestFullScreen)
                 _b.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
              else if(_b.mozRequestFullScreen){
-                     // TODO: fix this for firefox!!
                      _b.mozRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
                   }
                   else{
@@ -783,13 +945,18 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
     /**************************************************
      *               PRESENTATION CORE                *
      **************************************************/
-    var _startPresentation= function(){
+    var _startPresentation= function(evt){
         $('#PPW-splash-screen-container').animate({
             marginTop: '-460px'
         }, 200, function(){
             $('#PPW-splash-screen').fadeOut();
         });
         _conf.presentationStarted= true;
+        _goToSlide(_getCurrentSlideFromURL());
+        if(evt){
+            evt.preventDefault();
+            return false;
+        }
     };
     
     var _addAction= function(fn){
@@ -878,16 +1045,19 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
             idx= _conf.currentSlide;
         
         // setting the active slide class
-        $("."+_conf.cons.CLASS_ACTIVE_SLIDE).removeClass(_conf.cons.CLASS_ACTIVE_SLIDE);
-        
+        $(_d.querySelector("."+_conf.cons.CLASS_ACTIVE_SLIDE))
+            .removeClass(_conf.cons.CLASS_ACTIVE_SLIDE);
         $('#'+_settings.slides[idx].id).addClass(_conf.cons.CLASS_ACTIVE_SLIDE);
+        
         // setting the previous slide class
-        $("."+_conf.cons.CLASS_PREVIOUS_SLIDE).removeClass(_conf.cons.CLASS_PREVIOUS_SLIDE);
+        $(_d.querySelector("."+_conf.cons.CLASS_PREVIOUS_SLIDE))
+            .removeClass(_conf.cons.CLASS_PREVIOUS_SLIDE);
         if(_settings.slides[idx-1])
             $('#'+_settings.slides[idx-1].id).addClass(_conf.cons.CLASS_PREVIOUS_SLIDE);
         
         // setting the next slide class
-        $("."+_conf.cons.CLASS_NEXT_SLIDE).removeClass(_conf.cons.CLASS_NEXT_SLIDE);
+        $(_d.querySelector("."+_conf.cons.CLASS_NEXT_SLIDE))
+            .removeClass(_conf.cons.CLASS_NEXT_SLIDE);
         if(_settings.slides[idx+1])
             $('#'+_settings.slides[idx+1].id).addClass(_conf.cons.CLASS_NEXT_SLIDE);
     };
@@ -925,7 +1095,8 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         triggerPresentationToolLoadEvent: _triggerPresentationToolLoadEvent,
         showConfiguration               : _showConfiguration,
         startPresentation               : _startPresentation,
-        addAction                       : _addAction
+        addAction                       : _addAction,
+        cons                            : _conf.cons
     };
     
 })(jQuery, document, console);

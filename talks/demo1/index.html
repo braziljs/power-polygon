@@ -11,13 +11,19 @@
     <body>
         
         <section id="closing">
-            5: closing
+            4: closing
         </section>
         
         <script>
             window.PPW.init({
-                // basic configurations
+                
+                /**************************************************
+                *  BASIC CONFIGURATION (most of it, is optional)  *
+                **************************************************/
+               
+                // the talk's title
                 title: "Title of my demo1 presentation",
+                // the list of authors and their information
                 authors: [
                     {
                         name: "Felipe N. Moura",
@@ -27,18 +33,39 @@
                         description: "A nice guy!"
                     }
                 ],
-                /*createAboutSlide: true, // automatically creates the ABOUT ME slide(s)
-                useExternalSlides: true, // load slides with ajax
-                preloadSlides: true, // load all the slides before starting*/
-                PPWSrc: "../../ppw/", // where is(relatively) the source of PowerPolygonWeb
-                shortcutsEnable: true, // enables or not, the shortcuts
-                friendlyURL: 'id', // may be false or id(slide' id)
-                useSplashScreen: false, // should ppw open the splash screen first?
+                // where is(relatively) the source of PowerPolygonWeb
+                PPWSrc: "../../ppw/",
+                // enables or not, the shortcuts
+                shortcutsEnable: true,
+                // may be false or id(slide' id)
+                friendlyURL: 'id',
+                // should ppw open the splash screen first?
+                useSplashScreen: true,
+                /**
+                 * Defines the pattern to be used to load external slides.
+                 * The default is SLIDE_ID_DIR, found in cons.fs.
+                 * Also can be a string defining the pattern, where:
+                 *    %id    = slide identifier
+                 *    %num   = slide number
+                 *  
+                 * For example, if your slides a and b are in a directory called
+                 * slides, and the slide file is always index.html, the pattern
+                 * is as follows:
+                 *    fsPattern: 'slides/%id/index.html' // this is the default pattern
+                 */
+                fsPattern: PPW.cons.fs.SLIDE_ID_DIR,
                 
-                // presentation data
+                /**************************************************
+                *  PRESENTATION DATA (mostly required properties) *
+                **************************************************/
+               
+                // the theme to be used (default: default)
                 theme: "default",
-                duration: 60, // the expected duration in minutes
-                alertAt: [10, 30, 40, 50], // in minutes
+                // the expected duration in minutes in minutes (default 50)
+                duration: 60,
+                // When in minutes, the speaker should be alerted(default: 30, 40)
+                alertAt: [10, 30, 40, 50],
+                // the list of slides
                 slides: [
                     {
                         type: 'opening',
@@ -77,13 +104,23 @@
                 ],
                 
                 // KEYBOARD SHORTCUTS(optional)
-                shortcuts: [
-                    {
-                        'F4': function(){
-                            alert('F4 was pressed!!!');
-                        }
+                shortcuts: {
+                    'F6': function(){
+                        alert('F6 was pressed!!!');
+                    },
+                    'F7': function(){
+                        alert('F7 was pressed!!!');
+                    },
+                    'F8': function(){
+                        alert('F8 was pressed!!!');
+                    },
+                    'F9': function(){
+                        alert('F9 was pressed!!!');
+                    },
+                    'F10': function(){
+                        alert('F10 was pressed!!!');
                     }
-                ]
+                }
             });
         </script>
     </body>
