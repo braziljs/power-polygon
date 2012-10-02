@@ -313,6 +313,40 @@ ppw-message-content{
     line-height: 12px;
 }
 
+#ppw-notification-element{
+    position: absolute;
+    left: -200px;
+    bottom: 0px;
+    min-width: 200px;
+    min-height: 28px;
+    padding: 5px;
+    
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    
+    font-family: sans-serif, Arial, Tahoma;
+    background: -webkit-gradient(linear, left top, left bottom, from(rgba(90, 90, 90, 0.7)), to(rgba(0, 0, 0, 0.7)));
+    background: -moz-linear-gradient(to bottom, rgba(90, 90, 90, 0.7), rgba(0, 0, 0, 0.7));
+    /*background: rgba(0, 0, 0, 0.6);*/
+    color: white;
+    border-top: solid 1px black;
+    z-index: 999999999;
+}
+.ppw-notification-close-button{
+    background: black;
+    color: white;
+    width: 28px;
+    height: 28px;
+    margin: -5px;
+    margin-left: 3px;
+    float: right;
+    text-align: center;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    padding-top: 5px;
+    cursor: pointer;
+}
+
 .glass{
     -webkit-background-origin: border-box;
     -moz-background-origin: border;

@@ -75,7 +75,9 @@ window.PPW= (function($, _d, console){
             theme: _conf.defaults.theme,
             fsPattern: _conf.cons.fs.SLIDE_ID_DIR,
             alertAt: _conf.defaults.alertAt,
-            duration: _conf.defaults.duration
+            duration: _conf.defaults.duration,
+            showBatteryAlerts: true,
+            showOfflineAlerts: true
         },
         // a local reference to the $(document)
         $d= $(_d),
@@ -384,7 +386,7 @@ window.PPW= (function($, _d, console){
                 case 37: // left
                 case 40: // down
                 case  8: // delete/backspace
-                    if(_conf.presentationStarted){
+                    if(_conf.presentationStarted && !_isEditableTarget(evt.target)){
                         _goPreviousSlide();
                         evt.preventDefault();
                         return false;
@@ -394,16 +396,21 @@ window.PPW= (function($, _d, console){
                 case 38: // up
                 case 39: // right
                 case 13: // enter
-                case 32: // enter
-                    if(_conf.presentationStarted){
+                case 32: // space
+                    if(_conf.presentationStarted && !_isEditableTarget(evt.target)){
                         _goNextSlide();
                         evt.preventDefault();
                         return false;
                     }
+                    if(evt.keyCode == 13 && _isEditableTarget(evt.target)){
+                        evt.target.click();
+                    }
                     break;
                     
                 case 18: //alt
-                    if(_settings.shortcutsEnable && _conf.presentationStarted){
+                    if(_settings.shortcutsEnable
+                        && _conf.presentationStarted
+                        && !_isEditableTarget(evt.target)){
                         _showMessage("Go to slide:<br/><input style='margin: auto;' type='integer' id='ppw-go-to-slide' value='' />", false, true);
                         evt.preventDefault();
                         return false;
@@ -513,23 +520,92 @@ window.PPW= (function($, _d, console){
          */
         $d.bind('click', function(evt){
             
-            if(_conf.presentationStarted){
-                var t= evt.target,
-                    tag= t.tagName.toLowerCase(),
-                    $t= $(t);
-
-                if(tag != 'a' && tag != 'button' &&
-                   tag != 'input' && tag != 'textarea' &&
-                   !$t.hasClass(_conf.cons.FOCUSABLE_ELEMENT) &&
-                   !$t.hasClass(_conf.cons.CLICKABLE_ELEMENT))
-                {
-                    _goNextSlide();
-                    evt.preventDefault();
-                    return false;
-                }
+            if(_conf.presentationStarted && !_isEditableTarget(evt.target)){
+                _goNextSlide();
+                evt.preventDefault();
+                return false;
             }
         });
+        
+        /**
+         * Online/Offline events
+         */
+        if(_settings.showOfflineAlerts){
+            _b.addEventListener("offline", function () {
+                _showNotification("Your browser went offline!");
+            }, false);
+            _b.addEventListener("online", function () {
+                _showNotification("Your browser is back online");
+            }, false);
+        }
+        
+        // Battery events, if supported
+        if(_settings.showBatteryAlerts){
+            if(_n.battery){
+                _n.battery.addEventListener('chargingchange', function(data){
+                    if(!_n.battery.charging){ // was charging and is not anymore
+                        _showNotification("Your battery stoped charging!");
+                    }else{
+                        _closeNotification();
+                    }
+                }, false);
+
+                _addListener('onthemeloaded', function(){
+                    setTimeout(function(){
+                        if(!_n.battery.charging){
+                            if(_n.battery.dischargingTime / 60 < _settings.duration+100000){
+                                _showNotification("You have "+ (_n.battery.dischargingTime / 60)+" minutes of battery!");
+                            }
+                        }
+                    }, 1000);
+                });
+            }
+        }
     };
+    
+    /**
+     * Show a notification in the bottom of the page.
+     */
+    var _showNotification= function(msg){
+        var el= $('#ppw-notification-element');
+        if(el.length){
+            el.find('span').html(msg);
+            el.animate({
+                left: '0px'
+            }, 500);
+        }
+    };
+    
+    /**
+     * Closes the notification message.
+     */
+    var _closeNotification= function(){
+        var el= $('#ppw-notification-element');
+        el.animate({
+            left: '-'+(el[0].offsetWidth+10)+'px'
+        }, 300);
+    };
+    
+    /**
+     * Returns true if the event dispatcher is editable.
+     * 
+     * An editable element is a form element or any HTML element with the
+     * editable  or clickacble classes, or with a tabindex set.
+     */
+    var _isEditableTarget= function(target){
+        var t= target,
+               tag= t.tagName.toLowerCase(),
+               $t= $(t);
+
+        if(tag == 'a' || tag == 'button' ||
+           tag == 'input' || tag == 'textarea' ||
+           $t.hasClass(_conf.cons.FOCUSABLE_ELEMENT) ||
+           $t.hasClass(_conf.cons.CLICKABLE_ELEMENT) ||
+           t.hasAttribute('tabindex')){
+           return true;
+        }
+        return false;
+    }
     
     /**
      * Creates the URL to each external slide.
@@ -647,6 +723,7 @@ window.PPW= (function($, _d, console){
                 $('#ppw-talk-title').html(_settings.title);
                 
                 $('.ppw-menu-start-icon').click(_startPresentation);
+                $('.ppw-notification-close-button').click(_closeNotification);
                 
                 $('#ppw-slides-loader-bar').stop().animate({
                     marginTop: '0px'
@@ -732,6 +809,9 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         }
         
         $('#ppw-message-box-button').one('click', func);
+        setTimeout(function(){
+            _d.getElementById('ppw-message-box-button').focus();
+        }, 100);
     };
     
     /**
