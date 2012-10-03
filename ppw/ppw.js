@@ -33,7 +33,7 @@ window.PPW= (function($, _d, console){
             curLoaded: 0,
             preloadedSlidesCounter: 0,
             cameraLoaded: false,
-            presentationTool: null,
+            presentationTool: null, // TODO: fix layout bugs
             defaults: {
                 duration: 50,
                 alertAt: [30, 40],
@@ -564,6 +564,18 @@ window.PPW= (function($, _d, console){
             }
         }
     };
+    
+    /**
+     * Shows the help pannell
+     */
+    var _showHelp= function(){
+        var msg= "<h3>Help</h3>\
+                  Website: <a href='http://powerpolygon.com' target='_blank'>powerpolygon.com</a><br/>\
+                  Forum/Discussion group: <a href='https://groups.google.com/forum/#!forum/powerpolygon' target='_blank'>forum/powerpolygon</a><br/>\
+                  Documentation: <a href='https://github.com/braziljs/PowerPolygon/wiki' target='_blank'>wiki</a><br/>\
+                  Fork me: <a href='https://github.com/braziljs/PowerPolygon' target='_blank'>Github</a><br/>"
+        _showMessage(msg);
+    }
     
     /**
      * Show a notification in the bottom of the page.
@@ -1335,7 +1347,8 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         addAction                       : _addAction,
         cons                            : _conf.cons,
         showGoToComponent               : _showGoToComponent,
-        showSearchBox                   : _showSearchBox
+        showSearchBox                   : _showSearchBox,
+        showHelp                        : _showHelp
     };
     
 })(jQuery, document, console);
