@@ -573,7 +573,12 @@ window.PPW= (function($, _d, console){
                   Website: <a href='http://powerpolygon.com' target='_blank'>powerpolygon.com</a><br/>\
                   Forum/Discussion group: <a href='https://groups.google.com/forum/#!forum/powerpolygon' target='_blank'>forum/powerpolygon</a><br/>\
                   Documentation: <a href='https://github.com/braziljs/PowerPolygon/wiki' target='_blank'>wiki</a><br/>\
-                  Fork me: <a href='https://github.com/braziljs/PowerPolygon' target='_blank'>Github</a><br/>"
+                  Fork me: <a href='https://github.com/braziljs/PowerPolygon' target='_blank'>Github</a><br/>\
+                  <br/><br/>\
+                  <b>Shortcuts</b><br/>\
+                  ALT: Go to slide<br/>\
+                  ALT+F: Search into slides<br/>\
+                  F6, F7, F8, F9, F10: Custom"
         _showMessage(msg);
     }
     
