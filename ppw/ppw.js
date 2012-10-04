@@ -1277,16 +1277,14 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
      * To to the previous slide.
      */
     var _goPreviousSlide= function(){
-        _triggerEvent('onprev');
-        _goToSlide(_conf.currentSlide-1, true);
+        _goToSlide(_conf.currentSlide-1, 'prev');
     };
     
     /**
      * To to the next slide.
      */
     var _goNextSlide= function(){
-        _triggerEvent('onnext');
-        _goToSlide(_conf.currentSlide+1, true);
+        _goToSlide(_conf.currentSlide+1, 'next');
     };
     
     /**
@@ -1312,7 +1310,22 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         
         _setSlideClasses(idx);
         if(!prevent){
-            _triggerEvent('ongoto');
+            _triggerEvent('ongoto', {
+                previous: previousSlide,
+                current: _settings.slides[_conf.currentSlide]
+            });
+        }else{
+            if(prevent == 'prev'){
+                _triggerEvent('onprev', {
+                    previous: previousSlide,
+                    current: _settings.slides[_conf.currentSlide]
+                });
+            }else{
+                _triggerEvent('onnext', {
+                    previous: previousSlide,
+                    current: _settings.slides[_conf.currentSlide]
+                });
+            }
         }
         
         if(previousSlide && previousSlide.type != _settings.slides[_conf.currentSlide].type)
@@ -1321,7 +1334,10 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
                 current: _settings.slides[_conf.currentSlide]
             });
             
-        _triggerEvent('onslidechange', idx);
+        _triggerEvent('onslidechange', {
+            previous: previousSlide,
+            current: _settings.slides[_conf.currentSlide]
+        });
     };
     
     /**
