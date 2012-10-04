@@ -38,7 +38,8 @@ window.PPW= (function($, _d, console){
                 duration: 50,
                 alertAt: [30, 40],
                 theme: 'default',
-                slideType: 'content'
+                slideType: 'content',
+                slideTitleSize: 40
             },
             cons: {
                 CLASS_SLIDE             : 'ppw-slide-element',
@@ -104,6 +105,7 @@ window.PPW= (function($, _d, console){
         onnext                  : [],
         onprev                  : [],
         ongoto                  : [],
+        onslidechange           : [],
         onfullscreen            : [],
         onshowcamera            : [],
         onhidecamera            : [],
@@ -155,6 +157,9 @@ window.PPW= (function($, _d, console){
      * Triggers an event.
      * 
      * Used only internaly.
+     * 
+     * @param String Event identificator.
+     * @param Mixed Arguments
      */
     var _triggerEvent= function(evt, args){
         
@@ -656,7 +661,8 @@ window.PPW= (function($, _d, console){
             l= slides.length,
             i= 0,
             el= null,
-            nEl= null;
+            nEl= null,
+            tt= '';
         
         for(; i<l; i++){
             el= $('section#'+slides[i].id);
@@ -668,10 +674,18 @@ window.PPW= (function($, _d, console){
                 $.ajax(
                     {
                         url: _getSlideURL(slides[i].id, i),
-                        success: (function(slide){
+                        success: (function(slide, i){
                                     return function(data, status, xhr){
-                                                var el= _d.getElementById(slide.id);
+                                                var el= _d.getElementById(slide.id),
+                                                    tt= null;
+                                                    
                                                 el.innerHTML= data;
+                                                _settings.slides[i].el= el;
+                                                tt= $(el).find('h1, h2, h3, h4, h5, h6')[0];
+                                                tt= tt? tt.innerHTML: el.textContent.substring(0, _conf.defaults.slideTitleSize);
+                                                _settings.slides[i].title= tt;
+                                                _settings.slides[i].index= i+1;
+                                                
                                                 $(el).find("script").each(function(i, scr){
 
                                                     var f= new Function(scr.innerText);
@@ -684,7 +698,7 @@ window.PPW= (function($, _d, console){
                                                 });
                                                 _slidePreloaderNext();
                                             }
-                                })(slides[i]),
+                                })(slides[i], i),
                         error: (function(slide){
                             return function(){
                                 console.error("[PPW][Slide loading]: Slide not found!", slide);
@@ -694,6 +708,15 @@ window.PPW= (function($, _d, console){
                     });
                 el= $('section#'+slides[i].id);
             }else{
+                
+                
+                _settings.slides[i].el= el[0];
+                tt= el.find('h1, h2, h3, h4, h5, h6')[0];
+                tt= tt? tt.innerHTML: el[0].textContent.substring(0, _conf.defaults.slideTitleSize);
+                _settings.slides[i].title= tt;
+                _settings.slides[i].index= i+1;
+                
+                
                 _d.body.appendChild(el[0]);
                 _slidePreloaderNext();
             }
@@ -1123,12 +1146,11 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
             toolProps= "width=780,height=520,left=40,top=10";
         
         if(!_conf.presentationTool){
-            _conf.presentationTool= window.open(toolSrc,
+            _conf.presentationTool= _w.open(toolSrc,
                                                 toolName,
                                                 toolProps);
             _conf.presentationTool.onload= function(){
-                _conf.presentationTool.PresentationTool.init($, window.PPW);
-
+                _conf.presentationTool.PresentationTool.init($, _w.PPW, _getSlides());
             };
         }else{
             _conf.presentationTool.focus();
@@ -1255,6 +1277,9 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
      */
     var _goToSlide= function(idx){
         
+        if(!_conf.presentationStarted)
+            return false;
+        
         var url= '';
         
         if(idx > _settings.slides.length-1)
@@ -1266,6 +1291,7 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         _setHistoryStateTo(idx);
         
         _setSlideClasses(idx);
+        _triggerEvent('onslidechange', idx);
     };
     
     /**
@@ -1316,6 +1342,25 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
             $('#'+_settings.slides[idx+1].id).addClass(_conf.cons.CLASS_NEXT_SLIDE);
     };
     
+    
+    
+    /**************************************************
+     *                GETTERS/SETTERS                 *
+     **************************************************/
+    /**
+     * Returns the list os slide objects.
+     */
+    var _getSlides= function(){
+        return _settings.slides;
+    };
+    
+    /**
+     * Retrieves the current slide object.
+     */
+    var _getCurrentSlide= function(){
+        return _settings.slides[_conf.currentSlide];
+    };
+    
     /**************************************************
      *                  CONSTRUCTOR                   *
      **************************************************/
@@ -1341,6 +1386,8 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         enterFullScreen                 : _enterFullScreen,
         testResolution                  : _testResolution,
         openPresentationTool            : _openPresentationTool,
+        goNextSlide                     : _goNextSlide,
+        goPreviousSlide                : _goPreviousSlide,
         testAudio                       : _testAudio,
         extend                          : _extend,
         startCamera                     : _startCamera,
@@ -1353,7 +1400,10 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         cons                            : _conf.cons,
         showGoToComponent               : _showGoToComponent,
         showSearchBox                   : _showSearchBox,
-        showHelp                        : _showHelp
+        showHelp                        : _showHelp,
+        // API GETTERS/SETTERS METHODS
+        getSlides                       : _getSlides,
+        getCurrentSlide                 : _getCurrentSlide
     };
     
 })(jQuery, document, console);
