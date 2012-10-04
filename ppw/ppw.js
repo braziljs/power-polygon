@@ -34,6 +34,7 @@ window.PPW= (function($, _d, console){
             preloadedSlidesCounter: 0,
             cameraLoaded: false,
             presentationTool: null,
+            profiles: {},
             defaults: {
                 duration: 50,
                 alertAt: [30, 40],
@@ -79,7 +80,8 @@ window.PPW= (function($, _d, console){
             alertAt: _conf.defaults.alertAt,
             duration: _conf.defaults.duration,
             showBatteryAlerts: true,
-            showOfflineAlerts: true
+            showOfflineAlerts: true,
+            profile: 'none'
         },
         // a local reference to the $(document)
         $d= $(_d),
@@ -345,6 +347,46 @@ window.PPW= (function($, _d, console){
     };
     
     /**
+     * Gets if a specified slide is valid for the current profile.
+     */
+    var _isValidProfile= function(slide){
+        
+        if(!slide.profile || slide.profile == 'none'
+           || !_settings.profile || _settings.profile == 'none')
+           return true;
+       
+        if(slide.profile != _settings.profile)
+            return false;
+            
+        return true;
+    }
+    
+    /**
+     * Hides all the invalid slides for the current profile
+     */
+    var _setPresentationProfile= function(profile){
+        
+        var i= 0, l= _settings.slides.length,
+            slide;
+        
+        if(profile === false)
+            profile= 'none';
+        if(profile)
+            _settings.profile= profile;
+        
+        for(; i<l; i++){
+            slide= _settings.slides[i];
+            
+            if(_isValidProfile(slide)){
+                $('#'+slide.id).removeClass('ppw-slide-not-in-profile');
+            }else{
+                $('#'+slide.id).addClass('ppw-slide-not-in-profile');
+            }
+        }
+        
+    };
+    
+    /**
      * Advances one step in the slides preload bar.
      */
     var _slidePreloaderNext= function(loadedSlide){
@@ -365,8 +407,10 @@ window.PPW= (function($, _d, console){
         }
         
         _triggerEvent('onslideloaded', loadedSlide);
-        if(perc == 100)
+        if(perc == 100){
+            _setPresentationProfile();
             _triggerEvent('onslidesloaded', _settings.slides);
+        }
         
         $('#ppw-slides-loader-bar-loading-container>div').stop().animate({
             width: perc+'%'
@@ -673,7 +717,7 @@ window.PPW= (function($, _d, console){
         
         for(; i<l; i++){
             el= $('section#'+slides[i].id);
-            if(!el.length){
+            if(!el.length){ // should load it from ajax
                 nEl= _d.createElement("section");
                 nEl.id= slides[i].id;
                 _d.body.appendChild(nEl);
@@ -714,7 +758,7 @@ window.PPW= (function($, _d, console){
                         })(slides[i])
                     });
                 el= $('section#'+slides[i].id);
-            }else{
+            }else{ // the slide content is already on the DOM
                 
                 _settings.slides[i].el= el[0];
                 tt= el.find('h1, h2, h3, h4, h5, h6')[0];
@@ -726,6 +770,11 @@ window.PPW= (function($, _d, console){
                 _d.body.appendChild(el[0]);
                 _slidePreloaderNext(_settings.slides[i]);
             }
+            if(slides[i].profile){
+                _conf.profiles[slides[i].profile]= true;
+            }
+            if(_settings.profile)
+                _conf.profiles[_settings.profile]= true;
             el.addClass(_conf.cons.CLASS_SLIDE + " ppw-slide-type-" + (slides[i].type||_conf.defaults.slideType));
         }
     };
@@ -878,6 +927,7 @@ window.PPW= (function($, _d, console){
                         <img id="ppw-search-icon" onclick="PPW.showSearchBox()"/>\
                         <img id="ppw-fullscreen-icon" onclick="PPW.enterFullScreen()"/>\
                         <img id="ppw-camera-icon" onclick="PPW.startCamera();"/>\
+                        <img id="ppw-settings-icon" onclick="PPW.showConfiguration();"/>\
                     </div>\
                    </div>');
         
@@ -886,11 +936,17 @@ window.PPW= (function($, _d, console){
         
         $('#ppw-toolbox-icon').attr('src', _settings.PPWSrc+'/_images/toolbox.png')
                               .addClass(_conf.cons.CLICKABLE_ELEMENT);
+                              
         $('#ppw-search-icon').attr('src', _settings.PPWSrc+'/_images/search.png')
                              .addClass(_conf.cons.CLICKABLE_ELEMENT);
+                             
         $('#ppw-fullscreen-icon').attr('src', _settings.PPWSrc+'/_images/fullscreen.png')
                                  .addClass(_conf.cons.CLICKABLE_ELEMENT);
+                                 
         $('#ppw-camera-icon').attr('src', _settings.PPWSrc+'/_images/camera.png')
+                             .addClass(_conf.cons.CLICKABLE_ELEMENT);
+                                 
+        $('#ppw-settings-icon').attr('src', _settings.PPWSrc+'/_images/settings-icon.png')
                              .addClass(_conf.cons.CLICKABLE_ELEMENT);
 
         if(_settings.useSplashScreen){
@@ -1196,6 +1252,10 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
      */
     var _showConfiguration= function(){
         var msg= "",
+            i= 0,
+            el= null,
+            list= [],
+            l= 0,
             fn= function(){
                 var parsed= "";
                 
@@ -1215,9 +1275,27 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
                     <label>Enable shortcuts: </label><input type='checkbox' id='ppw-shortcutsEnable' "+(_settings.shortcutsEnable? 'checked=checked': '')+" /><br/>\
                     <label>Duration: </label><input type='integer' id='ppw-talk-duration' value='"+_settings.duration+"' /><br/>\
                     <label>Alert at: </label><input type='string' id='ppw-alert-at' value='"+_settings.alertAt+"'placeholder='Comma separated minutes' /><br/>\
+                    <label>Profile: </label><select id='ppw-profile-option'></select><br/>\
               </form>";
+            
         _showMessage(msg, fn);
-        _triggerEvent('onopensettings');
+        
+        if(_conf.profiles){
+            list= Object.keys(_conf.profiles);
+            l= list.length;
+            msg= "<option value='none'>none</option>";
+            for(; i<l; i++){
+                msg+= "<option value='"+list[i]+"'>"+list[i]+"</option>";
+            }
+            
+            $('#ppw-profile-option').html(msg)
+                                    .attr('value', (_settings.profile && _settings.profile != 'none'? _settings.profile: 'none'))
+                                    .bind('change', function(){
+                                        _setPresentationProfile(this.value);
+                                        _goToSlide(_conf.currentSlide);
+                                    });
+        }
+        _triggerEvent('onopensettings', _settings);
     };
     
     /**************************************************
@@ -1296,7 +1374,8 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
             return false;
         
         var url= '',
-            previousSlide= _settings.slides[_conf.currentSlide]||false;
+            previousSlide= _settings.slides[_conf.currentSlide]||false,
+            curSlide= null;
         
         if(idx > _settings.slides.length-1){
             idx= _settings.slides.length-1;
@@ -1306,6 +1385,22 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
             idx= 0;
         
         _conf.currentSlide= idx;
+        curSlide= _settings.slides[_conf.currentSlide];
+        
+        if(!curSlide){
+            _triggerEvent('onfinish');
+            return false;
+        }
+        
+        if(!_isValidProfile(curSlide)){
+            if(prevent == 'prev'){
+                _goPreviousSlide();
+            }else{
+                _goNextSlide();
+            }
+            return false;
+        }
+        
         _setHistoryStateTo(idx);
         
         _setSlideClasses(idx);
@@ -1318,25 +1413,25 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
             if(prevent == 'prev'){
                 _triggerEvent('onprev', {
                     previous: previousSlide,
-                    current: _settings.slides[_conf.currentSlide]
+                    current: curSlide
                 });
             }else{
                 _triggerEvent('onnext', {
                     previous: previousSlide,
-                    current: _settings.slides[_conf.currentSlide]
+                    current: curSlide
                 });
             }
         }
         
-        if(previousSlide && previousSlide.type != _settings.slides[_conf.currentSlide].type)
+        if(previousSlide && previousSlide.type != curSlide.type)
             _triggerEvent('onslidetypechange', {
                 previous: previousSlide,
-                current: _settings.slides[_conf.currentSlide]
+                current: curSlide
             });
             
         _triggerEvent('onslidechange', {
             previous: previousSlide,
-            current: _settings.slides[_conf.currentSlide]
+            current: curSlide
         });
     };
     
@@ -1367,6 +1462,8 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
      */
     var _setSlideClasses= function(idx){
         
+        var id= 0;
+        
         if(!idx)
             idx= _conf.currentSlide;
         
@@ -1378,14 +1475,27 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         // setting the previous slide class
         $(_d.querySelector("."+_conf.cons.CLASS_PREVIOUS_SLIDE))
             .removeClass(_conf.cons.CLASS_PREVIOUS_SLIDE);
-        if(_settings.slides[idx-1])
-            $('#'+_settings.slides[idx-1].id).addClass(_conf.cons.CLASS_PREVIOUS_SLIDE);
+            
+        id= idx;
+        do{
+            id--;
+        }while(_settings.slides[id] && !_isValidProfile(_settings.slides[id]));
+        
+        if(_settings.slides[id])
+            $('#'+_settings.slides[id].id).addClass(_conf.cons.CLASS_PREVIOUS_SLIDE);
+        
         
         // setting the next slide class
         $(_d.querySelector("."+_conf.cons.CLASS_NEXT_SLIDE))
             .removeClass(_conf.cons.CLASS_NEXT_SLIDE);
-        if(_settings.slides[idx+1])
-            $('#'+_settings.slides[idx+1].id).addClass(_conf.cons.CLASS_NEXT_SLIDE);
+        
+        id= idx;
+        do{
+            id++;
+        }while(_settings.slides[id] && !_isValidProfile(_settings.slides[id]));
+        
+        if(_settings.slides[id])
+            $('#'+_settings.slides[id].id).addClass(_conf.cons.CLASS_NEXT_SLIDE);
     };
     
     

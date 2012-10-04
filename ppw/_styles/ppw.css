@@ -300,7 +300,7 @@ ppw-message-content{
     background-size: 100% 100%;
 }
 
-#ppw-settings-form input{
+#ppw-settings-form input, #ppw-settings-form select{
     float: right;
 }
 #ppw-settings-form label{
@@ -351,16 +351,16 @@ ppw-message-content{
 #ppw-toolbar-container{
     position: absolute;
     left: 0px;
-    top: -205px;
+    top: -240px;
     width: 40px;
-    height: 215px;
+    height: 255px;
     z-index: 999999999;
     -webkit-transition: all 200ms linear;
     -moz-transition: all 200ms linear;
     transition: all 200ms linear;
 }
 #ppw-toolbar{
-    height: 200px;
+    height: 235px;
     width: 40px;
     box-shadow: 0px 0px 10px gray;
     background-color: white;
@@ -389,6 +389,18 @@ ppw-message-content{
     margin-left: 3px;
 }
 /** END TOOBOX **/
+/* HIDE INVALID SLIDES FOR PROFILE */
+.ppw-slide-not-in-profile{
+    display: none !IMPORTANT;
+    visibility: hidden !IMPORTANT;
+    opacity: 0 !IMPORTANT;
+    position: absolute !IMPORTANT;
+    left: -99000px !IMPORTANT;
+    top: -99000px !IMPORTANT;
+    width: 1px !IMPORTANT;
+    height: 1px !IMPORTANT;
+    overflow: hidden !IMPORTANT;
+}
 
 .glass{
     -webkit-background-origin: border-box;
