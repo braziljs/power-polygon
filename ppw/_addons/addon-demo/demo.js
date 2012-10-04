@@ -4,6 +4,9 @@ window.PPW.extend("demo", (function(){
     
     return {
         onstart: function(){ console.log("DEMO PLUGIN STARTING"); },
+        onsplashscreen: function(){ console.log("SPLASH SCREEN SHOWN"); },
+        onslidesloaded: function(){ console.log("ALL SLIDES LOADED"); },
+        onslideloaded: function(){ console.log("THIS SLIDE LOADED"); },
         onfinish: function(){ console.log("DEMO PLUGIN ENDING"); },
         onload: function(data){ console.log("DEMO PLUGIN LOADED", data); },
         onnext: function(){ console.log("DEMO PLUGIN GOING NEXT"); },

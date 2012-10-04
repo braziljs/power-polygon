@@ -104,6 +104,8 @@ window.PPW= (function($, _d, console){
         onload                  : [],
         onnext                  : [],
         onprev                  : [],
+        onslidesloaded          : [],
+        onslideloaded           : [],
         ongoto                  : [],
         onslidechange           : [],
         onfullscreen            : [],
@@ -114,6 +116,7 @@ window.PPW= (function($, _d, console){
         onclosesettings         : [],
         onopensettings          : [],
         onthemeloaded           : [],
+        onsplashscreen          : [],
         F10_PRESSED             : [],
         F9_PRESSED              : [],
         F8_PRESSED              : [],
@@ -344,7 +347,7 @@ window.PPW= (function($, _d, console){
     /**
      * Advances one step in the slides preload bar.
      */
-    var _slidePreloaderNext= function(){
+    var _slidePreloaderNext= function(loadedSlide){
         var l= _settings.slides.length,
             perc= 0, fn;
         _conf.preloadedSlidesCounter++;
@@ -360,6 +363,10 @@ window.PPW= (function($, _d, console){
                 }, 1000);
             };
         }
+        
+        _triggerEvent('onslideloaded', loadedSlide);
+        if(perc == 100)
+            _triggerEvent('onslidesloaded', _settings.slides);
         
         $('#ppw-slides-loader-bar-loading-container>div').stop().animate({
             width: perc+'%'
@@ -696,7 +703,7 @@ window.PPW= (function($, _d, console){
                                                         console.error("[PPW][Script loaded from slide] There was an error on a script, loaded in one of your slides!", e)
                                                     }
                                                 });
-                                                _slidePreloaderNext();
+                                                _slidePreloaderNext(_settings.slides[i]);
                                             }
                                 })(slides[i], i),
                         error: (function(slide){
@@ -709,7 +716,6 @@ window.PPW= (function($, _d, console){
                 el= $('section#'+slides[i].id);
             }else{
                 
-                
                 _settings.slides[i].el= el[0];
                 tt= el.find('h1, h2, h3, h4, h5, h6')[0];
                 tt= tt? tt.innerHTML: el[0].textContent.substring(0, _conf.defaults.slideTitleSize);
@@ -718,7 +724,7 @@ window.PPW= (function($, _d, console){
                 
                 
                 _d.body.appendChild(el[0]);
-                _slidePreloaderNext();
+                _slidePreloaderNext(_settings.slides[i]);
             }
             el.addClass(_conf.cons.CLASS_SLIDE + " ppw-slide-type-" + (slides[i].type||_conf.defaults.slideType));
         }
@@ -907,6 +913,7 @@ window.PPW= (function($, _d, console){
                 $('#ppw-slides-loader-bar').stop().animate({
                     marginTop: '0px'
                 }, 500, _preloadSlides);
+                _triggerEvent('onsplashscreen', _d.getElementById('ppw-addons-container'));
 
             });
         }else{
