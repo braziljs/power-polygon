@@ -233,7 +233,7 @@ window.PPW= (function($, _d, console){
         
         $('#PPW-loadingbar').css({width: perc+'%'});
         if(perc >= 100){
-            _triggerEvent('onthemeloaded');
+            _triggerEvent('onthemeloaded', _settings.themeSettings);
             $('#PPW-lock-loading').fadeOut();
         }
     };
@@ -1244,7 +1244,7 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
      * Adds an action to each speficied slide.
      */
     var _addAction= function(fn){
-        // TODO: feature for themes to add actions
+        // TODO: feature for slides to add actions
     };
     
     /**************************************************
@@ -1271,7 +1271,7 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
      */
     var _goPreviousSlide= function(){
         _triggerEvent('onprev');
-        _goToSlide(--_conf.currentSlide-1, true);
+        _goToSlide(_conf.currentSlide-1, true);
     };
     
     /**
