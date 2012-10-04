@@ -34,6 +34,7 @@ window.PPW= (function($, _d, console){
             preloadedSlidesCounter: 0,
             cameraLoaded: false,
             presentationTool: null,
+            currentLang: 'en',
             profiles: {},
             defaults: {
                 duration: 50,
@@ -387,6 +388,41 @@ window.PPW= (function($, _d, console){
     };
     
     /**
+     * Sets the language properties for the slides.
+     * 
+     * This method hides any element with a class starting by LANG- that does
+     * not end with(case insensitive regular expression match) the user's navigator
+     * language.
+     * 
+     * By the way, yes, LION stands for L10N(localization)
+     * Also...case matters, when using for example en or EN.
+     */
+    var _setLION= function(language){
+        
+        var lang= language||_n.language,
+            i= 0 || false,
+            list= _settings.languages,
+            rx= null;
+        
+        _conf.currentLang= lang;
+        
+        if(list){
+            
+            i= list.length-1;
+            do{
+                rx= new RegExp(list[i], 'i');
+                if(lang.match(rx)){
+                    lang= list[i];
+                    $('.LANG-'+list[i]).show();
+                }else{
+                    $('.LANG-'+list[i]).hide();
+                }
+            }while(i--);
+        }
+        
+    }
+    
+    /**
      * Advances one step in the slides preload bar.
      */
     var _slidePreloaderNext= function(loadedSlide){
@@ -409,6 +445,7 @@ window.PPW= (function($, _d, console){
         _triggerEvent('onslideloaded', loadedSlide);
         if(perc == 100){
             _setPresentationProfile();
+            _setLION(_settings.defaultLanguage||_n.language);
             _triggerEvent('onslidesloaded', _settings.slides);
         }
         
@@ -1275,7 +1312,8 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
                     <label>Enable shortcuts: </label><input type='checkbox' id='ppw-shortcutsEnable' "+(_settings.shortcutsEnable? 'checked=checked': '')+" /><br/>\
                     <label>Duration: </label><input type='integer' id='ppw-talk-duration' value='"+_settings.duration+"' /><br/>\
                     <label>Alert at: </label><input type='string' id='ppw-alert-at' value='"+_settings.alertAt+"'placeholder='Comma separated minutes' /><br/>\
-                    <label>Profile: </label><select id='ppw-profile-option'></select><br/>\
+                    <div id='ppw-profile-config'><label>Profile: </label><select id='ppw-profile-option'></select></div><br/>\
+                    <div id='ppw-languages-config'><label>Language: </label><select id='ppw-language-option'></select></div><br/>\
               </form>";
             
         _showMessage(msg, fn);
@@ -1294,7 +1332,28 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
                                         _setPresentationProfile(this.value);
                                         _goToSlide(_conf.currentSlide);
                                     });
+        }else{
+            $('#ppw-profile-config').hide();
         }
+        
+        if(!_settings.languages || !_settings.languages.length){
+            $('#ppw-languages-config').hide();
+        }else{
+            list= _settings.languages;
+            l= list.length;
+            msg= "";
+            for(i=0; i<l; i++){
+                msg+= "<option value='"+list[i]+"'>"+list[i]+"</option>";
+            }
+            
+            $('#ppw-language-option').html(msg)
+                                     .attr('value', _conf.currentLang)
+                                     .bind('change', function(){
+                                        _setLION(this.value);
+                                     });
+            
+        }
+        
         _triggerEvent('onopensettings', _settings);
     };
     
