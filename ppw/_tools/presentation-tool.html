@@ -142,7 +142,11 @@
                 text-align: center;
                 font-weight: bold;
                 color: red;
-                /*text-shadow: 0px 0px 40px black;*/
+                
+                -webkit-text-stroke: 3px black;
+                -moz-text-stroke: 3px black;
+                text-stroke: 3px black;
+                
                 font-size: 600px;
                 display: none;
             }
@@ -246,12 +250,20 @@
                 var _startTimer= function(){
                     clock= setInterval(function(){
                         timer++;
+                        
+                        if(ppw.getAlertAtTimes().indexOf(timer) >= 0){
+                            window.PresentationTool.alertTime(timer);
+                        }
+                        
                         d.querySelector('#timer span').innerHTML= timer;
                     }, 60000);
+                    d.querySelector('#timer span').innerHTML= timer;
                 };
                 
                 var _init= function(_$, _ppw, _slides){
-                    var el= null;
+                    
+                    var el= null, started= false, dt= new Date();
+                    
                     $= _$;
                     ppw= _ppw;
                     slides= _slides;
@@ -274,7 +286,13 @@
 
                     }, false);
                 
-                    _startTimer();
+                    started= ppw.getStartedAt();
+                    if(!started){
+                        ppw.addListener('onstart', _startTimer);
+                    }else{
+                        timer= Math.floor((dt.getTime() - started) / 60000);
+                        _startTimer();
+                    }
                     
                     
                     d.getElementById('previous-slide-trigger').addEventListener('click', function(){
@@ -340,16 +358,9 @@
                                 marginTop: '0px'
                             }, 400, function(){
                                 setTimeout(function(){
-                                    $(d.querySelector('#timeAlertElement')).css('webkitTransform', 'none')
-                                        .animate({
-                                        marginTop: notesEl.offsetHeight+'px',
-                                        marginLeft: (notesEl.offsetWidth/2)+'px',
-                                        'webkitTransform': 'translate(0px, -300px)', // fixing bug in chrome with big font sizes
-                                        fontSize: '70px',
-                                        opacity: 0
-                                    }, 1000, function(){
-                                        d.querySelector('#timeAlertElement').style.display= 'none';
-                                    });
+                                    var el= d.querySelector('#timeAlertElement');
+                                    if(el)
+                                        $(el).fadeOut();
                                 }, 1000);
                             });
                         });
@@ -364,9 +375,6 @@
                 PresentationTool.triggerPresentationToolLoadEvent();
             }
             
-            setTimeout(function(){
-                window.PresentationTool.alertTime(50);
-            }, 1000);
         </script>
     </body>
 </html>

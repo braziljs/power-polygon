@@ -1145,12 +1145,15 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
             toolName= 'PPW-Presentation-tool',
             toolProps= "width=780,height=520,left=40,top=10";
         
-        if(!_conf.presentationTool){
+        if(!_conf.presentationTool || !_conf.presentationTool.focus){
             _conf.presentationTool= _w.open(toolSrc,
                                                 toolName,
                                                 toolProps);
             _conf.presentationTool.onload= function(){
                 _conf.presentationTool.PresentationTool.init($, _w.PPW, _getSlides());
+            };
+            _conf.presentationTool.onunload= function(){
+                _conf.presentationTool= false;
             };
         }else{
             _conf.presentationTool.focus();
@@ -1218,14 +1221,19 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
      * Starts the presentation itself.
      */
     var _startPresentation= function(evt){
+        
+        var el= _d.querySelector('.ppw-menu-start-icon');
+        
         $('#PPW-splash-screen-container').animate({
             marginTop: '-460px'
         }, 200, function(){
             $('#PPW-splash-screen').fadeOut();
         });
-        _conf.presentationStarted= true;
+        _conf.presentationStarted= (new Date()).getTime();
         _goToSlide(_getCurrentSlideFromURL());
-        _d.querySelector('.ppw-menu-start-icon').blur();
+        if(el)
+            el.blur();
+        _triggerEvent('onstart', _conf.currentSlide);
         if(evt){
             evt.preventDefault();
             return false;
@@ -1361,6 +1369,20 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         return _settings.slides[_conf.currentSlide];
     };
     
+    /**
+     * Returns the array with the "alert at" times.
+     */
+    var _getAlertAtTimes= function(){
+        return _settings.alertAt;
+    };
+    
+    /**
+     * Returns the timestamp when the presentation started, or false.
+     */
+    var _getStartedAt= function(){
+        return _conf.presentationStarted;
+    }
+    
     /**************************************************
      *                  CONSTRUCTOR                   *
      **************************************************/
@@ -1403,7 +1425,9 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         showHelp                        : _showHelp,
         // API GETTERS/SETTERS METHODS
         getSlides                       : _getSlides,
-        getCurrentSlide                 : _getCurrentSlide
+        getCurrentSlide                 : _getCurrentSlide,
+        getAlertAtTimes                 : _getAlertAtTimes,
+        getStartedAt                    : _getStartedAt
     };
     
 })(jQuery, document, console);
