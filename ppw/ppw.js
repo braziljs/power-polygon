@@ -33,7 +33,7 @@ window.PPW= (function($, _d, console){
             curLoaded: 0,
             preloadedSlidesCounter: 0,
             cameraLoaded: false,
-            presentationTool: null, // TODO: fix layout bugs
+            presentationTool: null,
             defaults: {
                 duration: 50,
                 alertAt: [30, 40],
