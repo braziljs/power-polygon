@@ -804,7 +804,7 @@ window.PPW= (function($, _d, console){
     var _showSearchBox= function(){
         var content= "Search into slides:<br/>\
                       <input style='margin: auto;' type='text' id='ppw-search-slide' value='' />\
-                      <span id='ppw-search-prev' class='ppw-clickable' title='Find in previous slides(shift+enter)'>◄</span> <span id='ppw-search-next' title='Find in next slides(enter)' class='ppw-clickable'>►</span><span id='ppw-search-found' class='ppw-clickable'></span>",
+                      <span id='ppw-search-prev' class='ppw-clickable' title='Find in previous slides(shift+enter)'>◄</span> <span id='ppw-search-next' title='Find in next slides(enter)' class='ppw-clickable'>►</span><br/><br/><span id='ppw-search-found' class='ppw-clickable'></span>",
             el= null;
         _showMessage(content);
         
@@ -1270,28 +1270,33 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
      * To to the previous slide.
      */
     var _goPreviousSlide= function(){
-        _goToSlide(--_conf.currentSlide);
+        _triggerEvent('onprev');
+        _goToSlide(--_conf.currentSlide-1, true);
     };
     
     /**
      * To to the next slide.
      */
     var _goNextSlide= function(){
-        _goToSlide(++_conf.currentSlide);
+        _triggerEvent('onnext');
+        _goToSlide(_conf.currentSlide+1, true);
     };
     
     /**
      * Go to a specific slide by index.
      */
-    var _goToSlide= function(idx){
+    var _goToSlide= function(idx, prevent){
         
         if(!_conf.presentationStarted)
             return false;
         
-        var url= '';
+        var url= '',
+            previousSlide= _settings.slides[_conf.currentSlide]||false;
         
-        if(idx > _settings.slides.length-1)
+        if(idx > _settings.slides.length-1){
             idx= _settings.slides.length-1;
+            _triggerEvent('onfinish');
+        }
         if(idx < 0)
             idx= 0;
         
@@ -1299,6 +1304,16 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         _setHistoryStateTo(idx);
         
         _setSlideClasses(idx);
+        if(!prevent){
+            _triggerEvent('ongoto');
+        }
+        
+        if(previousSlide && previousSlide.type != _settings.slides[_conf.currentSlide].type)
+            _triggerEvent('onslidetypechange', {
+                previous: previousSlide,
+                current: _settings.slides[_conf.currentSlide]
+            });
+            
         _triggerEvent('onslidechange', idx);
     };
     

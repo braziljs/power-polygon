@@ -1,5 +1,7 @@
 window.PPW.extend("demo", (function(){
     
+    
+    
     return {
         onstart: function(){ console.log("DEMO PLUGIN STARTING"); },
         onfinish: function(){ console.log("DEMO PLUGIN ENDING"); },
@@ -11,6 +13,12 @@ window.PPW.extend("demo", (function(){
         onshowcamera: function(){ console.log("DEMO PLUGIN SHOWING CAMERA"); },
         onhidecamera: function(){ console.log("DEMO PLUGIN HIDING CAMERA"); },
         onslidetypechange: function(){ console.log("DEMO PLUGIN CHANGING SLIDE TYPE"); },
+        
+        onslidechange: function(){ console.log('SLIDE CHANGE'); },
+        ongoto: function(){ console.log('GO-TO'); },
+        onprev: function(){ console.log('SLIDE PREV'); },
+        onnext: function(){ console.log('SLIDE NEXT'); },
+        onslidetypechange: function(){ console.log('SLIDE TYPE CHANGE'); },
         
         onpresentationtoolloaded: function(win){
             console.log("DEMO PLUGIN LOADED THE PRESENTATION TOOL");
