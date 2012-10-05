@@ -781,8 +781,8 @@ window.PPW= (function($, _d, console){
                                                 _settings.slides[i].index= i+1;
                                                 
                                                 $(el).find("script").each(function(i, scr){
-
-                                                    var f= new Function("PPW.slideIterator= this; "+scr.innerText);
+                                                    
+                                                    var f= new Function("PPW.slideIterator= this; "+scr.textContent);
 
                                                     try{
                                                         f.apply(slide);
@@ -812,7 +812,7 @@ window.PPW= (function($, _d, console){
                 _d.body.appendChild(el[0]);
                 $(el).find("script").each(function(count, scr){
                     
-                    var f= new Function("PPW.slideIterator= this; "+scr.innerText);
+                    var f= new Function("PPW.slideIterator= this; "+scr.textContent);
 
                     try{
                         f.apply(slides[i]);
@@ -1486,8 +1486,12 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         slide.actionIdx++;
         
         if(l && slide.actionIdx <= l){
+            try{
+                slide.actions[slide.actionIdx-1].does(slide);
+            }catch(e){
+                console.error("[PPW][Slide action error] There was an error trying to execute an action of the current slide:", slide, e);
+            }
             
-            slide.actions[slide.actionIdx-1].does(slide);
             nextAction= slide.actions[slide.actionIdx];
             
             if(nextAction && nextAction.timing != 'click'){
