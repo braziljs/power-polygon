@@ -36,6 +36,8 @@ window.PPW= (function($, _d, console){
             presentationTool: null,
             currentLang: 'en',
             profiles: {},
+            slidesLoaded: false,
+            themeLoaded: false,
             defaults: {
                 duration: 50,
                 alertAt: [30, 40],
@@ -444,6 +446,7 @@ window.PPW= (function($, _d, console){
         
         _triggerEvent('onslideloaded', loadedSlide);
         if(perc == 100){
+            _conf.slidesLoaded= true;
             _setPresentationProfile();
             _setLION(_settings.defaultLanguage||_n.language);
             _triggerEvent('onslidesloaded', _settings.slides);
@@ -646,6 +649,7 @@ window.PPW= (function($, _d, console){
                 }, false);
 
                 _addListener('onthemeloaded', function(){
+                    _conf.themeLoaded= true;
                     setTimeout(function(){
                         if(!_n.battery.charging){
                             if(_n.battery.dischargingTime / 60 < _settings.duration){
@@ -754,6 +758,8 @@ window.PPW= (function($, _d, console){
         
         for(; i<l; i++){
             el= $('section#'+slides[i].id);
+            
+            slides[i].actions= [];
             if(!el.length){ // should load it from ajax
                 nEl= _d.createElement("section");
                 nEl.id= slides[i].id;
@@ -776,10 +782,10 @@ window.PPW= (function($, _d, console){
                                                 
                                                 $(el).find("script").each(function(i, scr){
 
-                                                    var f= new Function(scr.innerText);
+                                                    var f= new Function("PPW.slideIterator= this; "+scr.innerText);
 
                                                     try{
-                                                        f();
+                                                        f.apply(slide);
                                                     }catch(e){
                                                         console.error("[PPW][Script loaded from slide] There was an error on a script, loaded in one of your slides!", e)
                                                     }
@@ -803,8 +809,19 @@ window.PPW= (function($, _d, console){
                 _settings.slides[i].title= tt;
                 _settings.slides[i].index= i+1;
                 
-                
                 _d.body.appendChild(el[0]);
+                $(el).find("script").each(function(count, scr){
+                    
+                    var f= new Function("PPW.slideIterator= this; "+scr.innerText);
+
+                    try{
+                        f.apply(slides[i]);
+                    }catch(e){
+                        console.error("[PPW][Script loaded from slide] There was an error on a script, loaded in one of your slides!", e)
+                    }
+                });
+                
+                //_bindScripts(el[0], slides[i]);
                 _slidePreloaderNext(_settings.slides[i]);
             }
             if(slides[i].profile){
@@ -812,6 +829,8 @@ window.PPW= (function($, _d, console){
             }
             if(_settings.profile)
                 _conf.profiles[_settings.profile]= true;
+            
+            slides[i].actionIdx= 0;
             el.addClass(_conf.cons.CLASS_SLIDE + " ppw-slide-type-" + (slides[i].type||_conf.defaults.slideType));
         }
     };
@@ -1378,6 +1397,7 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         if(el)
             el.blur();
         _triggerEvent('onstart', _conf.currentSlide);
+        
         if(evt){
             evt.preventDefault();
             return false;
@@ -1387,8 +1407,25 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
     /**
      * Adds an action to each speficied slide.
      */
-    var _addAction= function(fn){
-        // TODO: feature for slides to add actions
+    var _addAction= function(action){
+        
+        var slideRef= PPW.slideIterator;
+        if(!slideRef || !slideRef.actions)
+            return false; // it probably is not loaded yet...will be called again when loaded
+        
+        if(typeof action == 'function'){
+            slideRef.actions.push({
+                timing: 'click',
+                does: action
+            });
+        }else{
+            if(action.does && typeof action.does == 'function'){
+                if(!action.timing)
+                    action.timing= 'click';
+                slideRef.actions.push(action);
+            }
+        }
+        return true;
     };
     
     /**************************************************
@@ -1414,14 +1451,59 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
      * To to the previous slide.
      */
     var _goPreviousSlide= function(){
-        _goToSlide(_conf.currentSlide-1, 'prev');
+        
+        var slide= _settings.slides[_conf.currentSlide],
+            l= slide.actions.length,
+            fn= null;
+        
+        slide.actionIdx--;
+        
+        if(l && slide.actionIdx >=0){
+            fn= slide.actions[slide.actionIdx].undo;
+            if(fn && typeof fn == 'function'){
+                try{
+                    fn(slide);
+                }catch(e){
+                    console.error("[PPW][Slide action error] There was an error trying to execute an action of the current slide:", slide, e);
+                }
+            }else{
+                
+            }
+        }else{
+            _goToSlide(_conf.currentSlide-1, 'prev');
+        }
     };
     
     /**
      * To to the next slide.
      */
     var _goNextSlide= function(){
-        _goToSlide(_conf.currentSlide+1, 'next');
+        
+        var slide= _settings.slides[_conf.currentSlide],
+            l= slide.actions.length,
+            nextAction= false;
+            
+        slide.actionIdx++;
+        
+        if(l && slide.actionIdx <= l){
+            
+            slide.actions[slide.actionIdx-1].does(slide);
+            nextAction= slide.actions[slide.actionIdx];
+            
+            if(nextAction && nextAction.timing != 'click'){
+                if(nextAction.timing == 'auto'){
+                    _goNextSlide();
+                }else{
+                    if(!isNaN(nextAction.timing)){
+                        setTimeout(function(){
+                            _goNextSlide();
+                        }, nextAction.timing);
+                    }
+                }
+            }
+        }else{
+            _goToSlide(_conf.currentSlide+1, 'next');
+        }
     };
     
     /**
@@ -1438,7 +1520,10 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         
         if(idx > _settings.slides.length-1){
             idx= _settings.slides.length-1;
+            _settings.slides[_conf.currentSlide].actionIdx--;
             _triggerEvent('onfinish');
+            if(prevent)
+                return;
         }
         if(idx < 0)
             idx= 0;
@@ -1481,6 +1566,8 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
                 });
             }
         }
+        
+        _settings.slides[_conf.currentSlide].actionIdx = 0;
         
         if(previousSlide && previousSlide.type != curSlide.type)
             _triggerEvent('onslidetypechange', {
