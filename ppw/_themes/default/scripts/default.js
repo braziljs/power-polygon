@@ -1,16 +1,15 @@
 
 PPW.addListener('onstart', function(data){
-    $(PPW.getCurrentSlide().el).fadeIn();
+    $(PPW.getCurrentSlide().el).stop().fadeIn();
 });
 
 PPW.addListener('onslidechange', function(data){
     
     var currentSlide= PPW.getCurrentSlide();
-    //alert(data.current.index)
-    //if(data.current.index != 0){
+    
     if(data.current != data.previous){
         $(data.previous.el).fadeOut(function(){
-            $(data.current.el).fadeIn();
+            $(PPW.getCurrentSlide().el).fadeIn();
         });
     }
     
