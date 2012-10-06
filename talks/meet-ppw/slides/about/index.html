@@ -1,29 +1,49 @@
+
+<style type="text/css">
+    #aboutElement-pt, #aboutElement-en{
+        visibility: hidden;
+    }
+</style>
+
 <div class="LANG-EN">
     <h2>About PPW</h2>
-    <div class="content">
+    <div id="aboutElement-en" class="content">
         PowerPolygon is a powerful framework that help you to prepare HTML5 presentations.
     </div>
 </div>
 <div class="LANG-PT">
     <h2>Sobre o PPW</h2>
-    <div class="content">
+    <div id="aboutElement-pt" class="content">
         PowerPolygon é um framework que lhe ajuda a construir apresentações em HTML5.
     </div>
 </div>
 
 <script>
-    //alert(this.id)
+    
     PPW.addAction({
         
         does: function(){
-            alert('a');
+            PPW.animate("#aboutElement-en, #aboutElement-pt",
+                        'bounceInDown',
+                        {
+                            duration: '2000ms'
+                            //,delay: '1000ms'
+                            //,count: '3'
+                        });
         },
         undo: function(){
-            alert('un-a');
+            PPW.animate("#aboutElement-en, #aboutElement-pt",
+                        'bounceOutUp',
+                        {
+                            duration: '2000ms'
+                            //,delay: '1000ms'
+                            //,count: '3'
+                        });
         }
     });
     
     PPW.addAction(function(){
         alert('b');
     });
+    
 </script>

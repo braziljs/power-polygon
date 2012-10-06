@@ -38,6 +38,7 @@ window.PPW= (function($, _d, console){
             profiles: {},
             slidesLoaded: false,
             themeLoaded: false,
+            animations: ["flip", "flipInX", "flipOutX", "flipInY", "flipOutY", "fadeIn", "fadeInUp", "fadeInDown", "fadeInLeft", "fadeInRight", "fadeInUpBig", "fadeInDownBig", "fadeInLeftBig", "fadeInRightBig", "fadeOut", "fadeOutUp", "fadeOutDown", "fadeOutLeft", "fadeOutRight", "fadeOutUpBig", "fadeOutDownBig", "fadeOutLeftBig", "fadeOutRightBig", "bounceIn", "bounceInDown", "bounceInUp", "bounceInLeft", "bounceInRight", "bounceOut", "bounceOutDown", "bounceOutUp", "bounceOutLeft", "bounceOutRight", "rotateIn", "rotateInDownLeft", "rotateInDownRight", "rotateInUpLeft", "rotateInUpRight", "rotateOut", "rotateOutDownLeft", "rotateOutDownRight", "rotateOutUpLeft", "rotateOutUpRight", "lightSpeedIn", "lightSpeedOut", "hinge", "rollIn", "rollOut"],
             defaults: {
                 duration: 50,
                 alertAt: [30, 40],
@@ -331,6 +332,13 @@ window.PPW= (function($, _d, console){
             rel: "stylesheet",
             type: "text/css",
             href: _settings.PPWSrc+"/_styles/ppw.css",
+            onload: "PPW.setLoadingBarStatus()"
+         }).appendTo("head");
+         
+         $("<link/>", {
+            rel: "stylesheet",
+            type: "text/css",
+            href: _settings.PPWSrc+"/_styles/animate.css",
             onload: "PPW.setLoadingBarStatus()"
          }).appendTo("head");
         
@@ -1685,7 +1693,62 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
             $('#'+_settings.slides[id].id).addClass(_conf.cons.CLASS_NEXT_SLIDE);
     };
     
-    
+    /**
+     * Animates elements using the animate.css library.
+     * 
+     * These animations are purely CSS3.
+     * The user has more control of animations when using the jquery.animate
+     * method.
+     * 
+     * @param Element The element to be animater.
+     * @param String The animation name.
+     * @param Object Settings[optional]
+     */
+    var _animate= function(el, anim, settings){
+        el= $(el);
+        el.show();
+        //alert(el.css('visibility'))
+        if(el.css('visibility') == 'hidden'){
+            el.css('visibility', 'visible');
+        }
+        if(_conf.animations.indexOf(anim)>=0){
+            if(settings){
+                if(settings.duration){
+                    el.css({
+                        'webkitAnimationDuration': settings.duration,
+                        'mozAnimationDuration'   : settings.duration,
+                        'msAnimationDuration'    : settings.duration,
+                        'oAnimationDuration'     : settings.duration,
+                        'animationDuration'      : settings.duration
+                    });
+                }
+                if(settings.delay){
+                    el.css({
+                        'webkitAnimationDelay': settings.delay,
+                        'mozAnimationDelay'   : settings.delay,
+                        'msAnimationDelay'    : settings.delay,
+                        'oAnimationDelay'     : settings.delay,
+                        'animationDelay'      : settings.delay
+                    });
+                }
+                if(settings.count){
+                    el.css({
+                        'webkitAnimationIterationCount': settings.count,
+                        'mozAnimationIterationCount'   : settings.count,
+                        'msAnimationIterationCount'    : settings.count,
+                        'oAnimationIterationCount'     : settings.count,
+                        'animationIterationCount'      : settings.count
+                    });
+                }
+            }
+            el[0].className= el[0].className.replace(/ppw\-anim\-([a-zA-z0-9\-_]+)( |$)/g, '');
+            el.removeClass(anim).addClass('animated ppw-anim-'+anim);
+            
+        }else{
+            throw new Error("Invalid animation "+anim);
+            return false;
+        }
+    };
     
     /**************************************************
      *                GETTERS/SETTERS                 *
@@ -1724,11 +1787,9 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
     var _constructor= function(){
         _createSplashScreen();
         _conf.currentSlide= _getCurrentSlideFromURL();
-        //if(_conf.currentSlide !== 0){
-            //_setHistoryStateTo(_conf.currentSlide);
-            _goToSlide(_conf.currentSlide);
-        //}
+        _goToSlide(_conf.currentSlide);
     };
+    
     $(_d).ready(_constructor);
     
     
@@ -1758,6 +1819,9 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         showGoToComponent               : _showGoToComponent,
         showSearchBox                   : _showSearchBox,
         showHelp                        : _showHelp,
+        animations                      : _conf.animations,
+        animate                         : _animate,
+        language                        : _conf.currentLang,
         // API GETTERS/SETTERS METHODS
         getSlides                       : _getSlides,
         getCurrentSlide                 : _getCurrentSlide,
