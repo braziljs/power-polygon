@@ -29,7 +29,7 @@ window.PPW= (function($, _d, console){
         
         // internal configuration properties
         _conf= {
-            loadSteps: 5,
+            loadSteps: 6,
             curLoaded: 0,
             preloadedSlidesCounter: 0,
             cameraLoaded: false,
@@ -244,6 +244,8 @@ window.PPW= (function($, _d, console){
         $('#PPW-loadingbar').css({width: perc+'%'});
         if(perc >= 100){
             _triggerEvent('onthemeloaded', _settings.themeSettings);
+            if(!_settings.useSplashScreen)
+                _preloadSlides();
             $('#PPW-lock-loading').fadeOut();
         }
     };
@@ -454,11 +456,14 @@ window.PPW= (function($, _d, console){
         }
         
         _triggerEvent('onslideloaded', loadedSlide);
+        
         if(perc == 100){
             _conf.slidesLoaded= true;
             _setPresentationProfile();
             _setLION(_settings.defaultLanguage||_n.language);
             _triggerEvent('onslidesloaded', _settings.slides);
+            if(!_settings.useSplashScreen)
+                _startPresentation();
         }
         
         $('#ppw-slides-loader-bar-loading-container>div').stop().animate({
@@ -723,7 +728,7 @@ window.PPW= (function($, _d, console){
                $t= $(t);
 
         if(tag == 'a' || tag == 'button' ||
-           tag == 'input' || tag == 'textarea' ||
+           tag == 'input' || tag == 'textarea' || tag == 'select' ||
            $t.hasClass(_conf.cons.FOCUSABLE_ELEMENT) ||
            $t.hasClass(_conf.cons.CLICKABLE_ELEMENT) ||
            t.hasAttribute('tabindex')){
@@ -1039,9 +1044,9 @@ window.PPW= (function($, _d, console){
 
             });
         }else{
-            _preloadSlides();
+            //_preloadSlides();
             _setLoadingBarStatus();
-            _startPresentation();
+            //_startPresentation();
         }
     };
     
