@@ -84,6 +84,7 @@ window.PPW= (function($, _d, console){
             duration: _conf.defaults.duration,
             showBatteryAlerts: true,
             showOfflineAlerts: true,
+            slidesCache: true,
             profile: 'none'
         },
         // a local reference to the $(document)
@@ -737,7 +738,8 @@ window.PPW= (function($, _d, console){
         
         return _settings.fsPattern
                         .replace(/\%id/i, id)
-                        .replace(/\%num/i, idx);
+                        .replace(/\%num/i, idx)
+                            + (!_settings.slidesCache? ('?noCache='+(new Date()).getTime()) : '');
     }
     
     /**
@@ -1485,7 +1487,14 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
             
         slide.actionIdx++;
         
+        
         if(l && slide.actionIdx <= l){
+            
+            if(slide._timer){
+                _w.clearTimeout(_settings.slides[_conf.currentSlide]._timer);
+                slide._timer= false;
+            }
+            
             try{
                 slide.actions[slide.actionIdx-1].does(slide);
             }catch(e){
@@ -1495,12 +1504,13 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
             nextAction= slide.actions[slide.actionIdx];
             
             if(nextAction && nextAction.timing != 'click'){
-                if(nextAction.timing == 'auto'){
+                if(nextAction.timing == 'auto' || slide._timer){
                     _goNextSlide();
                 }else{
                     if(!isNaN(nextAction.timing)){
-                        setTimeout(function(){
+                        _settings.slides[_conf.currentSlide]._timer= _w.setTimeout(function(){
                             _goNextSlide();
+                            _settings.slides[_conf.currentSlide]._timer= false
                         }, nextAction.timing);
                     }
                 }
@@ -1522,6 +1532,13 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
             previousSlide= _settings.slides[_conf.currentSlide]||false,
             curSlide= null;
         
+        // let' clean the previos timeout, if any
+        if(previousSlide._timer){
+            _w.clearTimeout(previousSlide._timer);
+            previousSlide._timer= false;
+        }
+        
+        // if there are no more slides, triggers the onfinish event
         if(idx > _settings.slides.length-1){
             idx= _settings.slides.length-1;
             _settings.slides[_conf.currentSlide].actionIdx--;
@@ -1529,7 +1546,9 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
             if(prevent)
                 return;
         }
-        if(idx < 0)
+        
+        // if it is negative or not valid, goes to the first slide
+        if(idx < 0 || isNaN(idx))
             idx= 0;
         
         _conf.currentSlide= idx;
@@ -1540,6 +1559,8 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
             return false;
         }
         
+        // if the current slide should not be visible for the current profile
+        // skips it going to the next or previous slide
         if(!_isValidProfile(curSlide)){
             if(prevent == 'prev'){
                 _goPreviousSlide();
@@ -1552,6 +1573,8 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         _setHistoryStateTo(idx);
         
         _setSlideClasses(idx);
+        
+        // triggers the events
         if(!prevent){
             _triggerEvent('ongoto', {
                 previous: previousSlide,
@@ -1571,18 +1594,32 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
             }
         }
         
-        _settings.slides[_conf.currentSlide].actionIdx = 0;
-        
+        // if the slide is of a different type
         if(previousSlide && previousSlide.type != curSlide.type)
             _triggerEvent('onslidetypechange', {
                 previous: previousSlide,
                 current: curSlide
             });
-            
+        
+        // default event for slidechange
         _triggerEvent('onslidechange', {
             previous: previousSlide,
             current: curSlide
         });
+        
+        // rests the current action for the slide
+        _settings.slides[_conf.currentSlide].actionIdx = 0;
+        
+        // if the slide has actions and the first one has a timing definition
+        if(curSlide.actions[0] && curSlide.actions[0].timing != 'click'){
+            if(curSlide.actions[0].timing == 'auto'){
+                _goNextSlide();
+            }else if(!isNaN(curSlide.actions[0].timing)){
+                _settings.slides[_conf.currentSlide]._timer= setTimeout(function(){
+                    _goNextSlide();
+                }, curSlide.actions[0].timing);
+            }
+        }
     };
     
     /**
