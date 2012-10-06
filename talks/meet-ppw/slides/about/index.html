@@ -28,7 +28,13 @@
                         {
                             duration: '2000ms'
                             //,delay: '1000ms'
-                            //,count: '3'
+                            ,count: '4'
+                            ,onstart: function(){
+                                console.log('started the animation!!');
+                            }
+                            ,onend: function(){
+                                console.log('ended the animation!!');
+                            }
                         });
         },
         undo: function(){

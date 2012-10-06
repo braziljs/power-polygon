@@ -1737,8 +1737,21 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
                         'mozAnimationIterationCount'   : settings.count,
                         'msAnimationIterationCount'    : settings.count,
                         'oAnimationIterationCount'     : settings.count,
-                        'animationIterationCount'      : settings.count
+                        'animationiterationcount'      : settings.count
                     });
+                }
+                if(settings.onstart && typeof settings.onstart == 'function'){
+                    el.one('webkitAnimationStart', settings.onstart);
+                    el.one('msAnimationStart', settings.onstart);
+                    el.one('oAnimationStart', settings.onstart);
+                    el.one('animationstart', settings.onstart);
+                }
+                if(settings.onend && typeof settings.onend == 'function'){
+                    el.one('webkitAnimationEnd', settings.onend);
+                    el.one('mozAnimationEnd', settings.onend);
+                    el.one('msAnimationEnd', settings.onend);
+                    el.one('oAnimationEnd', settings.onend);
+                    el.one('animationend', settings.onend);
                 }
             }
             el[0].className= el[0].className.replace(/ppw\-anim\-([a-zA-z0-9\-_]+)( |$)/g, '');
