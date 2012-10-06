@@ -1543,7 +1543,8 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         
         var url= '',
             previousSlide= _settings.slides[_conf.currentSlide]||false,
-            curSlide= null;
+            curSlide= null,
+            elementsToCleanUp= [];
         
         // let' clean the previos timeout, if any
         if(previousSlide._timer){
@@ -1623,6 +1624,12 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         // rests the current action for the slide
         _settings.slides[_conf.currentSlide].actionIdx = 0;
         
+        // remove animated classes to fix the issue #1
+        elementsToCleanUp= $(curSlide.el).find('.animated');
+        elementsToCleanUp.each(function(){
+            _removeAnimateCSSClasses(this);
+        });
+        
         // if the slide has actions and the first one has a timing definition
         if(curSlide.actions[0] && curSlide.actions[0].timing != 'click'){
             if(curSlide.actions[0].timing == 'auto'){
@@ -1698,6 +1705,15 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
             $('#'+_settings.slides[id].id).addClass(_conf.cons.CLASS_NEXT_SLIDE);
     };
     
+    var _removeAnimateCSSClasses= function(el){
+        
+        if(el.length)
+            el= el[0];
+        
+        el.className= el.className.replace(/ppw\-anim\-([a-zA-z0-9\-_]+)( |$)/g, '');
+        return el;
+    }
+    
     /**
      * Animates elements using the animate.css library.
      * 
@@ -1710,12 +1726,9 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
      * @param Object Settings[optional]
      */
     var _animate= function(el, anim, settings){
+        
         el= $(el);
-        el.show();
-        //alert(el.css('visibility'))
-        if(el.css('visibility') == 'hidden'){
-            el.css('visibility', 'visible');
-        }
+        
         if(_conf.animations.indexOf(anim)>=0){
             if(settings){
                 if(settings.duration){
@@ -1759,8 +1772,10 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
                     el.one('animationend', settings.onend);
                 }
             }
-            el[0].className= el[0].className.replace(/ppw\-anim\-([a-zA-z0-9\-_]+)( |$)/g, '');
-            el.removeClass(anim).addClass('animated ppw-anim-'+anim);
+            
+            _removeAnimateCSSClasses(el[0]);
+            
+            el.removeClass(anim).addClass('animated ppw-anim-visible ppw-anim-'+anim);
             
         }else{
             throw new Error("Invalid animation "+anim);

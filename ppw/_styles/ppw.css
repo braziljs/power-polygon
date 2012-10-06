@@ -402,6 +402,13 @@ ppw-message-content{
     overflow: hidden !IMPORTANT;
 }
 
+/* USED TO FIX THE ISSUE #1 */
+.ppw-anim-visible{
+    display: block !IMPORTANT;
+    visibility: visible !IMPORTANT;
+}
+/**/
+
 .glass{
     -webkit-background-origin: border-box;
     -moz-background-origin: border;
