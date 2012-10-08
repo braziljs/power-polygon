@@ -74,6 +74,7 @@
                 text-align: center;
                 font-size: 36px;
                 letter-spacing: -5px;
+                background-color: #eee;
             }
             .slide-counter span{
                 letter-spacing: 0px;
@@ -82,13 +83,13 @@
             .slide-counter span:nth-child(1){
                 font-weight: bold;
                 font-size: 60px;
-                margin-right: -14px;
+                /*margin-right: -14px;*/
             }
             
             .slide-percent-container{
                 width: 170px;
-                height: 10px;
-                border: solid 1px white;
+                height: 13px;
+                border: solid 1px gray;
                 background-color: white;
                 overflow: hidden;
                 margin: auto;
@@ -98,7 +99,7 @@
             }
             #slide-percent-bar{
                 height: 100%;
-                width: 32%;
+                width: 0%;
                 background-color: green;
                 border-radius: 0px 4px 4px 0px;
             }
@@ -106,11 +107,10 @@
             .slide-next-title{
                 margin: 4px;
                 border: solid 1px white;
-                background-color: gray;
+                background-color: #eee;
                 padding: 4px;
                 font-size: 32px;
                 color: white;
-                text-align: justify;
             }
             .slide-next-title span{
                 font-size: 24px;
@@ -122,6 +122,7 @@
                 bottom: -10px;
                 right: 4px;
                 font-size: 40px;
+                cursor: pointer;
             }
             #timer span{
                 font-weight: bold;
@@ -141,37 +142,57 @@
                 text-align: center;
                 font-weight: bold;
                 color: red;
-                /*text-shadow: 0px 0px 40px black;*/
+                
+                -webkit-text-stroke: 3px black;
+                -moz-text-stroke: 3px black;
+                text-stroke: 3px black;
+                
                 font-size: 600px;
+                display: none;
+            }
+            
+            #previous-slide-trigger, #next-slide-trigger{
+                cursor: pointer;
+                position: absolute;
+            }
+            #previous-slide-trigger{
+                left: 0px;
+            }
+            #next-slide-trigger{
+                right: 0px;
+            }
+            
+            #cameraContainer{
+                position: absolute;
+                right: 0px;
+                top: 205px;
+                width: 200px;
+                height: 200px;
+                background-color: black;
                 display: none;
             }
         </style>
     </head>
     <body>
-        <div id="header">PPW: Current slide title</div>
+        <div id="header"><span id="previous-slide-trigger">◄</span>PPW: <span id="ppw-slide-title">...</span><span id="next-slide-trigger">►</span></div>
         <div id="notes">
             <div class="title">
                 Notes
             </div>
             <div class="notes-list">
-                <ul type="disc">
-                    <li>Some note here to test the screen style</li>
-                    <li>Another idea should be typed here!</li>
-                    <li>Remember to say THIS</li>
-                    <li>Blah!</li>
-                    <li>Ok, now it's got boring already</li>
+                <ul type="disc" id="slide-notes-list">
                 </ul>
             </div>
         </div>
         
         <div id="right-panel">
             <div class="slide-counter">
-                <span>
-                    12
+                <span id="slides-current-slide">
+                    0
                 </span>
                 /
-                <span>
-                    43
+                <span id="slides-length">
+                    0
                 </span>
                 <div class="slide-percent-container">
                     <div id="slide-percent-bar">
@@ -179,15 +200,19 @@
                 </div>
             </div>
             <div class="slide-next-title">
-                <span>Next: </span>Next slide's title
+                <span>Next: </span><span id="next-slide-title">...</span>
             </div>
             
             <div class="addons-container">
             </div>
             
             <div id="timer">
-                <span>556</span>min
+                <span>0</span>min
             </div>
+        </div>
+        
+        <div id="cameraContainer">
+            <video id="ppw-video-element" autoplay="autoplay"></video>
         </div>
         
         <div id="timeAlertElement">30</div>
@@ -197,41 +222,143 @@
             
             window.PresentationTool= (function(_d){
                 var $= null,
-                    ppw= null;
+                    ppw= null,
+                    slides= null,
+                    curSlide= null,
+                    o= opener,
+                    d= _d,
+                    timer= 0,
+                    clock;
                 
+                var _setCurrentSlide= function(){
+                    
+                    var slide= curSlide= ppw.getCurrentSlide(),
+                        str= "",
+                        i= 0,
+                        l= 0,
+                        el= null;
+                    
+                    d.getElementById('ppw-slide-title').innerHTML= slide.title || slide.id;
+                    d.getElementById('slides-current-slide').innerHTML= slide.index;
+                    if(slides[slide.index]){
+                        d.getElementById('next-slide-title').innerHTML= slides[slide.index].title;
+                    }else{
+                        d.getElementById('next-slide-title').innerHTML= "Final";
+                    }
+                    
+                    el= d.getElementById('slide-notes-list');
+                    if(slide.notes && slide.notes.length){
+                        l= slide.notes.length;
+                        for(; i<l; i++){
+                            str+= "<li>"+slide.notes[i]+"</li>";
+                        }
+                    }else{
+                        str= "--";
+                    }
+                    el.innerHTML= str;
+                    
+                    el= d.getElementById('slide-percent-bar');
+                    el.style.width= (slide.index * 100 / slides.length)+'%';
+                };
+                
+                var _startTimer= function(){
+                    clock= setInterval(function(){
+                        timer++;
+                        
+                        if(ppw.getAlertAtTimes().indexOf(timer) >= 0){
+                            window.PresentationTool.alertTime(timer);
+                        }
+                        
+                        d.querySelector('#timer span').innerHTML= timer;
+                    }, 60000);
+                    d.querySelector('#timer span').innerHTML= timer;
+                };
+                
+                var _init= function(_$, _ppw, _slides){
+                    
+                    var el= null, started= false, dt= new Date();
+                    
+                    $= _$;
+                    ppw= _ppw;
+                    slides= _slides;
+                    d.getElementById('slides-length').innerHTML= slides.length;
+                    _setCurrentSlide();
+                    
+                    el= d.getElementById('timer');
+                    
+                    el.style.border= 'solid 1ps red';
+                    el.addEventListener('click', function(){
+                        
+                        var t= prompt("Set the current time to:");
+                        if(!t)
+                            return false;
+
+                        if(isNaN(t))
+                            t= timer;
+                        timer= t;
+                        d.querySelector('#timer span').innerHTML= timer;
+
+                    }, false);
+                
+                    started= ppw.getStartedAt();
+                    if(!started){
+                        ppw.addListener('onstart', _startTimer);
+                    }else{
+                        timer= Math.floor((dt.getTime() - started) / 60000);
+                        _startTimer();
+                    }
+                    
+                    
+                    d.getElementById('previous-slide-trigger').addEventListener('click', function(){
+                        ppw.goPreviousSlide();
+                    }, false);
+                    d.getElementById('next-slide-trigger').addEventListener('click', function(){
+                        ppw.goNextSlide();
+                    }, false);
+                
+                    ppw.addListener('onslidechange', function(){
+                        _setCurrentSlide();
+                    });
+                    /*
+                    ppw.addListener("onshowcamera", function(data){
+                        var video= d.getElementById('ppw-video-element');
+                        
+                        video.src= data.device;
+                        video.play();
+                    });*/
+                    
+                };
+                    
                 var verifyInstance= function(){
                     if(!$){
-                        $= opener.jQuery;
-                        ppw= opener.PPW;
+                        _init(o.jQuery, o.PPW, o.PPW.getSlides());
                     }
                 }
                 
                 return {
-                    init: function(_$, _ppw){
-                        $= _$;
-                        ppw= ppw
-                    },
+                    init: _init,
                     adjustScreen: function(){
                         verifyInstance();
                         
-                        var notesEl= document.getElementById('notes'),
-                            bar= document.getElementById('right-panel'),
-                            tt= document.getElementById('header');
+                        var notesEl= d.getElementById('notes'),
+                            bar= d.getElementById('right-panel'),
+                            tt= d.getElementById('header');
                         
-                        notesEl.style.width= (document.body.clientWidth - bar.offsetWidth - 22) + 'px';
-                        notesEl.style.height= (document.body.clientHeight - tt.offsetHeight - 22) + 'px';
+                        notesEl.style.width= (d.body.clientWidth - bar.offsetWidth - 22) + 'px';
+                        notesEl.style.height= (d.body.clientHeight - tt.offsetHeight - 22) + 'px';
                         
                     },
                     triggerPresentationToolLoadEvent: function(){
                         ppw.triggerPresentationToolLoadEvent(window);
                     },
                     alertTime: function(t){
+                        
                         var el= null,
-                            notesEl= document.getElementById('notes');
+                            notesEl= d.getElementById('notes');
                             
                         verifyInstance();
                         
-                        el= $(document.querySelector('#timeAlertElement'));
+                        el= $(d.querySelector('#timeAlertElement'));
                         
                         el.html(t)
                           .show()
@@ -251,19 +378,15 @@
                                 marginTop: '0px'
                             }, 400, function(){
                                 setTimeout(function(){
-                                    $(document.querySelector('#timeAlertElement')).css('webkitTransform', 'none')
-                                        .animate({
-                                        marginTop: notesEl.offsetHeight+'px',
-                                        marginLeft: (notesEl.offsetWidth/2)+'px',
-                                        'webkitTransform': 'translate(0px, -300px)', // fixing bug in chrome with big font sizes
-                                        fontSize: '70px',
-                                        opacity: 0
-                                    }, 1000);
+                                    var el= d.querySelector('#timeAlertElement');
+                                    if(el)
+                                        $(el).fadeOut();
                                 }, 1000);
                             });
                         });
                     }
                 }
+                
             })(document);
             
             window.onresize= PresentationTool.adjustScreen;
@@ -272,9 +395,6 @@
                 PresentationTool.triggerPresentationToolLoadEvent();
             }
             
-            setTimeout(function(){
-                window.PresentationTool.alertTime(50);
-            }, 1000);
         </script>
     </body>
 </html>

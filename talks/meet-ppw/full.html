@@ -7,13 +7,33 @@
         <script>window.jQuery || document.write('<script src="../../ppw/libs/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="../../ppw/ppw.js"></script>
         <script src="../../ppw/_addons/addon-demo/demo.js"></script>
-        <script src="../../ppw/_addons/remote-slide/demo.js"></script>
     </head>
     <body>
         
         <section id="closing">
             <h2 class="LANG-EN">Thank you!</h2>
             <h2 class="LANG-PT">Obrigado!</h2>
+            <div class="content">
+                <span class="LANG-EN">Questions?</span>
+                <span class="LANG-PT">Perguntas?</span>
+            </div>
+            
+            <script>
+                
+                PPW.addAction({
+                    does: function(){
+                        alert('last blah ever!');
+                    },
+                    undo: function(){
+                        alert('maybe not! :)');
+                    }
+                });
+
+                PPW.addAction(function(){
+                    alert('blah!');
+                });
+            </script>
+            
         </section>
         
         <script>
@@ -60,6 +80,8 @@
                 showBatteryAlerts: true,
                 // should show a notification when goes offline?
                 showOfflineAlerts: true,
+                // should allow cache for external slides? (default true)
+                slidesCache: false,
                 
                 /**
                  * Defines the profile for your presentation.
@@ -69,7 +91,7 @@
                  * here, will be shown.
                  * default: 'none'
                  */
-                profile: 'designers', // showing only slides with no profile, or profile=='designers'
+                profile: false,
                 
                 /**
                  *
@@ -78,7 +100,7 @@
                 defaultLanguage: 'EN',
                 
                 /**************************************************
-                *  PRESENTATION DATA (mostly required properties) *
+                *  PRESENTATION DATA                              *
                 **************************************************/
                
                 // the theme to be used (default: default)
@@ -93,35 +115,14 @@
                 slides: [
                     {
                         type: 'opening',
-                        id: 'cover', // also used as source
-                        // no profile set, so it will always be shown
-                        notes: [
-                            "this is the very first slide",
-                            "and has only these two useless notes"
-                        ]
+                        id: 'cover'
                     },
                     {
                         type: 'content',
-                        id: 'subject-a',
-                        // shown only when the presentation profile is none, or designers
-                        profile: 'designers',
-                        notes: [
-                            "First note",
-                            "Second useless note"
-                        ]
+                        id: 'about'
                     },
                     {
-                        type: 'title',
-                        id: 'another-title'
-                    },
-                    {
-                        type: 'content',
-                        id: 'subject-b',
-                        // shown only when the presentation profile is none, or programmers
-                        profile: 'programmers',
-                        notes: [
-                            "Another of those notes"
-                        ]
+                        id: 'profile-example'
                     },
                     {
                         type: 'closing',
