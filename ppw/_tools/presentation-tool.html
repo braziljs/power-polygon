@@ -161,6 +161,16 @@
             #next-slide-trigger{
                 right: 0px;
             }
+            
+            #cameraContainer{
+                position: absolute;
+                right: 0px;
+                top: 205px;
+                width: 200px;
+                height: 200px;
+                background-color: black;
+                display: none;
+            }
         </style>
     </head>
     <body>
@@ -199,6 +209,10 @@
             <div id="timer">
                 <span>0</span>min
             </div>
+        </div>
+        
+        <div id="cameraContainer">
+            <video id="ppw-video-element" autoplay="autoplay"></video>
         </div>
         
         <div id="timeAlertElement">30</div>
@@ -305,6 +319,13 @@
                     ppw.addListener('onslidechange', function(){
                         _setCurrentSlide();
                     });
+                    /*
+                    ppw.addListener("onshowcamera", function(data){
+                        var video= d.getElementById('ppw-video-element');
+                        
+                        video.src= data.device;
+                        video.play();
+                    });*/
                     
                 };
                     

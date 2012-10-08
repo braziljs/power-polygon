@@ -317,7 +317,7 @@ ppw-message-content{
     position: absolute;
     left: -200px;
     bottom: 0px;
-    min-width: 200px;
+    min-width: 52px;
     min-height: 28px;
     padding: 5px;
     
@@ -333,10 +333,11 @@ ppw-message-content{
     z-index: 999999998;
 }
 .ppw-notification-close-button{
-    background: black;
+    background: #222;
     color: white;
-    width: 28px;
-    height: 28px;
+    width: 20px;
+    height: 34px;
+    font-size: 16px;
     margin: -5px;
     margin-left: 3px;
     float: right;

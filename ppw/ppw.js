@@ -487,7 +487,7 @@ window.PPW= (function($, _d, console){
             
             // if the element is an input or has the ppw-focusable class
             // then no shortcut will be executed.
-            if(_isEditableTarget(evt.target))
+            if(_isEditableTarget(evt.target) && evt.keyCode != 27/*esc*/)
                 return true;
                 
             switch(evt.keyCode){
@@ -611,6 +611,8 @@ window.PPW= (function($, _d, console){
                     
                 case 70: // F
                     _showSearchBox();
+                    evt.preventDefault();
+                    return false;
                     break
             }
             return true;
@@ -656,7 +658,7 @@ window.PPW= (function($, _d, console){
             if(_n.battery){
                 _n.battery.addEventListener('chargingchange', function(data){
                     if(!_n.battery.charging){ // was charging and is not anymore
-                        _showNotification("Your battery stoped charging!");
+                        _showNotification("<img src='"+_settings.PPWSrc+"/_images/electricity.png' width='20' alt='Your battery stoped charging!' />");
                     }else{
                         _closeNotification();
                     }
@@ -666,14 +668,23 @@ window.PPW= (function($, _d, console){
                     _conf.themeLoaded= true;
                     setTimeout(function(){
                         if(!_n.battery.charging){
-                            if(_n.battery.dischargingTime / 60 < _settings.duration){
-                                _showNotification("You have "+ (_n.battery.dischargingTime / 60)+" minutes of battery!");
+                            if(_n.battery.dischargingTime / 600000 < _settings.duration){
+                                _showNotification("<img src='"+_settings.PPWSrc+"/_images/electricity.png' width='20' title='You have "+ (_n.battery.dischargingTime / 60)+" minutes of battery!' />");
                             }
                         }
                     }, 1000);
                 });
             }
         }
+        
+        _w.addEventListener('blur', function(){
+            if(_d.getElementById('ppw-message-box').style.display != 'none'){
+                if(_d.getElementById('ppw-message-box-button').style.display == 'none'){
+                    _closeMessage();
+                }
+            }
+            
+        }, false);
     };
     
     /**
@@ -727,7 +738,7 @@ window.PPW= (function($, _d, console){
                tag= t.tagName.toLowerCase(),
                $t= $(t);
 
-        if(tag == 'a' || tag == 'button' ||
+        if(tag == 'a' || tag == 'button' || tag == 'option' ||
            tag == 'input' || tag == 'textarea' || tag == 'select' ||
            $t.hasClass(_conf.cons.FOCUSABLE_ELEMENT) ||
            $t.hasClass(_conf.cons.CLICKABLE_ELEMENT) ||
@@ -978,7 +989,7 @@ window.PPW= (function($, _d, console){
         
         _preparePPW();
         
-        // APPENDING THE CAMERA AND MESSAGE-BOX TO THE DOCUMENT
+        // APPENDING THE CAMERA, TOOLBAR AND MESSAGE-BOX TO THE DOCUMENT
         $b.append('<div id="ppw-message-box" class="ppw-clickable">\
                         <div id="ppw-message-content" class="ppw-clickable"></div>\
                         <div id="ppw-message-box-ok-button" class="ppw-clickable">\
@@ -1173,6 +1184,14 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
                   video.play();
                   _conf.cameraLoaded= true;
                   
+                  _conf.video= video;
+                  _conf.stream= stream;
+                  
+                  _triggerEvent('onshowcamera', {
+                      "video": _conf.video,
+                      "device": _conf.stream
+                  });
+                  
                   el.draggable()
                     .resizable({
                         handles: "se, sw, ne, nw, n, e, s, w"
@@ -1213,14 +1232,15 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
                     }).animate({top: '0px'}, 500);
                     
                     $('#ppw-camera-hide-trigger').bind('click', _pauseCamera);
-                    _triggerEvent('onshowcamera', video);
-
+                    
                 }, function(data){
                     alert("Could NOT start the video!");
                     console.error("[PPW Error]: Could now open the camera!", data);
+                    return false;
                 });
             }else{
                 alert("Could NOT start the video!");
+                return false;
             }
         }else{
             _d.querySelector('#ppw-video-element').play();
@@ -1229,6 +1249,13 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
                             left: _b.offsetWidth - el[0].offsetWidth-10,
                             top: 0-el[0].offsetHeight
                        }).animate({top: '0px'}, 500);
+            }
+            
+            if(_conf.video && _conf.stream){
+                _triggerEvent('onshowcamera', {
+                    "video": _conf.video,
+                    "device": _conf.stream
+                });
             }
         }
     };
