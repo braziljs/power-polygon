@@ -226,10 +226,11 @@ window.PPW= (function($, _d, console){
      */
     var _init= function(conf){
         $.extend(_settings, conf);
-        _triggerEvent('onload', conf);
+        
         if(_settings.shortcutsEnable){
             _enableFuncKeys();
         }
+        _triggerEvent('onload', conf);
     };
     
     /**
@@ -455,9 +456,11 @@ window.PPW= (function($, _d, console){
             };
         }
         
+        // for each loaded slide
         _triggerEvent('onslideloaded', loadedSlide);
         
         if(perc == 100){
+            // when all the slides loaded
             _conf.slidesLoaded= true;
             _setPresentationProfile();
             _setLION(_settings.defaultLanguage||_n.language);
@@ -1890,3 +1893,33 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
     };
     
 })(jQuery, document, console);
+
+
+(function(){
+        // enabling jquery to load multiple scripts
+	var getScript = $.getScript;
+
+        $.getScript = function( resources, callback ) {
+
+                if(typeof resources == 'string')
+                    resources= [resources];
+                var // reference declaration & localization
+                length = resources.length, 
+                handler = function() { counter++; },
+                deferreds = [],
+                counter = 0, 
+                idx = 0;
+
+                for ( ; idx < length; idx++ ) {
+                    deferreds.push(
+                            getScript( resources[ idx ], handler )
+                    );
+                }
+
+                $.when.apply( null, deferreds ).then(function() {
+                    callback && callback();
+                });
+                
+        };
+        //
+})();
