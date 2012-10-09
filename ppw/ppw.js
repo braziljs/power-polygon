@@ -1842,7 +1842,11 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
      */
     var _getStartedAt= function(){
         return _conf.presentationStarted;
-    }
+    };
+    
+    var _get= function(key){
+        return _settings[key]||false;
+    };
     
     /**************************************************
      *                  CONSTRUCTOR                   *
@@ -1889,7 +1893,8 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         getSlides                       : _getSlides,
         getCurrentSlide                 : _getCurrentSlide,
         getAlertAtTimes                 : _getAlertAtTimes,
-        getStartedAt                    : _getStartedAt
+        getStartedAt                    : _getStartedAt,
+        get                             : _get
     };
     
 })(jQuery, document, console);
