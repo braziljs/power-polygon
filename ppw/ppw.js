@@ -680,6 +680,7 @@ window.PPW= (function($, _d, console){
             }
         }
         
+        // window events
         _w.addEventListener('blur', function(){
             if(_d.getElementById('ppw-message-box').style.display != 'none'){
                 if(_d.getElementById('ppw-message-box-button').style.display == 'none'){
@@ -688,6 +689,13 @@ window.PPW= (function($, _d, console){
             }
             
         }, false);
+        
+        _w.onbeforeunload= function(){
+            
+            if(_conf.presentationTool)
+                _conf.presentationTool.close();
+            return null;
+        };
     };
     
     /**

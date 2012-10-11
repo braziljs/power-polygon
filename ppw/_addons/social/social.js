@@ -32,42 +32,32 @@ window.PPW.extend("demo", (function(data){
             conf= PPW.get('social');
             el= document.createElement('div');
             el.id= 'PPWSocialPluginAlertElement';
-            if(conf.socialAlertType == 'popup'){
-                $(el).css({
-                    position: 'absolute',
-                    left: '6px',
-                    bottom: '-150px',
-                    zIndex: 999999999,
-                    backgroundColor: '#fff',
-                    height: '90px',
-                    width: '320px',
-                    padding: '4px',
-                    overflow: 'hidden',
-                    boxShadow: '0px 0px 20px black',
-                    color: '#444',
-                    fontSize: '16px',
-                    fontFamily: 'Verdana, Tahoma, Sans, Arial',
-                    opacity: 0
-                });
-            }else{
-                $(el).css({
-                    position: 'absolute',
-                    left: '0px',
-                    bottom: '0px',
-                    zIndex: 999999999,
-                    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-                    height: '26px',
-                    minWidth: '100%',
-                    color: 'white',
-                    fontSize: '16px',
-                    fontFamily: 'Verdana, Tahoma, Sans, Arial',
-                    overflow: 'visible',
-                    textIndent: '0px',
-                    whiteSpace: 'nowrap',
-                    display: 'none'
-                });
-            }
+
+            $(el).css({
+                position: 'absolute',
+                left: '6px',
+                bottom: '-150px',
+                zIndex: 999999999,
+                backgroundColor: '#fff',
+                height: '90px',
+                width: '320px',
+                padding: '4px',
+                overflow: 'hidden',
+                boxShadow: '0px 0px 20px black',
+                color: '#444',
+                fontSize: '16px',
+                fontFamily: 'Verdana, Tahoma, Sans, Arial',
+                opacity: 0
+            });
+
             PPWSocialPlugin.el= el;
+            
+            $(PPWSocialPlugin.el).bind('mouseover', function(){
+                window.clearTimeout(PPWSocialPlugin.timeOut);
+            });
+            $(PPWSocialPlugin.el).bind('mouseout', function(){
+                PPWSocialPlugin.timeOut= setTimeout(PPWSocialPlugin.showPopMessage, PPWSocialPlugin.alertTime);
+            });
         },
         onpresentationtoolloaded: function(win){
             win.document.body.appendChild(PPWSocialPlugin.el);
@@ -113,30 +103,13 @@ window.PPWSocialPlugin.twitterCallback= function(data){
     
     el= $(PPWSocialPlugin.el);
 
-    if(social.socialAlertType == 'popup'){
-        el.animate({
-            bottom: '6px',
-            opacity: 1
-        }, function(){
-            PPWSocialPlugin.showPopMessage();
-            setTimeout(PPWSocialPlugin.showPopMessage, alertTime);
-        });
-    }else{
-
-        el.html(str);
-        el.css('textIndent', '0px').fadeIn();
-        w= el.offsetWidth;
-        setTimeout(function(){
-            el.animate({
-                textIndent: (-1*(w))+ 'px'
-            },
-            w*10,
-            'linear',
-            function(){
-                el.fadeOut();
-            });
-        }, 500);
-    }
+    el.animate({
+        bottom: '6px',
+        opacity: 1
+    }, function(){
+        PPWSocialPlugin.showPopMessage();
+        setTimeout(PPWSocialPlugin.showPopMessage, alertTime);
+    });
 };
 
 PPWSocialPlugin.showPopMessage= function(){
@@ -149,7 +122,7 @@ PPWSocialPlugin.showPopMessage= function(){
         return;
     }
     el.html("@"+msg.from_user+": "+msg.text);
-    setTimeout(PPWSocialPlugin.showPopMessage, PPWSocialPlugin.alertTime);
+    PPWSocialPlugin.timeOut= setTimeout(PPWSocialPlugin.showPopMessage, PPWSocialPlugin.alertTime);
 };
 PPWSocialPlugin.hideMessage= function(){
     $(PPWSocialPlugin.el).animate({
