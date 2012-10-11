@@ -10,6 +10,7 @@ window.PPW.extend("demo", (function(data){
         conf= false,
         startTime= null,
         search= '',
+        toolEl= false,
         el= false;
     
     window.PPWSocialSearch= '';
@@ -25,15 +26,6 @@ window.PPW.extend("demo", (function(data){
     
     return {
         onstart: function(data){
-            
-            startTime= (new Date()).getTime();
-            
-            if(conf && conf.sodialSearch){
-                search= escape(conf.sodialSearch);
-                search= search + "&callback=PPWSocialPlugin&_="+ (new Date()).getTime()
-                getMentions();
-                setInterval(getMentions, 6000); // once a minute
-            }
         },
         onload: function(_ppw){
             ppw= _ppw;
@@ -43,7 +35,7 @@ window.PPW.extend("demo", (function(data){
             if(conf.socialAlertType == 'popup'){
                 $(el).css({
                     position: 'absolute',
-                    right: '6px',
+                    left: '6px',
                     bottom: '-150px',
                     zIndex: 999999999,
                     backgroundColor: '#fff',
@@ -75,15 +67,31 @@ window.PPW.extend("demo", (function(data){
                     display: 'none'
                 });
             }
-            document.body.appendChild(el);
+            PPWSocialPlugin.el= el;
+        },
+        onpresentationtoolloaded: function(win){
+            win.document.body.appendChild(PPWSocialPlugin.el);
+            
+            startTime= (new Date()).getTime();
+            
+            if(conf && conf.sodialSearch){
+                search= escape(conf.sodialSearch);
+                search= search + "&callback=window.PPWSocialPlugin.twitterCallback&_="+ (new Date()).getTime()
+                getMentions();
+                setInterval(getMentions, 60000); // once a minute
+            }
         }
     };
     
 })());
 
-window.PPWSocialPlugin= function(data){
+window.PPWSocialPlugin= {};
+window.PPWSocialPlugin.twitterCallback= function(data){
     
-    var i= 0, l= 0, social= PPW.get('social'), messages= [], str= '', el= null, w= 0, alertTime= 4000;
+    var i= 0, l= 0, social= PPW.get('social'), str= '', el= null, w= 0, alertTime= 4000;
+    
+    if(!PPWSocialPlugin.messages)
+        PPWSocialPlugin.messages= [];
     
     PPWSocialSearch= '&since_id='+data.max_id_str+'&';
     l= data.results.length;
@@ -93,55 +101,59 @@ window.PPWSocialPlugin= function(data){
     
     if(social.alertTime)
         alertTime= social.alertTime;
+    PPWSocialPlugin.alertTime= alertTime;
     
     for(; i<l; i++){
-        messages.push(data.results[i]);
+        PPWSocialPlugin.messages.push(data.results[i]);
         str+= ' - <b>@'+ data.results[i].from_user+'</b>: ' +data.results[i].text
         if(i>2){
             break;
         }
     }
     
-    el= document.getElementById('PPWSocialPluginAlertElement');
-    
+    el= $(PPWSocialPlugin.el);
+
     if(social.socialAlertType == 'popup'){
-        $(el).animate({
+        el.animate({
             bottom: '6px',
             opacity: 1
         }, function(){
-            setTimeout(function(){
-                el.innerHTML= '';
-                $(el).animate({
-                    bottom: '-150px',
-                    opacity: 0
-                }, function(){});
-            }, alertTime*(i));
-            
-            while(i--){
-                el.innerHTML= "@"+messages[i].from_user+": "+messages[i].text;
-                setTimeout((function(i){
-                    return function(){
-                        //alert(messages[i])
-                        el.innerHTML= "@"+messages[i].from_user+": "+messages[i].text;
-                    }
-                })(i), alertTime*(i));
-            };
+            PPWSocialPlugin.showPopMessage();
+            setTimeout(PPWSocialPlugin.showPopMessage, alertTime);
         });
     }else{
-        
-        el.innerHTML= str;
-        $(el).css('textIndent', '0px').fadeIn();
+
+        el.html(str);
+        el.css('textIndent', '0px').fadeIn();
         w= el.offsetWidth;
         setTimeout(function(){
-            $(el).animate({
+            el.animate({
                 textIndent: (-1*(w))+ 'px'
             },
             w*10,
             'linear',
             function(){
-                $(el).fadeOut();
+                el.fadeOut();
             });
         }, 500);
-        
     }
+};
+
+PPWSocialPlugin.showPopMessage= function(){
+    var el= $(PPWSocialPlugin.el), msg= null;
+    
+    msg= PPWSocialPlugin.messages.shift();
+    
+    if(!PPWSocialPlugin.messages.length){
+        PPWSocialPlugin.hideMessage();
+        return;
+    }
+    el.html("@"+msg.from_user+": "+msg.text);
+    setTimeout(PPWSocialPlugin.showPopMessage, PPWSocialPlugin.alertTime);
+};
+PPWSocialPlugin.hideMessage= function(){
+    $(PPWSocialPlugin.el).animate({
+        bottom: '-150px',
+        opacity: 0
+    }, function(){});
 };
