@@ -500,6 +500,7 @@ window.PPW= (function($, _d, console){
                     if(_conf.presentationStarted && !_isEditableTarget(evt.target)){
                         _goPreviousSlide();
                         evt.preventDefault();
+                        evt.stopPrapagation();
                         return false;
                     }
                     break;
@@ -511,6 +512,7 @@ window.PPW= (function($, _d, console){
                     if(_conf.presentationStarted && !_isEditableTarget(evt.target)){
                         _goNextSlide();
                         evt.preventDefault();
+                        evt.stopPrapagation();
                         return false;
                     }
                     if(evt.keyCode == 13 && _isEditableTarget(evt.target)){
@@ -524,6 +526,7 @@ window.PPW= (function($, _d, console){
                         && !_isEditableTarget(evt.target)){
                         _showGoToComponent();
                         evt.preventDefault();
+                        evt.stopPrapagation();
                         return false;
                     }
                     break;
@@ -532,8 +535,16 @@ window.PPW= (function($, _d, console){
                     if(_d.getElementById('ppw-message-box').style.display != 'none'){
                         _closeMessage();
                         evt.preventDefault();
+                        evt.stopPrapagation();
                         return false;
                     }
+                    break;
+                    
+                case 70: // F
+                    _showSearchBox();
+                    evt.preventDefault();
+                    evt.stopPrapagation();
+                    return false;
                     break;
                     
                 default: {
@@ -543,6 +554,7 @@ window.PPW= (function($, _d, console){
                             if(k>=0 && k<10){
                                 _d.getElementById('ppw-go-to-slide').value+= k;
                                 evt.preventDefault();
+                                evt.stopPrapagation();
                                 return false;
                             }
                         }
@@ -552,7 +564,6 @@ window.PPW= (function($, _d, console){
             }
             return true;
         });
-        
         $d.bind('keyup', function(evt){
             
             var s= false;
@@ -568,6 +579,7 @@ window.PPW= (function($, _d, console){
                         }
                         _closeMessage();
                         evt.preventDefault();
+                        evt.stopPrapagation();
                     }
                     return false;
                     break;
@@ -576,6 +588,7 @@ window.PPW= (function($, _d, console){
                     s= _triggerEvent('F6_PRESSED');
                     if(!s){
                         evt.preventDefault();
+                        evt.stopPrapagation();
                         return false;
                     }
                     break;
@@ -584,6 +597,7 @@ window.PPW= (function($, _d, console){
                     s= _triggerEvent('F7_PRESSED');
                     if(!s){
                         evt.preventDefault();
+                        evt.stopPrapagation();
                         return false;
                     }
                     break;
@@ -592,6 +606,7 @@ window.PPW= (function($, _d, console){
                     s= _triggerEvent('F8_PRESSED');
                     if(!s){
                         evt.preventDefault();
+                        evt.stopPrapagation();
                         return false;
                     }
                     break;
@@ -600,6 +615,7 @@ window.PPW= (function($, _d, console){
                     s= _triggerEvent('F9_PRESSED');
                     if(!s){
                         evt.preventDefault();
+                        evt.stopPrapagation();
                         return false;
                     }
                     break;
@@ -608,16 +624,41 @@ window.PPW= (function($, _d, console){
                     s= _triggerEvent('F10_PRESSED');
                     if(!s){
                         evt.preventDefault();
+                        evt.stopPrapagation();
                         return false;
                     }
                     break;
-                    
-                case 70: // F
-                    _showSearchBox();
-                    evt.preventDefault();
-                    return false;
-                    break
             }
+            
+            // for when the user holds a key
+            $d.bind('keypress', function(evt){
+                
+                if(!evt.altKey)
+                    return;
+                
+                switch(evt.keyCode){
+                    case 188: // ,(<)
+                    case 65: // a
+                    case 37: // left
+                        //_showSlidesThumb();
+                        evt.preventDefault();
+                        evt.stopPrapagation();
+                        return false;
+                    break;
+                    case 190: // .(>)
+                    case 83: // s
+                    case 39: // left
+                        //_showSlidesThumb();
+                        evt.preventDefault();
+                        evt.stopPrapagation();
+                        return false;
+                    break;
+                }
+            });
+                        
+            
+            
+            
             return true;
         });
         
