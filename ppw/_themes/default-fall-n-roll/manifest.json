@@ -1,0 +1,11 @@
+{
+    "name": "default-fall-n-roll",
+    "dependencies": {
+        "css": [
+            "styles/default.css"
+        ],
+        "js": [
+            "scripts/default.js"
+        ]
+    }
+}

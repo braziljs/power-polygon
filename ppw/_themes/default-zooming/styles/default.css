@@ -1,0 +1,122 @@
+.ppw-slide-element{
+    display: none;
+}
+.ppw-active-slide-element{
+    /*display: block;*/
+}
+
+/**/
+.ppw-previous-slide-element{
+ 
+}
+.ppw-next-slide-element{
+
+}
+
+body{
+    background-color: #999;
+}
+
+/**/
+section{
+    display: block;
+    position:absolute;
+    height: auto;
+    bottom: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-right: 10px;
+    margin-left: 10px;
+    background-color: #f0f0f0;
+    
+    border: solid 1px black;
+    box-shadow: 0px 0px 20px white;
+    border-radius: 10px;
+    font-family: Verdana, Sans-serif, Tahoma;
+    font-weight: bold;
+    padding: 20px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+.ppw-slide-type-opening{
+    text-align: center;
+}
+.ppw-slide-type-opening h1, .ppw-slide-type-opening h2{
+    font-size: 40px;
+}
+
+@-webkit-keyframes slideChange{
+    0% {
+        -webkit-transform: scale(1.5);
+        opacity: 0;
+    }
+    100% {
+        -webkit-transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@-moz-keyframes slideChange{
+    0% {
+        -moz-transform: scale(1.5);
+        opacity: 0;
+    }
+    100% {
+        -moz-transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@-ms-keyframes slideChange{
+    0% {
+        -ms-transform: scale(1.5);
+        opacity: 0;
+    }
+    100% {
+        -ms-transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@-o-keyframes slideChange{
+    0% {
+        -o-transform: scale(1.5);
+        opacity: 0;
+    }
+    100% {
+        -o-transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes slideChange{
+    0% {
+        transform: scale(1.5);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.ppw-theme-slide-change{
+    display: block;
+    -webkit-animation-name: slideChange;
+    -webkit-animation-duration: 500ms;
+    
+    -moz-animation-name: slideChange;
+    -moz-animation-duration: 500ms;
+    
+    -ms-animation-name: slideChange;
+    -ms-animation-duration: 500ms;
+    
+    -o-animation-name: slideChange;
+    -o-animation-duration: 500ms;
+    
+    animation-name: slideChange;
+    animation-duration: 500ms;
+}
