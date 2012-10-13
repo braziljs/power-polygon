@@ -1,0 +1,11 @@
+{
+    "name": "default-cut",
+    "dependencies": {
+        "css": [
+            "styles/default-cut.css"
+        ],
+        "js": [
+            "scripts/default-cut.js"
+        ]
+    }
+}

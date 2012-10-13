@@ -72,7 +72,7 @@ window.PPW.extend("demo", (function(){
         $.getScript(
             sCodes,
             function(){
-                //alert('loaded');
+                console.log("[PPW Addon] Syntax Highlighter being applied");
                 sh_highlightDocument();
             });
     };

@@ -1,0 +1,45 @@
+.ppw-slide-element{
+    display: none;
+}
+.ppw-active-slide-element{
+    /*display: block;*/
+}
+
+/**/
+.ppw-previous-slide-element{
+ 
+}
+.ppw-next-slide-element{
+
+}
+
+body{
+    margin: 0px;
+    padding: 0px;
+    background-color: #fff;
+    color: #333;
+    font-family: Verdana, Sans-serif, Tahoma;
+}
+
+/**/
+section{
+    border-left: solid 8px red;
+    background-color: white;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    padding: 8px;
+}
+.ppw-slide-type-opening{
+    border-left: solid 8px blue;
+    text-align: center;
+}
+.ppw-slide-type-closing{
+    border-left: solid 8px green;
+    text-align: center;
+}
+.ppw-slide-type-opening h1, .ppw-slide-type-opening h2{
+    font-size: 40px;
+}

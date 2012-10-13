@@ -44,7 +44,8 @@ window.PPW= (function($, _d, console){
                 alertAt: [30, 40],
                 theme: 'default',
                 slideType: 'content',
-                slideTitleSize: 40
+                slideTitleSize: 40,
+                containerID: 'PPW-slides-container'
             },
             cons: {
                 CLASS_SLIDE             : 'ppw-slide-element',
@@ -79,6 +80,7 @@ window.PPW= (function($, _d, console){
             shortcutsEnable: true, // enables or not, the shortcuts
             friendlyURL: 'id', // may be false(also, 'num') or id(slide' id)
             useSplashScreen: false, // should ppw open the splash screen first?
+            slidesContainer: _d.createElement('div'),
             theme: _conf.defaults.theme,
             fsPattern: _conf.cons.fs.SLIDE_ID_DIR,
             alertAt: _conf.defaults.alertAt,
@@ -500,7 +502,7 @@ window.PPW= (function($, _d, console){
                     if(_conf.presentationStarted && !_isEditableTarget(evt.target)){
                         _goPreviousSlide();
                         evt.preventDefault();
-                        evt.stopPrapagation();
+                        evt.stopPropagation();
                         return false;
                     }
                     break;
@@ -512,7 +514,7 @@ window.PPW= (function($, _d, console){
                     if(_conf.presentationStarted && !_isEditableTarget(evt.target)){
                         _goNextSlide();
                         evt.preventDefault();
-                        evt.stopPrapagation();
+                        evt.stopPropagation();
                         return false;
                     }
                     if(evt.keyCode == 13 && _isEditableTarget(evt.target)){
@@ -526,7 +528,7 @@ window.PPW= (function($, _d, console){
                         && !_isEditableTarget(evt.target)){
                         _showGoToComponent();
                         evt.preventDefault();
-                        evt.stopPrapagation();
+                        evt.stopPropagation();
                         return false;
                     }
                     break;
@@ -535,7 +537,7 @@ window.PPW= (function($, _d, console){
                     if(_d.getElementById('ppw-message-box').style.display != 'none'){
                         _closeMessage();
                         evt.preventDefault();
-                        evt.stopPrapagation();
+                        evt.stopPropagation();
                         return false;
                     }
                     break;
@@ -543,7 +545,7 @@ window.PPW= (function($, _d, console){
                 case 70: // F
                     _showSearchBox();
                     evt.preventDefault();
-                    evt.stopPrapagation();
+                    evt.stopPropagation();
                     return false;
                     break;
                     
@@ -554,7 +556,7 @@ window.PPW= (function($, _d, console){
                             if(k>=0 && k<10){
                                 _d.getElementById('ppw-go-to-slide').value+= k;
                                 evt.preventDefault();
-                                evt.stopPrapagation();
+                                evt.stopPropagation();
                                 return false;
                             }
                         }
@@ -579,7 +581,7 @@ window.PPW= (function($, _d, console){
                         }
                         _closeMessage();
                         evt.preventDefault();
-                        evt.stopPrapagation();
+                        evt.stopPropagation();
                     }
                     return false;
                     break;
@@ -588,7 +590,7 @@ window.PPW= (function($, _d, console){
                     s= _triggerEvent('F6_PRESSED');
                     if(!s){
                         evt.preventDefault();
-                        evt.stopPrapagation();
+                        evt.stopPropagation();
                         return false;
                     }
                     break;
@@ -597,7 +599,7 @@ window.PPW= (function($, _d, console){
                     s= _triggerEvent('F7_PRESSED');
                     if(!s){
                         evt.preventDefault();
-                        evt.stopPrapagation();
+                        evt.stopPropagation();
                         return false;
                     }
                     break;
@@ -606,7 +608,7 @@ window.PPW= (function($, _d, console){
                     s= _triggerEvent('F8_PRESSED');
                     if(!s){
                         evt.preventDefault();
-                        evt.stopPrapagation();
+                        evt.stopPropagation();
                         return false;
                     }
                     break;
@@ -615,7 +617,7 @@ window.PPW= (function($, _d, console){
                     s= _triggerEvent('F9_PRESSED');
                     if(!s){
                         evt.preventDefault();
-                        evt.stopPrapagation();
+                        evt.stopPropagation();
                         return false;
                     }
                     break;
@@ -624,7 +626,7 @@ window.PPW= (function($, _d, console){
                     s= _triggerEvent('F10_PRESSED');
                     if(!s){
                         evt.preventDefault();
-                        evt.stopPrapagation();
+                        evt.stopPropagation();
                         return false;
                     }
                     break;
@@ -642,7 +644,7 @@ window.PPW= (function($, _d, console){
                     case 37: // left
                         //_showSlidesThumb();
                         evt.preventDefault();
-                        evt.stopPrapagation();
+                        evt.stopPropagation();
                         return false;
                     break;
                     case 190: // .(>)
@@ -650,7 +652,7 @@ window.PPW= (function($, _d, console){
                     case 39: // left
                         //_showSlidesThumb();
                         evt.preventDefault();
-                        evt.stopPrapagation();
+                        evt.stopPropagation();
                         return false;
                     break;
                 }
@@ -832,7 +834,13 @@ window.PPW= (function($, _d, console){
             i= 0,
             el= null,
             nEl= null,
-            tt= '';
+            tt= '',
+            container= _settings.slidesContainer;
+        
+        if(!container.id){
+            container.id= _conf.defaults.containerID;
+            _b.appendChild(container);
+        }
         
         for(; i<l; i++){
             el= $('section#'+slides[i].id);
@@ -841,7 +849,7 @@ window.PPW= (function($, _d, console){
             if(!el.length){ // should load it from ajax
                 nEl= _d.createElement("section");
                 nEl.id= slides[i].id;
-                _d.body.appendChild(nEl);
+                container.appendChild(nEl);
                 
                 $.ajax(
                     {
@@ -887,7 +895,7 @@ window.PPW= (function($, _d, console){
                 _settings.slides[i].title= tt;
                 _settings.slides[i].index= i+1;
                 
-                _d.body.appendChild(el[0]);
+                container.appendChild(el[0]);
                 $(el).find("script").each(function(count, scr){
                     
                     var f= new Function("PPW.slideIterator= this; "+scr.textContent);
@@ -899,7 +907,6 @@ window.PPW= (function($, _d, console){
                     }
                 });
                 
-                //_bindScripts(el[0], slides[i]);
                 _slidePreloaderNext(_settings.slides[i]);
             }
             if(slides[i].profile){
@@ -910,6 +917,7 @@ window.PPW= (function($, _d, console){
             
             slides[i].actionIdx= 0;
             el.addClass(_conf.cons.CLASS_SLIDE + " ppw-slide-type-" + (slides[i].type||_conf.defaults.slideType));
+            
         }
     };
     
