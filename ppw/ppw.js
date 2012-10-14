@@ -197,6 +197,13 @@ window.PPW= (function($, _d, console){
     }
     
     /**
+     * verifies if the value is a number or not.
+     */
+    var isNum= function(val){
+        return !isNaN(val);
+    }
+    
+    /**
      * Removes a listener from the list.
      */
     var _removeListener= function(evt, fn){
@@ -415,14 +422,14 @@ window.PPW= (function($, _d, console){
      */
     var _isValidProfile= function(slide){
         
-        if(!slide.profile || slide.profile == 'none'
+        if(!slide ||!slide.profile || slide.profile == 'none'
            || !_settings.profile || _settings.profile == 'none')
-           return true;
+           return slide;
        
         if(slide.profile != _settings.profile)
             return false;
             
-        return true;
+        return slide;
     }
     
     /**
@@ -726,7 +733,7 @@ window.PPW= (function($, _d, console){
          * Mouse events.
          */
         $d.bind('click', function(evt){
-            if(_conf.presentationStarted && !_isEditableTarget(evt.target)){
+            if(_conf.presentationStarted && !_isEditableTargetContent(evt.target)){
                 _goNextSlide();
                 evt.preventDefault();
                 return false;
@@ -850,6 +857,25 @@ window.PPW= (function($, _d, console){
     }
     
     /**
+     * Returns if the targeted element is a child of an editable element.
+     * 
+     * An editable element is a form element or any HTML element with the
+     * editable  or clickacble classes, or with a tabindex set.
+     * 
+     * This method verifies all the parent elements up to the body element,
+     * if any of them is editable, it returns true.
+     */
+    var _isEditableTargetContent= function(target){
+        while(target.tagName.toLowerCase() != 'body'){
+            if(_isEditableTarget(target)){
+                return true;
+            }
+            target= target.parentNode;
+        }
+        return false;
+    }
+    
+    /**
      * Creates the URL to each external slide.
      * 
      * External slides' URLs should follow the fsPattern, defined by the user.
@@ -891,6 +917,11 @@ window.PPW= (function($, _d, console){
         
         for(; i<l; i++){
             el= $('section#'+slides[i].id);
+            
+            if(i === 0)
+                slides[i].first= true;
+            if(i==l-1)
+                slides[i].last= true;
             
             slides[i].actions= [];
             if(!el.length){ // should load it from ajax
@@ -1596,19 +1627,80 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         return h||0;
     };
     
+    
+    /**
+     * Goes to the previously valid slide.
+     */
+    var _getPrevValidSlide= function(slide){
+        
+        
+        var idx= 0,
+            l= _settings.slides.length;
+        
+        slide= typeof slide == 'object'? slide: _getCurrentSlide();
+        idx= slide.index-2;
+        
+        if(idx<0){
+            return _getCurrentSlide();
+        }
+        
+        slide= _settings.slides[idx];
+        
+        while(!_isValidProfile(slide)){
+            if(idx<0){
+                slide= _getCurrentSlide();
+                break;
+            }
+            slide= _settings.slides[--idx];
+        }
+        console.log(slide);
+        return slide;
+    }
+    
+    var _getNextValidSlide= function(slide){
+        
+        var idx= 0,
+            l= _settings.slides.length;
+        
+        slide= typeof slide == 'object'? slide: _getCurrentSlide();
+        idx= slide.index;
+        
+        slide= _settings.slides[idx];
+        
+        while(slide && !_isValidProfile(slide)){
+            if(idx>=l){
+                slide= _getCurrentSlide();
+                break;
+            }
+            slide= _settings.slides[++idx];
+        }
+        return slide;
+    };
+    
+    
+     
+    
     /**
      * To to the previous slide.
+     * 
+     * If the current slide has actions executed, it executes the undo method of
+     * the last executed action, instead of actually going to the previous slide.
      */
     var _goPreviousSlide= function(){
         
-        var slide= _settings.slides[_conf.currentSlide],
-            l= slide.actions.length,
+        var slide= _getCurrentSlide(),
             fn= null;
         
-        slide.actionIdx--;
-        
-        if(l && slide.actionIdx >=0){
+        if(slide.actionIdx > 0){
+            
+            if(slide._timer){
+                _w.clearTimeout(slide._timer);
+                slide._timer= false;
+            }
+            
+            slide.actionIdx--;
             fn= slide.actions[slide.actionIdx].undo;
+            
             if(fn && typeof fn == 'function'){
                 try{
                     fn(slide);
@@ -1616,24 +1708,70 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
                     console.error("[PPW][Slide action error] There was an error trying to execute an action of the current slide:", slide, e);
                 }
             }else{
-                
+                _goPreviousSlide();
+                //_goToSlide(_conf.currentSlide-1, 'prev');
             }
         }else{
-            _goToSlide(_conf.currentSlide-1, 'prev');
+            _goToSlide(_getPrevValidSlide(), 'prev');
         }
     };
     
     /**
      * To to the next slide.
+     * 
+     * If the current slide has actions yet to be executed, it executes its does
+     * method.
      */
     var _goNextSlide= function(){
         
-        var slide= _settings.slides[_conf.currentSlide],
+        var slide= _getCurrentSlide(),
+            fn= null,
+            nextAction= null;
+        
+        if(slide._timer){
+            _w.clearTimeout(slide._timer);
+            slide._timer= false;
+        }
+        
+        if(slide.actionIdx < slide.actions.length){
+            // still has actions to execute.
+            try{
+                fn= slide.actions[slide.actionIdx].does();
+            }catch(e){
+                console.error("[PPW][Slide action error] There was an error trying to execute an action of the current slide:", slide, e);
+            };
+            slide.actionIdx++;
+            
+            nextAction= slide.actions[slide.actionIdx];
+            
+            if(nextAction && nextAction.timing != 'click'){
+                if(nextAction.timing == 'auto' || slide._timer){
+                    _goNextSlide();
+                }else{
+                    if(isNum(nextAction.timing)){
+                        slide._timer= _w.setTimeout(function(){
+                            _goNextSlide();
+                            slide._timer= false;
+                        }, nextAction.timing);
+                    }
+                }
+            }
+        }else{
+            // go to the next valid slide.
+            _goToSlide(_getNextValidSlide(), 'next');
+        }
+        
+        
+        
+        /*var slide= _settings.slides[_conf.currentSlide],
             l= slide.actions.length,
             nextAction= false;
-            
-        slide.actionIdx++;
         
+        if(!_isValidProfile(slide)){
+            slide.actionIdx= l+1;
+        }else{
+            slide.actionIdx++;
+        }
         
         if(l && slide.actionIdx <= l){
             
@@ -1665,6 +1803,7 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         }else{
             _goToSlide(_conf.currentSlide+1, 'next');
         }
+        */
     };
     
     /**
@@ -1672,13 +1811,14 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
      */
     var _goToSlide= function(idx, prevent){
         
-        if(!_conf.presentationStarted)
-            return false;
-        
         var url= '',
-            previousSlide= _settings.slides[_conf.currentSlide]||false,
+            previousSlide= _getCurrentSlide(),
+            slide= null,
             curSlide= null,
             elementsToCleanUp= [];
+        
+        if(!_conf.presentationStarted)
+            return false;
         
         // let' clean the previos timeout, if any
         if(previousSlide._timer){
@@ -1686,35 +1826,45 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
             previousSlide._timer= false;
         }
         
-        // if there are no more slides, triggers the onfinish event
-        if(idx > _settings.slides.length-1){
-            idx= _settings.slides.length-1;
-            _settings.slides[_conf.currentSlide].actionIdx--;
+        if(previousSlide.last && prevent == 'next'){
             _triggerEvent('onfinish');
-            if(prevent)
-                return;
+            return false;
+        }
+        if(previousSlide.first && prevent == 'prev'){
+            return false;
+        }
+
+        if(isNum(idx)){
+            
+            slide= _settings.slides[_conf.currentSlide];
+            
+            // if it is negative or not valid, goes to the first slide
+            if(idx < 0)
+                idx= 0;
+            
+            if(!_isValidProfile(_settings.slides[idx])){
+                if(prevent == 'prev'){
+                    _goPreviousSlide();
+                }else{
+                    _goToSlide(_getNextValidSlide(_settings.slides[idx]));
+                }
+                return false;
+            }
+            
+        }else{
+            slide= idx;
+            idx= slide.index-1;
         }
         
-        // if it is negative or not valid, goes to the first slide
-        if(idx < 0 || isNaN(idx))
-            idx= 0;
+        // if the current slide should not be visible for the current profile
+        // skips it going to the next or previous slide
+        /**/
         
         _conf.currentSlide= idx;
         curSlide= _settings.slides[_conf.currentSlide];
         
         if(!curSlide){
             _triggerEvent('onfinish');
-            return false;
-        }
-        
-        // if the current slide should not be visible for the current profile
-        // skips it going to the next or previous slide
-        if(!_isValidProfile(curSlide)){
-            if(prevent == 'prev'){
-                _goPreviousSlide();
-            }else{
-                _goNextSlide();
-            }
             return false;
         }
         
