@@ -6,13 +6,57 @@
     Você também pode usar o addon para syntax highlight de seus códigos fonte quando precisa.
 </div>
 
-<pre class="sh_cpp">
-#include &lt;iostream&gt;
+<pre id="focusableExample" class="sh_php">
+&lt;?php
+    function empty_dir($dir) {
+        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir),
+                                                  RecursiveIteratorIterator::CHILD_FIRST);
+        foreach ($iterator as $path) {
+          if ($path->isDir()) {
+             rmdir($path->__toString());
+          } else {
+             unlink($path->__toString());
+          }
+        }
+        // rmdir($dir);
+    }
+?></pre>
+<br/>
+<div class="LANG-EN">With no line numbers nor lines</div>
+<div class="LANG-PT">Sem números de linhas nem linhas</div>
+<pre class="sh_javascript no-numbers no-lines">
+    var o= { "prop": "value" };
+    alert(o.prop);</pre>
 
-using namespace std;
 
-int main(int argc, char ** argv) {
-  cout &lt;&lt; "Hello world" &lt;&lt; endl;
-  return 0;
-}
-</pre>
+<script>
+    PPW.addAction({
+        does: function(){
+            PPW.sh.focus('#focusableExample', [1, 2, 13, 14]);
+        },
+        undo: function(){
+            // removes the focus
+            PPW.sh.focus('#focusableExample');
+        }
+    });
+    
+    PPW.addAction({
+        does: function(){
+            PPW.sh.focus('#focusableExample', [5, 6, 8, 10]);
+        },
+        undo: function(){
+            // removes the focus
+            PPW.sh.focus('#focusableExample', [1, 2, 13, 14]);
+        }
+    });
+    
+    PPW.addAction({
+        does: function(){
+            PPW.sh.focus('#focusableExample', [3, 4, 7, 9]);
+        },
+        undo: function(){
+            // removes the focus
+            PPW.sh.focus('#focusableExample', [5, 6, 8, 10]);
+        }
+    });
+</script>

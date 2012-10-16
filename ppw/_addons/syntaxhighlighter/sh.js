@@ -1,4 +1,4 @@
-window.PPW.extend("demo", (function(){
+window.PPW.extend("sh", (function(){
     
     var ppw= null,
         hlToLoad= {},
@@ -59,7 +59,14 @@ window.PPW.extend("demo", (function(){
             i= classes.length-1;
             
             do{
-                if(validSH.indexOf(classes[i])){
+                if(validSH.indexOf(classes[i])>=0){
+                    
+                    this.innerHTML= "<ol type='1' class='ppw-sh-source-container ppw-clickable'>"+
+                                    this.innerHTML.replace(/</g, "&lt;")
+                                                  .replace(/^/gm, "<li class='ppw-sh-line'><div>")
+                                                  .replace(/$/gm, "</div></li>") +
+                                    "</ol>";
+                    
                     if(!hlToLoad[classes[i]]){
                         hlToLoad[classes[i]]= true;
                         sCodes.push(ppw.PPWSrc+'/_addons/syntaxhighlighter/lang/'+classes[i]+".js");
@@ -74,7 +81,34 @@ window.PPW.extend("demo", (function(){
             function(){
                 console.log("[PPW Addon] Syntax Highlighter being applied");
                 sh_highlightDocument();
-            });
+        });
+        
+        PPW.sh= {
+            focus: function(el, lines){
+                
+                var i= 0, list= null;
+                
+                el= $(el);
+                
+                list= el.find('.ppw-sh-line');
+                list.removeClass('ppw-sh-focused-line');
+                
+                if(!lines){
+                    el.removeClass('ppw-sh-focused-lines');
+                    return true;
+                }
+                
+                el.addClass('ppw-sh-focused-lines');
+                
+                if(!lines.length)
+                    lines= [lines];
+                
+                for(; i<lines.length; i++){
+                    list.eq(lines[i]-1).addClass('ppw-sh-focused-line');
+                }
+            }
+        };
+        
     };
     
     var _themeLoaded= function(settings){
@@ -83,6 +117,11 @@ window.PPW.extend("demo", (function(){
             rel: "stylesheet",
             type: "text/css",
             href: ppw.PPWSrc+"/_addons/syntaxhighlighter/css/"+theme+'.css'
+         }).appendTo("head");
+        $("<link/>", {
+            rel: "stylesheet",
+            type: "text/css",
+            href: ppw.PPWSrc+"/_addons/syntaxhighlighter/sh.css"
          }).appendTo("head");
     };
     

@@ -38,7 +38,16 @@ window.PPW= (function($, _d, console){
             profiles: {},
             slidesLoaded: false,
             themeLoaded: false,
-            animations: ["flip",
+            animations: [
+                         "flash",
+                         "shake",
+                         "bounce",
+                         "tada",
+                         "swing",
+                         "wobble",
+                         "wiggle",
+                         "pulse",
+                         "flip",
                          "flipInX",
                          "flipOutX",
                          "flipInY",
@@ -422,7 +431,10 @@ window.PPW= (function($, _d, console){
      */
     var _isValidProfile= function(slide){
         
-        if(!slide ||!slide.profile || slide.profile == 'none'
+        if(!slide)
+            return false;
+        
+        if(!slide.profile || slide.profile == 'none'
            || !_settings.profile || _settings.profile == 'none')
            return slide;
        
@@ -440,6 +452,8 @@ window.PPW= (function($, _d, console){
         var i= 0, l= _settings.slides.length,
             slide;
         
+        _conf.validSlides= [];
+        
         if(profile === false)
             profile= 'none';
         if(profile)
@@ -449,13 +463,17 @@ window.PPW= (function($, _d, console){
             slide= _settings.slides[i];
             
             if(_isValidProfile(slide)){
+                _conf.validSlides.push(slide);
                 $('#'+slide.id).removeClass('ppw-slide-not-in-profile');
             }else{
                 $('#'+slide.id).addClass('ppw-slide-not-in-profile');
             }
         }
-        
     };
+    
+    var _getValidSlides= function(){
+        return _conf.validSlides;
+    }
     
     /**
      * Sets the language properties for the slides.
@@ -1629,7 +1647,10 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
     
     
     /**
-     * Goes to the previously valid slide.
+     * Gets the previously profile valid slide.
+     * 
+     * If a slide is given, it returns the closest previous valid slide in
+     * relation to that slide.
      */
     var _getPrevValidSlide= function(slide){
         
@@ -1653,10 +1674,15 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
             }
             slide= _settings.slides[--idx];
         }
-        console.log(slide);
         return slide;
     }
     
+    /**
+     * Gets the next profile valid slide.
+     * 
+     * If a slide is given, it returns the next closest valid slide in
+     * relation to that slide.
+     */
     var _getNextValidSlide= function(slide){
         
         var idx= 0,
@@ -1681,7 +1707,7 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
      
     
     /**
-     * To to the previous slide.
+     * Go to the previous slide.
      * 
      * If the current slide has actions executed, it executes the undo method of
      * the last executed action, instead of actually going to the previous slide.
@@ -1717,7 +1743,7 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
     };
     
     /**
-     * To to the next slide.
+     * Go to the next slide.
      * 
      * If the current slide has actions yet to be executed, it executes its does
      * method.
@@ -1760,50 +1786,6 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
             // go to the next valid slide.
             _goToSlide(_getNextValidSlide(), 'next');
         }
-        
-        
-        
-        /*var slide= _settings.slides[_conf.currentSlide],
-            l= slide.actions.length,
-            nextAction= false;
-        
-        if(!_isValidProfile(slide)){
-            slide.actionIdx= l+1;
-        }else{
-            slide.actionIdx++;
-        }
-        
-        if(l && slide.actionIdx <= l){
-            
-            if(slide._timer){
-                _w.clearTimeout(_settings.slides[_conf.currentSlide]._timer);
-                slide._timer= false;
-            }
-            
-            try{
-                slide.actions[slide.actionIdx-1].does(slide);
-            }catch(e){
-                console.error("[PPW][Slide action error] There was an error trying to execute an action of the current slide:", slide, e);
-            }
-            
-            nextAction= slide.actions[slide.actionIdx];
-            
-            if(nextAction && nextAction.timing != 'click'){
-                if(nextAction.timing == 'auto' || slide._timer){
-                    _goNextSlide();
-                }else{
-                    if(!isNaN(nextAction.timing)){
-                        _settings.slides[_conf.currentSlide]._timer= _w.setTimeout(function(){
-                            _goNextSlide();
-                            _settings.slides[_conf.currentSlide]._timer= false
-                        }, nextAction.timing);
-                    }
-                }
-            }
-        }else{
-            _goToSlide(_conf.currentSlide+1, 'next');
-        }
-        */
     };
     
     /**
@@ -1833,6 +1815,12 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         if(previousSlide.first && prevent == 'prev'){
             return false;
         }
+        
+        if(_getValidSlides().length == 0){
+            _triggerEvent('onfinish');
+            console.error("[PPW] Invalid slides definition: There are no valid slides to show!");
+            return false;
+        }
 
         if(isNum(idx)){
             
@@ -1855,10 +1843,6 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
             slide= idx;
             idx= slide.index-1;
         }
-        
-        // if the current slide should not be visible for the current profile
-        // skips it going to the next or previous slide
-        /**/
         
         _conf.currentSlide= idx;
         curSlide= _settings.slides[_conf.currentSlide];
@@ -1994,7 +1978,8 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         if(el.length)
             el= el[0];
         
-        el.className= el.className.replace(/ppw\-anim\-([a-zA-z0-9\-_]+)( |$)/g, '');
+        el.className= el.className.replace(/ppw\-anim\-([a-zA-z0-9\-_]+)( |$)/g,
+                                           '');
         return el;
     }
     
@@ -2059,7 +2044,8 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
             
             _removeAnimateCSSClasses(el[0]);
             
-            el.removeClass(anim).addClass('animated ppw-anim-visible ppw-anim-'+anim);
+            el.removeClass(anim).addClass('animated ppw-anim-visible ppw-anim-'+
+                                           anim);
             
         }else{
             throw new Error("Invalid animation "+anim);
@@ -2126,7 +2112,7 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         testResolution                  : _testResolution,
         openPresentationTool            : _openPresentationTool,
         goNextSlide                     : _goNextSlide,
-        goPreviousSlide                : _goPreviousSlide,
+        goPreviousSlide                 : _goPreviousSlide,
         testAudio                       : _testAudio,
         extend                          : _extend,
         startCamera                     : _startCamera,
@@ -2145,9 +2131,12 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         language                        : _conf.currentLang,
         // API GETTERS/SETTERS METHODS
         getSlides                       : _getSlides,
+        getValidSlides                  : _getValidSlides,
         getCurrentSlide                 : _getCurrentSlide,
         getAlertAtTimes                 : _getAlertAtTimes,
         getStartedAt                    : _getStartedAt,
+        getNextSlide                    : _getNextValidSlide,
+        getPrevSlide                    : _getPrevValidSlide,
         get                             : _get
     };
     

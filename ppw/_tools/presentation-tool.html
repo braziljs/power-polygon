@@ -239,7 +239,7 @@
                         el= null;
                     
                     d.getElementById('ppw-slide-title').innerHTML= slide.title || slide.id;
-                    d.getElementById('slides-current-slide').innerHTML= slide.index;
+                    d.getElementById('slides-current-slide').innerHTML= ppw.getValidSlides().indexOf(slide)+1;
                     if(slides[slide.index]){
                         d.getElementById('next-slide-title').innerHTML= slides[slide.index].title;
                     }else{
@@ -258,7 +258,9 @@
                     el.innerHTML= str;
                     
                     el= d.getElementById('slide-percent-bar');
-                    el.style.width= (slide.index * 100 / slides.length)+'%';
+                    //alert(ppw.getValidSlides().length);
+                    el.style.width= (slide.index * 100 / ppw.getValidSlides().length)+'%';
+                    d.getElementById('slides-length').innerHTML= ppw.getValidSlides().length;
                 };
                 
                 var _startTimer= function(){
@@ -281,7 +283,7 @@
                     $= _$;
                     ppw= _ppw;
                     slides= _slides;
-                    d.getElementById('slides-length').innerHTML= slides.length;
+                    d.getElementById('slides-length').innerHTML= ppw.getValidSlides().length;
                     _setCurrentSlide();
                     
                     el= d.getElementById('timer');
