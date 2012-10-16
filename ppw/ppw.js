@@ -1160,12 +1160,12 @@ window.PPW= (function($, _d, console){
                       </div>');
         $b.append('<div id="ppw-toolbar-container" class="'+_conf.cons.CLICKABLE_ELEMENT+'">\
                     <div id="ppw-toolbar" class="'+_conf.cons.CLICKABLE_ELEMENT+'">\
-                        <img id="ppw-goto-icon" onclick="PPW.showGoToComponent(true);" />\
-                        <img id="ppw-toolbox-icon" onclick="PPW.openPresentationTool();" />\
-                        <img id="ppw-search-icon" onclick="PPW.showSearchBox()"/>\
-                        <img id="ppw-fullscreen-icon" onclick="PPW.enterFullScreen()"/>\
-                        <img id="ppw-camera-icon" onclick="PPW.startCamera();"/>\
-                        <img id="ppw-settings-icon" onclick="PPW.showConfiguration();"/>\
+                        <img id="ppw-goto-icon" onclick="PPW.showGoToComponent(true);" title="Go to a specific slide" />\
+                        <img id="ppw-toolbox-icon" onclick="PPW.openPresentationTool();" title="Open Presentation Tool" />\
+                        <img id="ppw-search-icon" onclick="PPW.showSearchBox()" title="Search on slides"/>\
+                        <img id="ppw-fullscreen-icon" onclick="PPW.enterFullScreen()" title="Go Fullscreen"/>\
+                        <img id="ppw-camera-icon" onclick="PPW.startCamera();" title="Start the camera"/>\
+                        <img id="ppw-settings-icon" onclick="PPW.showConfiguration();" title="Settings"/>\
                     </div>\
                    </div>');
         
