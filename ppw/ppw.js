@@ -648,8 +648,11 @@ window.PPW= (function($, _d, console){
                     s= _d.getElementById('ppw-go-to-slide');
                     if(s){
                         if(s.value){
-                            s= parseInt(s.value, 10)||0;
-                            _goToSlide(s);
+                            s= parseInt(s.value, 10);
+                            if(s <= 0)
+                                s= 1;
+                            _goToSlide(_getValidSlides()[s -1]);
+                            
                         }
                         _closeMessage();
                         evt.preventDefault();
@@ -1031,9 +1034,12 @@ window.PPW= (function($, _d, console){
             el= _d.querySelector('#ppw-go-to-slide');
             el.addEventListener('keyup', function(evt){
                 if(evt.keyCode == 13){
-                    _goToSlide(parseInt(this.value, 10));
+                    _goToSlide(_getValidSlides()[parseInt(this.value, 10) -1]);
                     _closeMessage();
                 }
+                evt.preventDefault();
+                evt.stopPropagation();
+                return false;
             }, false);
             el.focus();
         }else{
@@ -1840,6 +1846,10 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
             }
             
         }else{
+            if(!idx || !idx.index){
+                idx= _getValidSlides();
+                idx= idx[idx.length-1];
+            }
             slide= idx;
             idx= slide.index-1;
         }

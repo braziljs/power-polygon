@@ -59,4 +59,14 @@
             PPW.sh.focus('#focusableExample', [5, 6, 8, 10]);
         }
     });
+    
+    PPW.addAction({
+        does: function(){
+            PPW.sh.focus('#focusableExample');
+        },
+        undo: function(){
+            // removes the focus
+            PPW.sh.focus('#focusableExample', [3, 4, 7, 9]);
+        }
+    });
 </script>

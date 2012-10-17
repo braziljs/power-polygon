@@ -17,27 +17,68 @@
     </head>
     <body>
         
-        <section id="closing">
-            <h2 class="LANG-EN">Thank you!</h2>
-            <h2 class="LANG-PT">Obrigado!</h2>
-            <div class="content">
-                <span class="LANG-EN">Questions?</span>
-                <span class="LANG-PT">Perguntas?</span>
+        <section id="closing" style="padding: 0px !IMPORTANT;">
+            
+            <style type="text/css">
+                #getInTouch{
+                    display: none;
+                    text-align: center;
+                }
+                #getInTouch img{
+                    max-height: 200px
+                }
+                .credits{
+                    margin-top: 40px;
+                    background: rgba(250, 250, 250, 0.7);
+                    padding: 4px;
+                }
+                .braziljs-logo{
+                    position: relative;
+                    top: -60px;
+                }
+            </style>
+            
+            <div style="background: url(slides/closing-images/question_mark.png);
+                        background-size: 100% 100%;
+                        height: 100%;
+                        width: 100%;
+                        padding: 20px;
+                        box-sizing: border-box">
+                <h2 class="LANG-EN">Thank you!</h2>
+                <h2 class="LANG-PT">Obrigado!</h2>
+                <div class="content">
+                    <span class="LANG-EN">Questions?</span>
+                    <span class="LANG-PT">Perguntas?</span>
+                </div>
+                <a href="https://github.com/braziljs/powerpolygon"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png" alt="Fork me on GitHub"></a>
+                
+                <div id="getInTouch">
+                    <a href="http://github.com/braziljs/powerpolygon/" target="_blank" >
+                        <img src="slides/closing-images/github.png" title="Follow me on Github!"/></a>
+                    <a href="http://github.com/braziljs/powerpolygon/" target="_blank" class="braziljs-logo">
+                        <img src="slides/closing-images/braziljs.png" title="Know BrazilJS and its projects" /></a>
+                    <br/>
+                    <div class="credits">
+                        <span class="LANG-EN">
+                            Created by <a href="http://felipenmoura.org">Felipe N. Moura</a>...help him improving it!
+                        </span>
+                        <span class="LANG-PT">
+                            Criado por <a href="http://felipenmoura.org">Felipe N. Moura</a>...ajude-o a melhora-lo!
+                        </span>
+                    </div>
+                </div>
+                
             </div>
             
             <script>
                 
                 PPW.addAction({
                     does: function(){
-                        alert('last blah ever!');
+                        PPW.animate('#getInTouch', 'fadeIn');
                     },
                     undo: function(){
-                        alert('maybe not! :)');
+                        PPW.animate('#getInTouch', 'fadeOut');
                     }
-                });
-
-                PPW.addAction(function(){
-                    alert('blah!');
                 });
             </script>
             
@@ -138,7 +179,14 @@
                         id: 'about'
                     },
                     {
-                        id: 'profile-example',
+                        type: 'content',
+                        id: 'presentationTool'
+                    },
+                    {
+                        id: 'profile-example-1'
+                    },
+                    {
+                        id: 'profile-example-2',
                         profile: 'longer'
                     },
                     {
@@ -147,7 +195,7 @@
                     },
                     {
                         type: 'content',
-                        id: 'presentationTool'
+                        id: 'showCamera'
                     },
                     {
                         type: 'closing',
