@@ -48,12 +48,19 @@ pre:not(.no-numbers) .ppw-sh-line:before{
     background-color: rgba(200, 200, 200, 0.1);
 }
 
+pre:not(.no-numbers) .ppw-sh-focused-line:before{
+    background-color: #999 !IMPORTANT;
+    color: white;
+    font-weight: bold;
+}
+
 .ppw-sh-focused-lines li:not(.ppw-sh-focused-line)>div{
-    -webkit-filter: blur(1px);
-    -moz-filter: blur(1px);
-    -o-filter: blur(1px);
-    -ms-filter: blur(1px);
-    filter: blur(1px);
+    -webkit-filter: blur(2px);
+    -moz-filter: blur(2px) ;
+    -o-filter: blur(2px);
+    -ms-filter: blur(2px);
+    filter: blur(2px);
     opacity: 0.7;
-    -moz-transform: opacity(0.5);
+    
+    /*filter: url(#blur-effect-1);*/
 }

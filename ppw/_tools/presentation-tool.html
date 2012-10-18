@@ -164,12 +164,21 @@
             
             #cameraContainer{
                 position: absolute;
-                right: 0px;
-                top: 205px;
+                right: -210px;
+                bottom: 60px;
                 width: 200px;
-                height: 200px;
+                height: 160px;
                 background-color: black;
-                display: none;
+            }
+            #close-video{
+                position: absolute;
+                left: -5px;
+                top: -5px;
+                cursor: pointer;
+            }
+            #ppw-video-element{
+                width: 200px;
+                height: 160px;
             }
         </style>
     </head>
@@ -212,7 +221,8 @@
         </div>
         
         <div id="cameraContainer">
-            <video id="ppw-video-element" autoplay="autoplay"></video>
+            <video id="ppw-video-element" width="200" height="160" autoplay="autoplay"></video>
+            <img src="../_images/close.png" id="close-video" />
         </div>
         
         <div id="timeAlertElement">30</div>
@@ -258,7 +268,7 @@
                     el.innerHTML= str;
                     
                     el= d.getElementById('slide-percent-bar');
-                    //alert(ppw.getValidSlides().length);
+                    
                     el.style.width= (slide.index * 100 / ppw.getValidSlides().length)+'%';
                     d.getElementById('slides-length').innerHTML= ppw.getValidSlides().length;
                 };
@@ -321,13 +331,31 @@
                     ppw.addListener('onslidechange', function(){
                         _setCurrentSlide();
                     });
-                    /*
+                    
                     ppw.addListener("onshowcamera", function(data){
-                        var video= d.getElementById('ppw-video-element');
                         
-                        video.src= data.device;
-                        video.play();
-                    });*/
+                        var video= d.getElementById('ppw-video-element'),
+                            container= d.getElementById('cameraContainer');
+                        
+                        window.URL = window.URL || window.webkitURL;
+                        navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia ||
+                                           navigator.mozGetUserMedia || navigator.msGetUserMedia;
+                        
+                        navigator.getUserMedia({audio: false, video: true}, function(stream) {
+                            var streamData= stream;
+                            try{
+                                streamData= window.URL.createObjectURL(stream);
+                                video.src = streamData;
+                                stream= streamData;
+                            }catch(e){
+                                video= stream;
+                            }
+                            video.play();
+                            $(container).animate({
+                                right: '0px'
+                            }, function(){});
+                        });
+                    });
                     
                 };
                     
@@ -395,6 +423,16 @@
             window.onload= function(){
                 PresentationTool.adjustScreen();
                 PresentationTool.triggerPresentationToolLoadEvent();
+                
+                document.getElementById('#close-video').addEventListener('click', function(){
+                    
+                    alert('aaaa');
+                    var container= document.getElementById('cameraContainer')
+                    document.getElementById('ppw-video-element').pause();
+                    $(container).animate({
+                        right: '0px'
+                    }, function(){});
+                }, false);
             }
             
         </script>

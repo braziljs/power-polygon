@@ -1175,6 +1175,13 @@ window.PPW= (function($, _d, console){
                     </div>\
                    </div>');
         
+        // adding the svg blur effect, to be able to apply blur on firefox as well.
+        $b.append('<svg id="ppw-svg-image-blur">\
+                        <filter id="blur-effect-1">\
+                            <feGaussianBlur stdDeviation="1" />\
+                        </filter>\
+                   </svg>')
+        
         $('#ppw-goto-icon').attr('src', _settings.PPWSrc+'/_images/goto.png')
                            .addClass(_conf.cons.CLICKABLE_ELEMENT)
         
@@ -1336,13 +1343,20 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
 
             if (_n.getUserMedia) {
                 
-                _n.getUserMedia({audio: false, video: true}, function(stream) {
-                    
+                _n.getUserMedia({audio: false, video: true}, function(stream){
+                  
+                  var streamData= stream;
+                  PPW.cameraStream= stream;
+                  
                   try{
-                      stream= _w.URL.createObjectURL(stream);
-                  }catch(e){}
+                      streamData= _w.URL.createObjectURL(stream);
+                      video.src = streamData;
+                      stream= streamData;
+                  }catch(e){
+                      video= stream;
+                  }
+                  
 
-                  video.src = stream;
                   video.play();
                   _conf.cameraLoaded= true;
                   
@@ -1396,16 +1410,17 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
                     $('#ppw-camera-hide-trigger').bind('click', _pauseCamera);
                     
                 }, function(data){
-                    alert("Could NOT start the video!");
-                    console.error("[PPW Error]: Could now open the camera!", data);
+                    console.error("[PPW Error]: Could now open the camera! User did not allow it!", data);
                     return false;
                 });
             }else{
                 alert("Could NOT start the video!");
+                console.error("[PPW Error]: Could now open the camera! It looks like your browser does not support it!", data);
                 return false;
             }
         }else{
             _d.querySelector('#ppw-video-element').play();
+            
             if(el[0].offsetTop <0){
                 el.css({
                             left: _b.offsetWidth - el[0].offsetWidth-10,
@@ -1433,6 +1448,8 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
             el= $('#ppw-camera-tool');
             _d.querySelector('#ppw-video-element').pause();
             el.animate({top: -el[0].offsetHeight - 30})
+            PPW.cameraStream.pause();
+            //_conf.cameraLoaded= false;
         }
         _triggerEvent('onhidecamera');
     };
