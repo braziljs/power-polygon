@@ -1439,12 +1439,12 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
                       streamData= _w.URL.createObjectURL(stream);
                       video.src = streamData;
                       stream= streamData;
+                      video.play();
                   }catch(e){
-                      video= stream;
+                      video.src= streamData;
+                      video.play();
                   }
                   
-
-                  video.play();
                   _conf.cameraLoaded= true;
                   
                   _conf.video= video;

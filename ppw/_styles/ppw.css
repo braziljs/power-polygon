@@ -468,7 +468,8 @@ ppw-message-content{
 .ppw-show-thumbs{
     width: 100% !IMPORTANT;
     height: 100% !IMPORTANT;
-    background-color: #777 !IMPORTANT;
+    /*background-color: #777 !IMPORTANT;*/
+    background: url(../_images/splash-screen-bg.png);
     overflow-y: auto !IMPORTANT;
     position: absolute !IMPORTANT;
     left: 0px !IMPORTANT;
@@ -495,4 +496,12 @@ ppw-message-content{
     -o-transform: scale(0.3);
     transform-origin: 0px 0px;
     transform: scale(0.3);
+}
+.ppw-show-thumbs>div:not(.ppw-slide-not-in-profile)
+{
+    border: solid 1px transparent;
+}
+.ppw-show-thumbs>div:not(.ppw-slide-not-in-profile):hover{
+    box-shadow: 0px 0px 40px white;
+    border: solid 1px black;
 }
