@@ -470,6 +470,7 @@ ppw-message-content{
     height: 100% !IMPORTANT;
     /*background-color: #777 !IMPORTANT;*/
     background: url(../_images/splash-screen-bg.png);
+    background-size: 100%;
     overflow-y: auto !IMPORTANT;
     position: absolute !IMPORTANT;
     left: 0px !IMPORTANT;

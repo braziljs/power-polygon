@@ -1441,7 +1441,8 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
                       stream= streamData;
                       video.play();
                   }catch(e){
-                      video.src= streamData;
+                      //video.src= streamData;
+                      video.mozSrcObject = stream;
                       video.play();
                   }
                   
