@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Presentation Demo</title>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="../../ppw/libs/jquery-1.8.2.min.js"><\/script>')</script>
+        <script src="../../ppw/ppw.js"></script>
+    </head>
+    <body>
+
+    <div>
+            <section id="start">
+                <h2>start!</h2>
+            </section>        
+        
+
+        <section id="closing">
+            <h2>Obrigado!</h2>
+        </section>
+
+    </div>
+        
+        <script>
+            window.PPW.init({
+                
+                /**************************************************
+                *  BASIC CONFIGURATION (most of it, is optional)  *
+                **************************************************/
+               
+                // the talk's title
+                title: "Demo 2",
+                // the list of authors and their information
+                authors: [
+                    {
+                        name: "Jaydson Gomes",
+                        email: "jayalemaoa@gmail.com",
+                        twitter: "@jaydson",
+                        picture: "",
+                        description: "!"
+                    }
+                ],
+                // where is(relatively) the source of PowerPolygonWeb
+                PPWSrc: "../../ppw/",
+                // enables or not, the shortcuts
+                shortcutsEnable: true,
+                // may be false or id(slide' id)
+                friendlyURL: 'id',
+                // should ppw open the splash screen first?
+                useSplashScreen: false,
+                /**
+                 * Defines the pattern to be used to load external slides.
+                 * The default is SLIDE_ID_DIR, found in cons.fs.
+                 * Also can be a string defining the pattern, where:
+                 *    %id    = slide identifier
+                 *    %num   = slide number
+                 *  
+                 * For example, if your slides a and b are in a directory called
+                 * slides, and the slide file is always index.html, the pattern
+                 * is as follows:
+                 *    fsPattern: 'slides/%id/index.html' // this is the default pattern
+                 */
+                fsPattern: PPW.cons.fs.SLIDE_ID_DIR,
+                // should show battery alerts WHEN SUPPORTED?
+                showBatteryAlerts: true,
+                // should show a notification when goes offline?
+                showOfflineAlerts: true,
+                
+                /**
+                 * Defines the profile for your presentation.
+                 * ** When not set, every slide will be shown.
+                 * ** When set, only slides with NO profile property, or profile
+                 * equals to null/'none'/false, or equals to the defined profile
+                 * here, will be shown.
+                 * default: 'none'
+                 */
+                profile: 'designers', // showing only slides with no profile, or profile=='designers'
+                
+                /**
+                 *
+                 */
+                languages: ['PT', 'EN'],
+                defaultLanguage: 'EN',
+                
+                /**************************************************
+                *  PRESENTATION DATA (mostly required properties) *
+                **************************************************/
+               
+                // the theme to be used (default: default)
+                theme: "yat",
+                // special settings for a theme(changes according to the choosen theme and is not required)
+                themeSettings: {},
+                // the expected duration in minutes in minutes (default 50)
+                duration: 60,
+                // When in minutes, the speaker should be alerted(default: 30, 40)
+                alertAt: [10, 30, 40, 50],
+                // the list of slides
+                slides: [
+                    {
+                        type: 'opening',
+                        id: 'start', // also used as source
+                        // no profile set, so it will always be shown
+                        notes: [
+                            "this is the very first slide",
+                            "and has only these two useless notes"
+                        ]
+                    },                    
+                    {
+                        type: 'closing',
+                        id: 'closing',
+                        notes: [
+                            "The last slide, to thank and ask for questions"
+                        ]
+                    }
+                ],
+                
+                // KEYBOARD SHORTCUTS(optional)
+                shortcuts: {
+                    'F6': function(){
+                        alert('F6 was pressed!!!');
+                    },
+                    'F7': function(){
+                        alert('F7 was pressed!!!');
+                    },
+                    'F8': function(){
+                        alert('F8 was pressed!!!');
+                    },
+                    'F9': function(){
+                        alert('F9 was pressed!!!');
+                    },
+                    'F10': function(){
+                        alert('F10 was pressed!!!');
+                    }
+                }
+            });
+        </script>
+    </body>
+</html>

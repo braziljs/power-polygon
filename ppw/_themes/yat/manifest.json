@@ -1,0 +1,11 @@
+{
+    "name": "yat",
+    "dependencies": {
+        "css": [
+            "core.css"
+        ],
+        "js": [
+            "core.js"
+        ]
+    }
+}
