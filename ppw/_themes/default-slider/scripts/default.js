@@ -26,6 +26,10 @@ window.PPWTheme= {
 PPW.addListener('onslidechange', function(data){
     PPWTheme.onresize();
 });
+PPW.addListener('onhidethumbs', function(data){
+    console.log('}}}}}}}}}}}}}', PPW.getCurrentSlide())
+    PPWTheme.onresize();
+});
 
 window.addEventListener("resize", function(){
     PPWTheme.onresize();

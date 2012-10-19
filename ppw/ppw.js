@@ -38,6 +38,16 @@ window.PPW= (function($, _d, console){
             profiles: {},
             slidesLoaded: false,
             themeLoaded: false,
+            inThumbsMode: false,
+            prevStyle: {
+                margin: '0px',
+                padding: '0px',
+                width: '100%',
+                height: '100%',
+                position: 'absolute',
+                top: '0px',
+                left: '0px'
+            },
             animations: [
                          "flash",
                          "shake",
@@ -182,6 +192,8 @@ window.PPW= (function($, _d, console){
         onopensettings          : [],
         onthemeloaded           : [],
         onsplashscreen          : [],
+        onshowthumbs            : [],
+        onhidethumbs            : [],
         F10_PRESSED             : [],
         F9_PRESSED              : [],
         F8_PRESSED              : [],
@@ -464,9 +476,9 @@ window.PPW= (function($, _d, console){
             
             if(_isValidProfile(slide)){
                 _conf.validSlides.push(slide);
-                $('#'+slide.id).removeClass('ppw-slide-not-in-profile');
+                $('#'+slide.id).parent().removeClass('ppw-slide-not-in-profile');
             }else{
-                $('#'+slide.id).addClass('ppw-slide-not-in-profile');
+                $('#'+slide.id).parent().addClass('ppw-slide-not-in-profile');
             }
         }
     };
@@ -534,20 +546,68 @@ window.PPW= (function($, _d, console){
         _triggerEvent('onslideloaded', loadedSlide);
         
         if(perc == 100){
+            
             // when all the slides loaded
             _conf.slidesLoaded= true;
             _setPresentationProfile();
             _setLION(_settings.defaultLanguage||_n.language);
             _triggerEvent('onslidesloaded', _settings.slides);
+            
             if(!_settings.useSplashScreen)
                 _startPresentation();
+            
+            $('.ppw-slide-container').click(function(evt){
+                if(_conf.inThumbsMode){
+                    _goToSlide($(this).data('ppw-slide-ref'));
+                    evt.preventDefault();
+                    evt.stopPropagation();
+                    return false;
+                }
+            });
+        
         }
         
         $('#ppw-slides-loader-bar-loading-container>div').stop().animate({
             width: perc+'%'
         }, 100, fn);
+        
     };
     
+    /**
+     * Shows the list of slides as thumbnails.
+     */
+    var _showThumbs= function(){
+        var el= $("#PPW-slides-container");
+        _conf.prevStyle= {
+            margin: el.css('margin'),
+            padding: el.css('padding'),
+            width: el.css('width'),
+            height: el.css('height'),
+            position: el.css('position'),
+            top: el.css('top'),
+            left: el.css('left')
+        };
+        
+        el.addClass('ppw-show-thumbs');
+        $b.addClass("ppw-showing-thumb");
+        _conf.inThumbsMode= true;
+        
+        _triggerEvent('onshowthumbs');
+    };
+    
+    /**
+     * Closes the thumbnails screen.
+     */
+    var _closeThumbnails= function(){
+        
+        var el= $("#PPW-slides-container");
+        
+        _triggerEvent('onhidethumbs');
+         
+        el.removeClass('ppw-show-thumbs');
+        $b.removeClass("ppw-showing-thumb");
+        _conf.inThumbsMode= false;
+    };
     /**
      * Binds the keyboard events to the presentation.
      */
@@ -583,6 +643,15 @@ window.PPW= (function($, _d, console){
                 case 39: // right
                 case 13: // enter
                 case 32: // space
+                    
+                    if(evt.keyCode == 32 /*space*/ && evt.altKey){
+                        _closeMessage();
+                        _showThumbs();
+                        evt.preventDefault();
+                        evt.stopPropagation();
+                        return false;
+                    }
+                    
                     if(_conf.presentationStarted && !_isEditableTarget(evt.target)){
                         _goNextSlide();
                         evt.preventDefault();
@@ -611,6 +680,10 @@ window.PPW= (function($, _d, console){
                         evt.preventDefault();
                         evt.stopPropagation();
                         return false;
+                    }
+                    if(_conf.inThumbsMode){
+                        _goToSlide(_conf.currentSlide);
+                        //_closeThumbnails();
                     }
                     break;
                     
@@ -755,7 +828,9 @@ window.PPW= (function($, _d, console){
          */
         $d.bind('click', function(evt){
             if(_conf.presentationStarted && !_isEditableTargetContent(evt.target)){
-                _goNextSlide();
+                if(!_conf.inThumbsMode)
+                    _goNextSlide();
+                evt.stopPropagation();
                 evt.preventDefault();
                 return false;
             }
@@ -829,6 +904,7 @@ window.PPW= (function($, _d, console){
                   <b>Shortcuts</b><br/>\
                   ALT: Go to slide<br/>\
                   ALT+F: Search into slides<br/>\
+                  ALT+Space: Show slides thumbnails<br/>\
                   F6, F7, F8, F9, F10: Custom"
         _showMessage(msg);
     }
@@ -946,9 +1022,9 @@ window.PPW= (function($, _d, console){
             
             slides[i].actions= [];
             if(!el.length){ // should load it from ajax
-                nEl= _d.createElement("section");
-                nEl.id= slides[i].id;
-                container.appendChild(nEl);
+                nEl= $("<div id='ppw-slide-container-"+slides[i].id+"' class='ppw-slide-container'><section id='"+slides[i].id+"'></section></div>");
+                //nEl.id= slides[i].id;
+                container.appendChild(nEl[0]);
                 
                 $.ajax(
                     {
@@ -994,7 +1070,15 @@ window.PPW= (function($, _d, console){
                 _settings.slides[i].title= tt;
                 _settings.slides[i].index= i+1;
                 
-                container.appendChild(el[0]);
+                
+                
+                $(container).append("<div id='ppw-slide-container-"+slides[i].id+"' class='ppw-slide-container'></div>");
+                //_slidePreloaderNext(_settings.slides[i]); return;
+                
+                
+                $('#ppw-slide-container-'+slides[i].id).append(el[0]);
+                
+                
                 $(el).find("script").each(function(count, scr){
                     
                     var f= new Function("PPW.slideIterator= this; "+scr.textContent);
@@ -1008,6 +1092,9 @@ window.PPW= (function($, _d, console){
                 
                 _slidePreloaderNext(_settings.slides[i]);
             }
+            
+            $("#ppw-slide-container-"+slides[i].id).data('ppw-slide-ref', slides[i]);
+            
             if(slides[i].profile){
                 _conf.profiles[slides[i].profile]= true;
             }
@@ -1877,6 +1964,11 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         if(!curSlide){
             _triggerEvent('onfinish');
             return false;
+        }
+        
+        // closing the thumbs
+        if(_conf.inThumbsMode){
+            _closeThumbnails();
         }
         
         _setHistoryStateTo(idx);
