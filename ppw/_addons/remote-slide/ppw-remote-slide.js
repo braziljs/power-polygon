@@ -23,7 +23,10 @@ window.PPW.extend("remote-slide", (function(){
                    PPW.goPreviousSlide();
                 });
                 remote.on('camera', function() {
-                   PPW.startCamera();
+                   PPW.toggleCamera();
+                });
+                remote.on('start', function() {
+                   PPW.startPresentation()
                 });
             }
             head.appendChild(remoteslide);
