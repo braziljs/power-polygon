@@ -31,6 +31,7 @@ window.PPW= (function($, _d, console){
         _conf= {
             loadSteps: 6,
             curLoaded: 0,
+            showingCamera: false,
             preloadedSlidesCounter: 0,
             cameraLoaded: false,
             presentationTool: null,
@@ -1495,6 +1496,7 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
                         top: 0-el[0].offsetHeight
                     }).animate({top: '0px'}, 500);
                     
+                    _conf.showingCamera= true;
                     $('#ppw-camera-hide-trigger').bind('click', _pauseCamera);
                     
                 }, function(data){
@@ -1522,6 +1524,7 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
                     "device": _conf.stream
                 });
             }
+            _conf.showingCamera= true;
         }
     };
     
@@ -1536,7 +1539,8 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
             el= $('#ppw-camera-tool');
             _d.querySelector('#ppw-video-element').pause();
             el.animate({top: -el[0].offsetHeight - 30})
-            PPW.cameraStream.pause();
+            //PPW.cameraStream.pause();
+            _conf.showingCamera= false;
             //_conf.cameraLoaded= false;
         }
         _triggerEvent('onhidecamera');
@@ -2237,7 +2241,7 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         extend                          : _extend,
         startCamera                     : _startCamera,
         stopCamera                      : _pauseCamera,
-        toggleCamera                    : function(){ if(_conf.cameraLoaded) _pauseCamera(); else _startCamera(); },
+        toggleCamera                    :  function(){ if(_conf.showingCamera) _pauseCamera(); else _startCamera(); },
         addListener                     : _addListener,
         removeListener                  : _removeListener,
         triggerPresentationToolLoadEvent: _triggerPresentationToolLoadEvent,
