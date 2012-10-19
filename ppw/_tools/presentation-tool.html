@@ -175,10 +175,12 @@
                 left: -5px;
                 top: -5px;
                 cursor: pointer;
+                z-index: 9999;
             }
             #ppw-video-element{
                 width: 200px;
                 height: 160px;
+                z-index: 9995;
             }
         </style>
     </head>
@@ -357,6 +359,15 @@
                         });
                     });
                     
+                    
+                    document.getElementById('close-video').addEventListener('click', function(){
+
+                        var container= document.getElementById('cameraContainer')
+                        document.getElementById('ppw-video-element').pause();
+                        $(container).animate({
+                            right: '-210px'
+                        }, function(){});
+                    }, false);
                 };
                     
                 var verifyInstance= function(){
@@ -423,16 +434,6 @@
             window.onload= function(){
                 PresentationTool.adjustScreen();
                 PresentationTool.triggerPresentationToolLoadEvent();
-                
-                document.getElementById('#close-video').addEventListener('click', function(){
-                    
-                    alert('aaaa');
-                    var container= document.getElementById('cameraContainer')
-                    document.getElementById('ppw-video-element').pause();
-                    $(container).animate({
-                        right: '0px'
-                    }, function(){});
-                }, false);
             }
             
         </script>
