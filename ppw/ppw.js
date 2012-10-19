@@ -1524,6 +1524,7 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
                     "device": _conf.stream
                 });
             }
+            _conf.showingCamera= true;
         }
     };
     
@@ -1538,7 +1539,7 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
             el= $('#ppw-camera-tool');
             _d.querySelector('#ppw-video-element').pause();
             el.animate({top: -el[0].offsetHeight - 30})
-            PPW.cameraStream.pause();
+            //PPW.cameraStream.pause();
             _conf.showingCamera= false;
             //_conf.cameraLoaded= false;
         }
@@ -2240,7 +2241,7 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         extend                          : _extend,
         startCamera                     : _startCamera,
         stopCamera                      : _pauseCamera,
-        toggleCamera                    : function(){ if(_conf.showingCamera) _pauseCamera(); else _startCamera(); },
+        toggleCamera                    :  function(){ if(_conf.showingCamera) _pauseCamera(); else _startCamera(); },
         addListener                     : _addListener,
         removeListener                  : _removeListener,
         triggerPresentationToolLoadEvent: _triggerPresentationToolLoadEvent,
