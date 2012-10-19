@@ -2010,12 +2010,12 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         });
         
         // rests the current action for the slide
-        _settings.slides[_conf.currentSlide].actionIdx = 0;
+        //_settings.slides[_conf.currentSlide].actionIdx = 0;
         
         // remove animated classes to fix the issue #1
         elementsToCleanUp= $(curSlide.el).find('.animated');
         elementsToCleanUp.each(function(){
-            _removeAnimateCSSClasses(this);
+            //_removeAnimateCSSClasses(this);
         });
         
         // if the slide has actions and the first one has a timing definition
