@@ -17,10 +17,13 @@ window.PPW.extend("remote-slide", (function(){
                 var remote = new RemoteSlide();
                 remote.connect('http://localhost:81');
                 remote.on('next', function() {
-                    alert('next');
+                    PPW.goNextSlide();
                 });
                 remote.on('previous', function() {
-                    alert('previous');
+                   PPW.goPreviousSlide();
+                });
+                remote.on('camera', function() {
+                   PPW.startCamera();
                 });
             }
             head.appendChild(remoteslide);
