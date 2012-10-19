@@ -864,7 +864,7 @@ window.PPW= (function($, _d, console){
                     _conf.themeLoaded= true;
                     setTimeout(function(){
                         if(!_n.battery.charging){
-                            if(_n.battery.dischargingTime / 600000 < _settings.duration){
+                            if(_n.battery.dischargingTime < _settings.duration){
                                 _showNotification("<img src='"+_settings.PPWSrc+"/_images/electricity.png' width='20' title='You have "+ (_n.battery.dischargingTime / 60)+" minutes of battery!' />");
                             }
                         }
@@ -2236,6 +2236,8 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         testAudio                       : _testAudio,
         extend                          : _extend,
         startCamera                     : _startCamera,
+        stopCamera                      : _pauseCamera,
+        toggleCamera                    : function(){ if(_conf.cameraLoaded) _pauseCamera(); else _startCamera(); },
         addListener                     : _addListener,
         removeListener                  : _removeListener,
         triggerPresentationToolLoadEvent: _triggerPresentationToolLoadEvent,
