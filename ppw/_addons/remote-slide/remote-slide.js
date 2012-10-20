@@ -29,7 +29,7 @@ if (!window.io) {
 
 	RemoteSlide.prototype.on = function (action, fn) {
 		if (private.connected) {
-			var act = action.match(/next|previous|fullscreen/);
+			var act = action.match(/next|previous|fullscreen|camera|start/);
 			if (act !== null && act[0]) {
 				private.setAction(action,fn);
 			} else {
