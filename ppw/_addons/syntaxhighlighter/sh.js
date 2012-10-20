@@ -64,7 +64,7 @@ window.PPW.extend("sh", (function(){
                     this.innerHTML= "<ol type='1' class='ppw-sh-source-container ppw-clickable'>"+
                                     this.innerHTML.replace(/</g, "&lt;")
                                                   .replace(/^/gm, "<li class='ppw-sh-line'><div>")
-                                                  .replace(/$/gm, "</div></li>") +
+                                                  .replace(/$/gm, "<br/></div></li>") +
                                     "</ol>";
                     
                     if(!hlToLoad[classes[i]]){

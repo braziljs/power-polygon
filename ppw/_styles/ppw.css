@@ -23,6 +23,7 @@ html, body {
     z-index: 999999995;
     /*background: url(../_images/ppw-gray-bg.png);*/
     background: url(../_images/splash-screen-bg.png);
+    background-size: 100% 100%;
     /*background: url(http://www.hannytech.com/wallpapers/walls/3d__abstract_wallpaper_85-normal.jpg);*/
     height: 100%;
     width: 100%;
@@ -184,7 +185,7 @@ html, body {
     
     border-radius: 6px;
     box-shadow: -5px -5px 40px black;
-    background-color: #f9f9f9;
+    background-color: #fff;
     display: none;
     padding: 6px;
     
@@ -312,7 +313,6 @@ ppw-message-content{
     height: 100%;
     width: 0%;
     background: url(../_images/loadingBar.gif) no-repeat;
-    background-size: 100% 100%;
 }
 
 #ppw-settings-form input, #ppw-settings-form select{
@@ -438,6 +438,10 @@ ppw-message-content{
     position: absolute;
     left: -9999px;
     top: -9999px;
+}
+
+.ppw-slide-element{
+    overflow: hidden;
 }
 
 .ppw-slide-container{
