@@ -39,7 +39,11 @@ window.PPW= (function($, _d, console){
             profiles: {},
             slidesLoaded: false,
             themeLoaded: false,
+            fontSize: 100,
+            
+            // MODES
             inThumbsMode: false,
+            
             prevStyle: {
                 margin: '0px',
                 padding: '0px',
@@ -1240,18 +1244,22 @@ window.PPW= (function($, _d, console){
         _preparePPW();
         
         // APPENDING THE CAMERA, TOOLBAR AND MESSAGE-BOX TO THE DOCUMENT
-        $b.append('<div id="ppw-message-box" class="ppw-clickable">\
+        $b.append('<div id="ppw-message-box"  class="ppw-clickable">\
                         <div id="ppw-message-content" class="ppw-clickable"></div>\
                         <div id="ppw-message-box-ok-button" class="ppw-clickable">\
                             <input type="button" id="ppw-message-box-button" value="Close" />\
                         </div>\
                       </div>');
+        
         $b.append('<div id="ppw-camera-tool" class="ppw-clickable">\
                         <video id="ppw-video-element" autoplay="autoplay" class="ppw-clickable"></video>\
                         <div id="ppw-camera-hide-trigger" class="ppw-clickable">\
                             <img height="10" class="ppw-clickable" src="">\
                         </div>\
                       </div>');
+        
+        $b.append('<div id="ppw-text-only" class="ppw-clickable">\</div>');
+        
         $b.append('<div id="ppw-toolbar-container" class="'+_conf.cons.CLICKABLE_ELEMENT+'">\
                     <div id="ppw-toolbar" class="'+_conf.cons.CLICKABLE_ELEMENT+'">\
                         <img id="ppw-goto-icon" onclick="PPW.showGoToComponent(true);" title="Go to a specific slide" />\
@@ -1261,6 +1269,11 @@ window.PPW= (function($, _d, console){
                         <img id="ppw-camera-icon" onclick="PPW.startCamera();" title="Start the camera"/>\
                         <img id="ppw-settings-icon" onclick="PPW.showConfiguration();" title="Settings"/>\
                     </div>\
+                    <div id="ppw-content-toolbar">\
+                        <span id="ppw-ct-text-small" title="Smaller fonts" onclick="PPW.smallerFonts();">A</span>\
+                        <span id="ppw-ct-text-big" title="Bigger fonts" onclick="PPW.biggerFonts();">A</span>\
+                        <img id="ppw-ct-thumbs" onclick="PPW.showThumbs();" title="Show thumbnails"/>\
+                    </div>\
                    </div>');
         
         // adding the svg blur effect, to be able to apply blur on firefox as well.
@@ -1268,7 +1281,7 @@ window.PPW= (function($, _d, console){
                         <filter id="blur-effect-1">\
                             <feGaussianBlur stdDeviation="1" />\
                         </filter>\
-                   </svg>')
+                   </svg>');
         
         $('#ppw-goto-icon').attr('src', _settings.PPWSrc+'/_images/goto.png')
                            .addClass(_conf.cons.CLICKABLE_ELEMENT)
@@ -1286,10 +1299,15 @@ window.PPW= (function($, _d, console){
                              .addClass(_conf.cons.CLICKABLE_ELEMENT);
                                  
         $('#ppw-settings-icon').attr('src', _settings.PPWSrc+'/_images/settings-icon.png')
-                             .addClass(_conf.cons.CLICKABLE_ELEMENT);
+                               .addClass(_conf.cons.CLICKABLE_ELEMENT);
+                             
+        $('#ppw-ct-thumbs').attr('src', _settings.PPWSrc+'/_images/thumbs.png')
+                           .addClass(_conf.cons.CLICKABLE_ELEMENT)
+                                 
+        //$('#ppw-ct-text-only').addClass(_conf.cons.CLICKABLE_ELEMENT);
 
         if(_settings.useSplashScreen){
-        
+            
             $.get(_settings.PPWSrc+"_tools/splash-screen.html", {}, function(data){
 
                 _d.body.innerHTML+= data;
@@ -1316,6 +1334,22 @@ window.PPW= (function($, _d, console){
             _setLoadingBarStatus();
             //_startPresentation();
         }
+    };
+    
+    /**
+     * Set the font sizes 10% bigger.
+     */
+    var _biggerFonts= function(){
+        _conf.fontSize+= 10;
+        _d.getElementById('PPW-slides-container').style.fontSize= _conf.fontSize+"%";
+    };
+    
+    /**
+     * Set the font sizes 10% smaller.
+     */
+    var _smallerFonts= function(){
+        _conf.fontSize-= 10;
+        _d.getElementById('PPW-slides-container').style.fontSize= _conf.fontSize+"%";
     };
     
     /**
@@ -2255,6 +2289,9 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         animations                      : _conf.animations,
         animate                         : _animate,
         language                        : _conf.currentLang,
+        showThumbs                      : _showThumbs,
+        biggerFonts                     : _biggerFonts,
+        smallerFonts                    : _smallerFonts,
         // API GETTERS/SETTERS METHODS
         getSlides                       : _getSlides,
         getValidSlides                  : _getValidSlides,

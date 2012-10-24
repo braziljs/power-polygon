@@ -14,6 +14,15 @@ html, body {
     padding: 0px;
 }
 
+body *:not(.ppw-clickable){
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -o-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
 #PPW-splash-screen{
     position: absolute;
     box-sizing: border-box;
@@ -22,7 +31,7 @@ html, body {
     top: 0px;
     z-index: 999999995;
     /*background: url(../_images/ppw-gray-bg.png);*/
-    background: url(../_images/splash-screen-bg.png);
+    background: url(../_images/splash-screen-bg-2.png);
     background-size: 100% 100%;
     /*background: url(http://www.hannytech.com/wallpapers/walls/3d__abstract_wallpaper_85-normal.jpg);*/
     height: 100%;
@@ -376,6 +385,9 @@ ppw-message-content{
     transition: all 200ms linear;
 }
 #ppw-toolbar{
+    position: relative;
+    z-index: 3;
+    float: left;
     height: 235px;
     width: 40px;
     box-shadow: 0px 0px 10px gray;
@@ -473,8 +485,8 @@ ppw-message-content{
     width: 100% !IMPORTANT;
     height: 100% !IMPORTANT;
     /*background-color: #777 !IMPORTANT;*/
-    background: url(../_images/splash-screen-bg.png);
-    background-size: 100%;
+    background: url(../_images/splash-screen-bg-2.png);
+    background-size: 100% 100%;
     overflow-y: auto !IMPORTANT;
     position: absolute !IMPORTANT;
     left: 0px !IMPORTANT;
@@ -486,10 +498,13 @@ ppw-message-content{
     float: left !IMPORTANT;
     display: block !IMPORTANT;
     margin: 0px !IMPORTANT;
-    box-shadow: 5px 5px 20px black !IMPORTANT;
-    border: none !IMPORTANT;
+    box-shadow: 0px 0px 0px black !IMPORTANT;
+    border: solid 1px black !IMPORTANT;
     overflow: hidden !IMPORTANT;
     border-radius: 0px !IMPORTANT;
+    
+    width: 860px !IMPORTANT;
+    height: 600px !IMPORTANT;
     
     -webkit-transform-origin: 0px 0px;
     -webkit-transform: scale(0.3);
@@ -504,9 +519,59 @@ ppw-message-content{
 }
 .ppw-show-thumbs>div:not(.ppw-slide-not-in-profile)
 {
-    border: solid 1px transparent;
+    border: solid 1px black;
 }
 .ppw-show-thumbs>div:not(.ppw-slide-not-in-profile):hover{
     box-shadow: 0px 0px 40px white;
     border: solid 1px black;
+}
+
+
+
+
+#ppw-text-only{
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    background-color: white;
+    color: black;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    display: none;
+    z-index: 99999999;
+    white-space: pre;
+}
+#ppw-ct-text-only{
+    cursor: pointer !IMPORTANT;
+}
+
+
+#ppw-content-toolbar{
+    position: absolute;
+    left: 40px;
+    top: 0px;
+    background-color: #fff;
+    cursor: default;
+    z-index: 1;
+    box-shadow: 0px 0px 9px 2px gray;
+    padding-left: 10px;
+    box-sizing: border-box;
+}
+#ppw-ct-text-small{
+    font-size: 11px;
+    cursor: pointer;
+}
+#ppw-ct-text-big{
+    font-size: 18px;
+    cursor: pointer;
+}
+
+#ppw-content-toolbar{
+    width: 70px;
+    height: 30px;
+    white-space: nowrap;
+}
+#ppw-content-toolbar img{
+    cursor: pointer;
 }
