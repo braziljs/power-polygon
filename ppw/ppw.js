@@ -159,7 +159,8 @@ window.PPW= (function($, _d, console){
             showBatteryAlerts: true,
             showOfflineAlerts: true,
             slidesCache: true,
-            profile: 'none'
+            profile: 'none',
+            slidesPerPage: 1 // not working properly because no browser support 100%it by now
         },
         // a local reference to the $(document)
         $d= $(_d),
@@ -524,7 +525,9 @@ window.PPW= (function($, _d, console){
                 }
             }while(i--);
         }
-        
+        //$b.removeClass('.LANG-').addClass('.LANG-'+lang);
+        _b.className= _b.className.replace(/LANG_[a-z]+( |$)/ig, '');
+        $b.addClass('LANG_'+lang);
     }
     
     /**
@@ -582,7 +585,12 @@ window.PPW= (function($, _d, console){
      * Shows the list of slides as thumbnails.
      */
     var _showThumbs= function(){
+        
         var el= $("#PPW-slides-container");
+        
+        if(!_conf.presentationStarted)
+            return;
+        
         _conf.prevStyle= {
             margin: el.css('margin'),
             padding: el.css('padding'),
@@ -699,6 +707,14 @@ window.PPW= (function($, _d, console){
                     return false;
                     break;
                     
+                case 80: // P
+                    if(evt.altKey || evt.ctrlKey){
+                        evt.preventDefault();
+                        evt.stopPropagation();
+                        return false;
+                    }
+                    break;
+                
                 default: {
                     if(_settings.shortcutsEnable){
                         if(evt.altKey && _conf.presentationStarted){
@@ -716,6 +732,27 @@ window.PPW= (function($, _d, console){
             }
             return true;
         });
+        
+        $d.bind('keypress', function(evt){
+            if(evt.altKey){
+                evt.preventDefault();
+                evt.stopPropagation();
+                return false;
+            }
+            
+            switch(evt.keyCode){
+                case 112: // P
+                    if(evt.altKey || evt.ctrlKey){
+                        evt.preventDefault();
+                        evt.stopPropagation();
+                        return false;
+                    }
+                    break;
+            }
+            
+            return true;
+        });
+        
         $d.bind('keyup', function(evt){
             
             var s= false;
@@ -738,7 +775,16 @@ window.PPW= (function($, _d, console){
                     }
                     return false;
                     break;
-                    
+                
+                case 80: // P
+                    if(evt.altKey || evt.ctrlKey){
+                        _print();
+                        evt.preventDefault();
+                        evt.stopPropagation();
+                        return false;
+                    }
+                    break;
+                
                 case 117: // F6
                     s= _triggerEvent('F6_PRESSED');
                     if(!s){
@@ -894,6 +940,16 @@ window.PPW= (function($, _d, console){
                 _conf.presentationTool.close();
             return null;
         };
+        
+        $b.bind('selectstart', function(evt){
+            
+            if(_isEditableTargetContent(evt.target))
+                return true;
+            
+            evt.preventDefault();
+            evt.stopPropagation();
+            return false;
+        });
     };
     
     /**
@@ -1188,6 +1244,37 @@ window.PPW= (function($, _d, console){
     }
     
     /**
+     * Prepares the presentation to be printed.
+     * 
+     * You can use this feature to save the presentation as pdf, for example.
+     */
+    var _print= function(){
+        
+        var slides= _getValidSlides(),
+            notVisible= [],
+            tmp= null;
+        
+        $('#PPW-splash-screen').hide();
+        $('#ppw-toolbar-container').hide();
+        
+        
+        if(_settings.languages && _settings.languages.length){
+            $(slides).each(function(){
+                tmp= $(this.el).find(':not(:visible)');
+                notVisible.push(tmp);
+                tmp.show();
+                _setLION(_conf.currentLang);
+            });
+        }
+        
+        $b.addClass('printing-'+(_settings.slidesPerPage||1));
+        _w.print();
+        $b.removeClass('printing-'+(_settings.slidesPerPage||1));
+        $('#ppw-toolbar-container').show();
+        $(notVisible).each(function(){ $(this).hide(); });
+    };
+    
+    /**
      * Shows the searchbox.
      * 
      * This search goes to the slide where the searched term is found.
@@ -1244,7 +1331,7 @@ window.PPW= (function($, _d, console){
         _preparePPW();
         
         // APPENDING THE CAMERA, TOOLBAR AND MESSAGE-BOX TO THE DOCUMENT
-        $b.append('<div id="ppw-message-box"  class="ppw-clickable">\
+        $b.append('<div id="ppw-message-box"  class="ppw-clickable glass">\
                         <div id="ppw-message-content" class="ppw-clickable"></div>\
                         <div id="ppw-message-box-ok-button" class="ppw-clickable">\
                             <input type="button" id="ppw-message-box-button" value="Close" />\
@@ -1273,6 +1360,7 @@ window.PPW= (function($, _d, console){
                         <span id="ppw-ct-text-small" title="Smaller fonts" onclick="PPW.smallerFonts();">A</span>\
                         <span id="ppw-ct-text-big" title="Bigger fonts" onclick="PPW.biggerFonts();">A</span>\
                         <img id="ppw-ct-thumbs" onclick="PPW.showThumbs();" title="Show thumbnails"/>\
+                        <img id="ppw-ct-print" onclick="PPW.print();" title="Print or save as PDF"/>\
                     </div>\
                    </div>');
         
@@ -1302,7 +1390,10 @@ window.PPW= (function($, _d, console){
                                .addClass(_conf.cons.CLICKABLE_ELEMENT);
                              
         $('#ppw-ct-thumbs').attr('src', _settings.PPWSrc+'/_images/thumbs.png')
-                           .addClass(_conf.cons.CLICKABLE_ELEMENT)
+                           .addClass(_conf.cons.CLICKABLE_ELEMENT);
+                             
+        $('#ppw-ct-print').attr('src', _settings.PPWSrc+'/_images/print.png')
+                           .addClass(_conf.cons.CLICKABLE_ELEMENT);
                                  
         //$('#ppw-ct-text-only').addClass(_conf.cons.CLICKABLE_ELEMENT);
 
@@ -2292,6 +2383,7 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         showThumbs                      : _showThumbs,
         biggerFonts                     : _biggerFonts,
         smallerFonts                    : _smallerFonts,
+        print                           : _print,
         // API GETTERS/SETTERS METHODS
         getSlides                       : _getSlides,
         getValidSlides                  : _getValidSlides,

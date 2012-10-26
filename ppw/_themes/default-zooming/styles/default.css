@@ -45,7 +45,7 @@ section{
     text-align: center;
 }
 .ppw-slide-type-opening h1, .ppw-slide-type-opening h2{
-    font-size: 40px;
+    font-size: 2.4em;
 }
 
 @-webkit-keyframes slideChange{
