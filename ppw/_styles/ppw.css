@@ -90,6 +90,15 @@
     }
 }
 
+.ppw-red{
+    font-weight: bold;
+    color: red;
+}
+
+.ppw-green{
+    font-weight: bold;
+    color: green;
+}
 
 .ppw-platform{
     -webkit-touch-callout: none;
@@ -399,10 +408,18 @@ ppw-message-content{
 
 #ppw-addons-container{
     width: 100%;
+    font-size: 90%;
     text-align: center;
     margin: 0px;
-    padding: 2px;
     clear: both;
+    color: #444 !IMPORTANT;
+    font-style: italic !IMPORTANT;
+    /*background-color: rgba(255, 255, 255, 0.2);*/
+}
+#ppw-addons-container>div, #ppw-addons-container>span{
+    padding: 0px 6px 0px 6px !IMPORTANT;
+    border-right: solid 1px #ddd;
+    border-left: solid 1px #ddd;
 }
 
 #ppw-slides-loader-bar{

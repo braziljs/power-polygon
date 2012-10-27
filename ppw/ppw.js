@@ -319,7 +319,7 @@ window.PPW= (function($, _d, console){
                     _init(xhr);
                 },
                 error: function(xhr, data, ret){
-                    alert('[PPW] Error loading the init() configuration manifest!\nThere must be an erron on the json or the file was not found!\nCheck the console for more detailes.');
+                    alert('[PPW] Error loading the init() configuration manifest!\nThere must be an erron on the json or the file was not found!\nCheck the console for more details.');
                     console.error("[PPW] Error loading the init() configuration manifest! ", xhr, data, ret, "Please, verify if your json has no single quoted properties or if there is any comment on it!")
                 }
             });
@@ -2414,6 +2414,7 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         extend                          : _extend,
         startCamera                     : _startCamera,
         stopCamera                      : _pauseCamera,
+        showMessage                     : _showMessage,
         toggleCamera                    :  function(){ if(_conf.showingCamera) _pauseCamera(); else _startCamera(); },
         addListener                     : _addListener,
         removeListener                  : _removeListener,
