@@ -674,6 +674,10 @@ ppw-message-content{
     box-shadow: 0px 0px 9px 2px gray;
     padding-left: 10px;
     box-sizing: border-box;
+    
+    width: 195px;
+    height: 30px;
+    white-space: nowrap;
 }
 #ppw-ct-text-small{
     font-size: 11px;
@@ -684,11 +688,6 @@ ppw-message-content{
     cursor: pointer;
 }
 
-#ppw-content-toolbar{
-    width: 90px;
-    height: 30px;
-    white-space: nowrap;
-}
 #ppw-content-toolbar img{
     cursor: pointer;
 }
@@ -697,4 +696,45 @@ ppw-message-content{
     position: relative;
     float: none;
     height: 100%;
+}
+
+#ppw-social-buttons{
+    float: right;
+    width: 100px;
+    height: 25px;
+}
+#ppw-social-buttons .fb-like,
+#ppw-presentation-social-buttons .fb-like{
+    width: 56px;
+    overflow: hidden;
+    float: right;
+    margin-left: 4px;
+}
+
+#ppw-social-buttons .gp-button{
+    margin-top: 2px;
+    float: right !IMPORTANT;
+}
+.ppw-powered-by-link{
+    line-height: 25px;
+}
+.ppw-powered-by-link a{
+    color: white !IMPORTANT;
+    letter-spacing: 1px;
+    text-decoration: none !IMPORTANT;
+    text-shadow: 0px 0px 6px black !IMPORTANT;
+}
+
+#ppw-presentation-social-buttons{
+    width: 100px;
+    float: right;
+    overflow: hidden;
+    border-left: dotted 2px #eee;
+}
+#ppw-presentation-social-buttons .fb-like{
+    margin-top: 3px;
+}
+#ppw-presentation-social-buttons .gp-button{
+    margin-top: 5px !IMPORTANT;
+    float: right !IMPORTANT;
 }

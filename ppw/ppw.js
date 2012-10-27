@@ -150,7 +150,7 @@ window.PPW= (function($, _d, console){
             PPWSrc: "../../ppw/", // wondering the talk is in /talks/talkname for example
             shortcutsEnable: true, // enables or not, the shortcuts
             friendlyURL: 'id', // may be false(also, 'num') or id(slide' id)
-            useSplashScreen: false, // should ppw open the splash screen first?
+            useSplashScreen: true, // should ppw open the splash screen first?
             slidesContainer: _d.createElement('div'),
             theme: _conf.defaults.theme,
             fsPattern: _conf.cons.fs.SLIDE_ID_DIR,
@@ -1349,7 +1349,9 @@ window.PPW= (function($, _d, console){
         
         _preparePPW();
         
-        // APPENDING THE CAMERA, TOOLBAR AND MESSAGE-BOX TO THE DOCUMENT
+        // APPENDING THE CAMERA, TOOLBAR, SOCIAL BUTTONS AND MESSAGE-BOX TO THE DOCUMENT
+        $b.append('<div id="fb-root"></div>');
+        
         $b.append('<div id="ppw-message-box"  class="ppw-clickable glass ppw-platform">\
                         <div id="ppw-message-content" class="ppw-clickable"></div>\
                         <div id="ppw-message-box-ok-button" class="ppw-clickable">\
@@ -1378,6 +1380,10 @@ window.PPW= (function($, _d, console){
                         <span id="ppw-ct-text-big" title="Bigger fonts" onclick="PPW.biggerFonts();">A</span>\
                         <img id="ppw-ct-thumbs" onclick="PPW.showThumbs();" title="Show thumbnails"/>\
                         <img id="ppw-ct-print" onclick="PPW.print();" title="Print or save as PDF"/>\
+                        <div id="ppw-presentation-social-buttons">\
+                            <div class="fb-like" data-href="'+_l+'" data-send="false" data-width="450" data-show-faces="false"></div>\
+                            <span class="gp-button"><div class="g-plusone" data-size="medium" data-annotation="none" data-href="'+_l+'"></div></span>\
+                        </div>\
                     </div>\
                    </div>');
         
@@ -1435,7 +1441,23 @@ window.PPW= (function($, _d, console){
                     marginTop: '0px'
                 }, 500, _preloadSlides);
                 _triggerEvent('onsplashscreen', _d.getElementById('ppw-addons-container'));
-
+                
+                // applying Facebook Buttons
+                (function(d, s, id) {
+                    var js, fjs = d.getElementsByTagName(s)[0];
+                    if (d.getElementById(id)) return;
+                    js = d.createElement(s); js.id = id;
+                    js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=281929191903584";
+                    fjs.parentNode.insertBefore(js, fjs);
+                }(_d, 'script', 'facebook-jssdk'));
+                
+                // applying the g+ buttons
+                $.getScript('https://apis.google.com/js/plusone.js', function(){
+                });
+                /*$b.append('<script type="text/javascript" src="https://apis.google.com/js/plusone.js">\
+                            {parsetags: "explicit"}\
+                           </script>');*/
+                //window.gapi.plusone.go();
             });
         }else{
             //_preloadSlides();
