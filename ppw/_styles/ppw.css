@@ -43,9 +43,6 @@
         margin: 10px !IMPORTANT;
     }
     
-    
-    
-    
     /* 4(FOUR) slides per page */
     body.printing-4{
         overflow: auto !IMPORTANT;
@@ -94,28 +91,14 @@
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-    
-
-
-
-
-
-
-
-
-
+.ppw-platform{
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
 
 
 
@@ -269,6 +252,7 @@
 
 .ppw-menu-conf-icon{
     background: url(../_images/config-icon.png) no-repeat -20px -10px #fff;
+    
     color: black;
     font-size: 30px;
     font-weight: bold;

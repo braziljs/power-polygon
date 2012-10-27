@@ -308,6 +308,25 @@ window.PPW= (function($, _d, console){
      * Method called by the user to define the presentation settings.
      */
     var _init= function(conf){
+        
+        if(typeof conf != 'object'){
+            
+            $.ajax({
+                url: conf,
+                dataType: 'json',
+                success: function(xhr, data, ret){
+                    console.log("OK ", xhr, data, ret);
+                    _init(xhr);
+                },
+                error: function(xhr, data, ret){
+                    alert('[PPW] Error loading the init() configuration manifest!\nThere must be an erron on the json or the file was not found!\nCheck the console for more detailes.');
+                    console.error("[PPW] Error loading the init() configuration manifest! ", xhr, data, ret, "Please, verify if your json has no single quoted properties or if there is any comment on it!")
+                }
+            });
+            
+            return;
+        }
+        
         $.extend(_settings, conf);
         
         if(_settings.shortcutsEnable){
@@ -941,7 +960,7 @@ window.PPW= (function($, _d, console){
             return null;
         };
         
-        $b.bind('selectstart', function(evt){
+        /*$b.bind('selectstart', function(evt){
             
             if(_isEditableTargetContent(evt.target))
                 return true;
@@ -949,7 +968,7 @@ window.PPW= (function($, _d, console){
             evt.preventDefault();
             evt.stopPropagation();
             return false;
-        });
+        });*/
     };
     
     /**
@@ -1331,7 +1350,7 @@ window.PPW= (function($, _d, console){
         _preparePPW();
         
         // APPENDING THE CAMERA, TOOLBAR AND MESSAGE-BOX TO THE DOCUMENT
-        $b.append('<div id="ppw-message-box"  class="ppw-clickable glass">\
+        $b.append('<div id="ppw-message-box"  class="ppw-clickable glass ppw-platform">\
                         <div id="ppw-message-content" class="ppw-clickable"></div>\
                         <div id="ppw-message-box-ok-button" class="ppw-clickable">\
                             <input type="button" id="ppw-message-box-button" value="Close" />\
@@ -1345,9 +1364,7 @@ window.PPW= (function($, _d, console){
                         </div>\
                       </div>');
         
-        $b.append('<div id="ppw-text-only" class="ppw-clickable">\</div>');
-        
-        $b.append('<div id="ppw-toolbar-container" class="'+_conf.cons.CLICKABLE_ELEMENT+'">\
+        $b.append('<div id="ppw-toolbar-container" class="ppw-platform ppw-platform '+_conf.cons.CLICKABLE_ELEMENT+'">\
                     <div id="ppw-toolbar" class="'+_conf.cons.CLICKABLE_ELEMENT+'">\
                         <img id="ppw-goto-icon" onclick="PPW.showGoToComponent(true);" title="Go to a specific slide" />\
                         <img id="ppw-toolbox-icon" onclick="PPW.openPresentationTool();" title="Open Presentation Tool" />\
@@ -1975,9 +1992,9 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
                 }
             }else{
                 _goPreviousSlide();
-                //_goToSlide(_conf.currentSlide-1, 'prev');
             }
         }else{
+            _removeAnimateCSSClasses();
             _goToSlide(_getPrevValidSlide(), 'prev');
         }
     };
@@ -2036,8 +2053,7 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         var url= '',
             previousSlide= _getCurrentSlide(),
             slide= null,
-            curSlide= null,
-            elementsToCleanUp= [];
+            curSlide= null;
         
         if(!_conf.presentationStarted)
             return false;
@@ -2138,23 +2154,14 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
             current: curSlide
         });
         
-        // rests the current action for the slide
-        //_settings.slides[_conf.currentSlide].actionIdx = 0;
-        
-        // remove animated classes to fix the issue #1
-        elementsToCleanUp= $(curSlide.el).find('.animated');
-        elementsToCleanUp.each(function(){
-            //_removeAnimateCSSClasses(this);
-        });
-        
         // if the slide has actions and the first one has a timing definition
-        if(curSlide.actions[0] && curSlide.actions[0].timing != 'click'){
-            if(curSlide.actions[0].timing == 'auto'){
+        if(curSlide.actions[curSlide.actionIdx] && curSlide.actions[curSlide.actionIdx].timing != 'click'){
+            if(curSlide.actions[curSlide.actionIdx].timing == 'auto'){
                 _goNextSlide();
-            }else if(!isNaN(curSlide.actions[0].timing)){
+            }else if(!isNaN(curSlide.actions[curSlide.actionIdx].timing)){
                 _settings.slides[_conf.currentSlide]._timer= setTimeout(function(){
                     _goNextSlide();
-                }, curSlide.actions[0].timing);
+                }, curSlide.actions[curSlide.actionIdx].timing);
             }
         }
     };
@@ -2224,11 +2231,19 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
     
     var _removeAnimateCSSClasses= function(el){
         
-        if(el.length)
-            el= el[0];
+        if(!el){
+            el= $(_getCurrentSlide().el).find('.animated');
+        }else{
+            el= $(el);
+        }
         
-        el.className= el.className.replace(/ppw\-anim\-([a-zA-z0-9\-_]+)( |$)/g,
-                                           '');
+        $(el).each(function(){
+            console.log(this.className);
+            this.className= this.className.replace(/ppw\-anim\-([a-zA-z0-9\-_]+)( |$)/g, '')
+                                          .replace('animated', '');
+            console.log('depois', {el: this}, this.className)
+        });
+        
         return el;
     }
     
@@ -2244,6 +2259,16 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
      * @param Object Settings[optional]
      */
     var _animate= function(el, anim, settings){
+        
+        var onEnd= function(event){
+            
+            if(settings.onend && typeof settings.onend == 'function'){
+                try{
+                    settings.onend(event, el, anim);
+                }catch(e){};
+            }
+            //_removeAnimateCSSClasses(el);
+        };
         
         el= $(el);
         
@@ -2282,13 +2307,13 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
                     el.one('oAnimationStart', settings.onstart);
                     el.one('animationstart', settings.onstart);
                 }
-                if(settings.onend && typeof settings.onend == 'function'){
-                    el.one('webkitAnimationEnd', settings.onend);
-                    el.one('mozAnimationEnd', settings.onend);
-                    el.one('msAnimationEnd', settings.onend);
-                    el.one('oAnimationEnd', settings.onend);
-                    el.one('animationend', settings.onend);
-                }
+                //if(settings.onend && typeof settings.onend == 'function'){
+                el.one('webkitAnimationEnd', onEnd);
+                el.one('mozAnimationEnd', onEnd);
+                el.one('msAnimationEnd', onEnd);
+                el.one('oAnimationEnd', onEnd);
+                el.one('animationend', onEnd);
+                //}
             }
             
             _removeAnimateCSSClasses(el[0]);
@@ -2346,7 +2371,8 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         _goToSlide(_conf.currentSlide);
     };
     
-    $(_d).ready(_constructor);
+    //$(_d).ready(_constructor);
+    _addListener('onload', _constructor)
     
     
     /**************************************************
