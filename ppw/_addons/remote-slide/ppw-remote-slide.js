@@ -6,7 +6,10 @@ window.PPW.extend("remote-slide", (function(){
             server: 'http://localhost:81',
             controler: 'http://localhost:81',
             hash: null,
-            pointer: null
+            pointer: false,
+            drawing: false,
+            w: 0,
+            h: 0
         };
     
     var _enable= function(){
@@ -40,24 +43,49 @@ window.PPW.extend("remote-slide", (function(){
         remote.on('start', function() {
            PPW.startPresentation();
         });
+        
+        remote.on('point', function(data) {});
+        
         remote.on('point', function(data) {
             
             var l, t;
             
-            if(!_conf.pointer)
-                _conf.pointer= $('#ppw-pointer');
+            if(!_conf.pointer){
+                _conf.w= document.body.clientWidth;
+                _conf.h= document.body.clientHeight;
+                
+                _conf.pointer= document.getElementById('ppw-pointer');
+                _conf.pointer.width= _conf.w;
+                _conf.pointer.height= _conf.h;
+                _conf.pointer= _conf.pointer.getContext('2d');
+            }
+            
+            console.log("DRAWING", _conf.drawing, data);
+            if(!_conf.drawing){
+                document.getElementById('ppw-pointer').style.display= '';
+            }
             
             if(data[0]>=0){
                 
-                console.log("POINTTIIINNNNGGGG>>>>", data)
-                _conf.pointer.css({
-                    left: data[0]+'%',
-                    top: data[1]+'%',
-                    display: 'block'
-                });
+                _conf.drawing= true;
+                
+                if(data[2]){
+                    _conf.pointer.closePath();
+                    _conf.pointer.strokeStyle = "#ff0000";
+                    _conf.pointer.lineWidth = 16;
+                    _conf.pointer.lineCap = "round";
+                    _conf.pointer.moveTo(data[0]/100*_conf.w, data[1]/100*_conf.h);
+                    _conf.pointer.beginPath();
+                }else{
+                    _conf.pointer.lineTo(data[0]/100*_conf.w, data[1]/100*_conf.h);
+                }
+                _conf.pointer.stroke();
                 
             }else{
-               _conf.pointer.hide();
+                _conf.pointer.closePath();
+                _conf.pointer.clearRect(0, 0, _conf.w, _conf.h);
+                _conf.drawing= false;
+                //document.getElementById('ppw-pointer').style.display= 'none';
             }
         });
         
@@ -97,7 +125,7 @@ window.PPW.extend("remote-slide", (function(){
     }    
 
     var _setup= function(data){
-        $(document.body).append("<div id='ppw-pointer' style='position: absolute; left: 0px; top: 0px; z-index: 99999999; background: red; border-radius: 50%; width: 10px; height: 10px; display: none; border: solid 1px black; box-shadow: 0px 0px 2px 1px white'></div>");
+        $(document.body).append("<canvas id='ppw-pointer' style='position: absolute; left: 0px; top: 0px; z-index: 99999999; opacity: 0.3; display: none;' width='100%' height='100%'></canvas>");
         _ppw= data;
     }
 
