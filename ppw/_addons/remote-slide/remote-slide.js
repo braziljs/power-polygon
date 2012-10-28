@@ -1,44 +1,60 @@
 if (!window.io) {
-	throw 'Socket.io library is required. Make sure that node server is up';
+    throw 'Socket.io library is required. Make sure that node server is up';
 }
 
 (function (io) {
-	var RemoteSlide = function () {},
+    var RemoteSlide = function () {},
+    
+    priv = {
 
-	private = {
+        socket : null,
 
-		socket : null,
+        connected : false,
 
-		connected : false,
+        setAction : function(action, fn) {
+            priv.socket.on(action, fn);
+        }
+    };
 
-		setAction : function(action, fn) {
-			private.socket.on('message', function(data) {
-		  		if (data === action && typeof fn === 'function') {
-		  			fn();
-		  		}
-		  	});
-		}
-	};
+    var getHash= function(str){
 
-	RemoteSlide.prototype.connect = function (socketserver) {
-		if (private.connected === false) {
-			private.socket = io.connect(socketserver);
-			private.connected = true;
-		}
-	};
+        var hash = 0, i, ch;
 
-	RemoteSlide.prototype.on = function (action, fn) {
-		if (private.connected) {
-			var act = action.match(/next|previous|fullscreen|camera|start/);
-			if (act !== null && act[0]) {
-				private.setAction(action,fn);
-			} else {
-				throw 'Invalid action name';
-			}
-		} else {
-			throw '#RemoteSlide - You must to connect before!';
-		}
-	};	
+        if (str.length == 0)
+            return hash;
 
-	window.RemoteSlide = RemoteSlide;
+        for (i = 0; i < str.length; i++) {
+            ch = str.charCodeAt(i);
+            hash = ((hash<<5)-hash)+ch;
+            hash = hash & hash; // Convert to 32bit integer
+        }
+
+        return Math.abs(hash);
+    };
+
+    RemoteSlide.prototype.connect = function (socketserver) {
+        if (priv.connected === false) {
+            priv.socket = io.connect(socketserver);
+            priv.connected = true;
+        }
+    };
+
+    RemoteSlide.prototype.on = function (action, fn) {
+        if (priv.connected) {
+            priv.setAction(action,fn);
+        } else {
+            throw '#RemoteSlide - You must to connect before!';
+        }
+    };
+    
+    RemoteSlide.prototype.sync= function (pattern) {
+        pattern= getHash((pattern||location.href));
+
+        priv.socket.emit('requestSync', pattern);
+
+        return pattern;
+    };
+    //sync-request
+
+    window.RemoteSlide = RemoteSlide;
 }(io));

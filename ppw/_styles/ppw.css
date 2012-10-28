@@ -100,7 +100,7 @@
     color: green;
 }
 
-.ppw-platform{
+.ppw-platform:not(.ppw-focusable), .ppw-platform:not(.ppw-clickable){
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -108,7 +108,10 @@
     -ms-user-select: none;
     user-select: none;
 }
-
+.ppw-focusable, .ppw-clickable{
+    -webkit-touch-callout: text !IMPORTANT;
+    -webkit-user-select: text !IMPORTANT;
+}
 
 
 
