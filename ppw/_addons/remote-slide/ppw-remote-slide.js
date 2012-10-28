@@ -60,7 +60,6 @@ window.PPW.extend("remote-slide", (function(){
                 _conf.pointer= _conf.pointer.getContext('2d');
             }
             
-            console.log("DRAWING", _conf.drawing, data);
             if(!_conf.drawing){
                 document.getElementById('ppw-pointer').style.display= '';
             }
