@@ -4,7 +4,7 @@ window.PPW.extend("remote-slide", (function(){
         remote= null,
         _conf= {
             server: 'http://localhost:81',
-            controler: 'http://localhost:81',
+            controller: 'http://localhost:81',
             hash: null,
             pointer: false,
             drawing: false,
@@ -14,7 +14,15 @@ window.PPW.extend("remote-slide", (function(){
     
     var _enable= function(){
         
-        var msg= "<strong>Remote control</strong><br/>In your remote device, go to the address: <div style='text-align: center; font-style: italic;'>"+_conf.controler+"</div>and enter the code:<br/>",
+        var conf= null;
+        if(conf= PPW.get('remote')){
+            if(conf.server)
+                _conf.server= conf.server;
+            if(conf.controller)
+                _conf.controller= conf.controller;
+        }
+        
+        var msg= "<strong>Remote control</strong><br/>In your remote device, go to the address: <div style='text-align: center; font-style: italic;'>"+_conf.controller+"</div>and enter the code:<br/>",
             hash= false;
             
         if(_conf.hash){
@@ -97,30 +105,36 @@ window.PPW.extend("remote-slide", (function(){
     var _init = function (data) {
         
         var head = document.getElementsByTagName('head')[0],
-        socketio = document.createElement('script'),
+        //socketio = document.createElement('script'),
         remoteslide = document.createElement('script');
-        socketio.src = _conf.server + '/socket.io/socket.io.js';
+        
+        //socketio.src = ;
         remoteslide.src = _ppw.PPWSrc + '/_addons/remote-slide/remote-slide.js';
+
+        $.ajax({
+            url: _conf.server + '/socket.io/socket.io.js',
+            dataType: "script",
+            success: function () {
+                console.log('[PPW Addon] Socketio loaded');
+                remoteslide.onload = function () {
+
+                    // Enable button
+                    $('#ppw-addon-remote-trigger').css('cursor', 'pointer')
+                                                  .html("Off")
+                                                  .click('click', _enable);
+
+                    console.log('[PPW Addon] Remoteslide addon loaded successfuly');
+                }
+                head.appendChild(remoteslide);
+            },
+            error: function(){
+                console.error("[PPW Addon] Remoteslide failed loading the socketio.js from "+ _conf.server + '/socket.io/socket.io.js');
+            }
+        });
 
         // Add a disabled button
         $('#ppw-addons-container').append("<span>Remote controle: <span id='ppw-addon-remote-trigger'>...</span></span>")
         
-        socketio.onload = function () {
-            
-            console.log('socketio loaded');
-            
-            remoteslide.onload = function () {
-                
-                // Enable button
-                $('#ppw-addon-remote-trigger').css('cursor', 'pointer')
-                                              .html("Off")
-                                              .click('click', _enable);
-
-                console.log('remoteslide loaded');
-            }
-            head.appendChild(remoteslide);
-        }
-        head.appendChild(socketio);        
     }    
 
     var _setup= function(data){

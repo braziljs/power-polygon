@@ -360,53 +360,66 @@ window.PPW= (function($, _d, console){
      * dependencies.
      */
     var _loadTheme= function(){
-        $.getJSON(_settings.PPWSrc+'/_themes/'+_settings.theme+'/manifest.json', function(data, status){
-            
-            var dependencies= false,
-                i= 0,
-                l= 0,
-                url= '';
-            
-            if(status == 'success'){
-                
-                _conf.themeData= data;
-                dependencies= _conf.themeData.dependencies||[];
-                
-                if(dependencies.css){
-                    _conf.loadSteps+= dependencies.css.length;
-                    l= dependencies.css.length;
-                    
-                    for(i= 0; i<l; i++){
-                        url= _settings.PPWSrc+'/_themes/'+
-                             _settings.theme+'/'+dependencies.css[i];
-                                
-                        $("head").append($("<link rel='stylesheet' href='"+
-                                            url+"' type='text/css' media='screen' />")
-                                        .bind('load',
-                                              function(){
-                                                  _setLoadingBarStatus();
-                                              }));
+        
+        var theme= null;
+        
+        if(typeof _settings.theme == 'string')
+            _settings.theme= _settings.theme.replace(/ /g, '').split(',');
+        
+        _conf.loadSteps+= _settings.theme.length-1;
+        
+        $(_settings.theme).each(function(){
+            var theme= this.toString();
+            $.getJSON(_settings.PPWSrc+'/_themes/'+theme+'/manifest.json', function(data, status){
+
+                var dependencies= false,
+                    i= 0,
+                    l= 0,
+                    url= '';
+
+                console.log("[PPW] Loading theme: "+ theme);
+
+                if(status == 'success'){
+
+                    _conf.themeData= data;
+                    dependencies= _conf.themeData.dependencies||[];
+
+                    if(dependencies.css){
+                        _conf.loadSteps+= dependencies.css.length;
+                        l= dependencies.css.length;
+
+                        for(i= 0; i<l; i++){
+                            url= _settings.PPWSrc+'/_themes/'+
+                                 theme+'/'+dependencies.css[i];
+
+                            $("head").append($("<link rel='stylesheet' href='"+
+                                                url+"' type='text/css' media='screen' />")
+                                            .bind('load',
+                                                  function(){
+                                                      _setLoadingBarStatus();
+                                                  }));
+                        }
                     }
-                }
-                
-                if(dependencies.js){
-                    
-                    _conf.loadSteps+= dependencies.js.length;
-                    l= dependencies.js.length;
-                    
-                    for(i= 0; i<l; i++){
-                        $.getScript(_settings.PPWSrc+'/_themes/'+
-                                    _settings.theme+'/'+dependencies.js[i],
-                                    function(data, status, xhr){
-                                        _setLoadingBarStatus();
-                                    });
+
+                    if(dependencies.js){
+
+                        _conf.loadSteps+= dependencies.js.length;
+                        l= dependencies.js.length;
+
+                        for(i= 0; i<l; i++){
+                            $.getScript(_settings.PPWSrc+'/_themes/'+
+                                        theme+'/'+dependencies.js[i],
+                                        function(data, status, xhr){
+                                            _setLoadingBarStatus();
+                                        });
+                        }
                     }
+
+                }else{
+                    console.error("[PPW][Theme data] Could not load manifest.json! Theme: " + theme);
                 }
-                
-            }else{
-                console.error("[PPW][Theme data] Could not load manifest.json! Theme: " + _settings.theme);
-            }
-            _setLoadingBarStatus();
+                _setLoadingBarStatus();
+            });
         });
     };
     
@@ -1863,6 +1876,9 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
     var _startPresentation= function(evt){
         
         var el= _d.querySelector('.ppw-menu-start-icon');
+        
+        if(!_conf.slidesLoaded)
+            return;
         
         $('#PPW-splash-screen-container').animate({
             marginTop: '-460px'
