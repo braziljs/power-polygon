@@ -630,6 +630,10 @@ ppw-message-content{
     top: 0px !IMPORTANT;
     margin: 0px !IMPORTANT;
 }
+.ppw-show-thumbs .ppw-slide-container{
+    width: 256px !IMPORTANT;
+    height: 178px !IMPORTANT;
+}
 .ppw-show-thumbs div:not(.ppw-slide-not-in-profile) section{
     position: relative !IMPORTANT;
     float: left !IMPORTANT;

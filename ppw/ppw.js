@@ -26,6 +26,7 @@ window.PPW= (function($, _d, console){
     
     var _self = this,
         _version= '2.0.0',
+        _tmp= {},
         
         // internal configuration properties
         _conf= {
@@ -636,6 +637,7 @@ window.PPW= (function($, _d, console){
             top: el.css('top'),
             left: el.css('left')
         };
+        _tmp.scroll= [_b.scrollLeft, _b.scrollTop];
         
         el.addClass('ppw-show-thumbs');
         $b.addClass("ppw-showing-thumb");
@@ -650,6 +652,10 @@ window.PPW= (function($, _d, console){
     var _closeThumbnails= function(){
         
         var el= $("#ppw-slides-container");
+        
+        
+        el[0].scrollTop= _tmp.scroll[1];
+        el[0].scrollLeft= _tmp.scroll[0];
         
         _triggerEvent('onhidethumbs');
          
