@@ -28,7 +28,9 @@ body{
 }
 
 /**/
-section{
+/*section{*/
+.ppw-slide-container{
+    float: left;
     border: solid 1px black;
     background-color: white;
     margin: 5px;

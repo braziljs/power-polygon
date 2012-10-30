@@ -113,10 +113,11 @@ window.PPW= (function($, _d, console){
             defaults: {
                 duration: 50,
                 alertAt: [30, 40],
-                theme: 'default',
+                theme: 'thm-default',
+                transition: 'trans-slider',
                 slideType: 'content',
                 slideTitleSize: 40,
-                containerID: 'PPW-slides-container'
+                containerID: 'ppw-slides-container'
             },
             cons: {
                 CLASS_SLIDE             : 'ppw-slide-element',
@@ -344,12 +345,12 @@ window.PPW= (function($, _d, console){
         _conf.curLoaded++;
         var perc= _conf.curLoaded * 100 / _conf.loadSteps;
         
-        $('#PPW-loadingbar').css({width: perc+'%'});
+        $('#ppw-loadingbar').css({width: perc+'%'});
         if(perc >= 100){
             _triggerEvent('onthemeloaded', _settings.themeSettings);
             if(!_settings.useSplashScreen)
                 _preloadSlides();
-            $('#PPW-lock-loading').fadeOut();
+            $('#ppw-lock-loading').fadeOut();
         }
     };
     
@@ -365,6 +366,9 @@ window.PPW= (function($, _d, console){
         
         if(typeof _settings.theme == 'string')
             _settings.theme= _settings.theme.replace(/ /g, '').split(',');
+        
+        if(_settings.transition)
+            _settings.theme.push(_settings.transition);
         
         _conf.loadSteps+= _settings.theme.length-1;
         
@@ -431,16 +435,16 @@ window.PPW= (function($, _d, console){
      */
     var _preparePPW= function(){
         
-        $b.append("<div id='PPW-lock-loading' style='position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; background-color: #f0f9f9; padding: 10px; font-family: Arial; z-index: 999999999;'>\
-                    Loading Contents<br/><div id='PPW-loadingbarParent'><div/><div id='PPW-loadingbar'><div/></div>");
-        $('#PPW-loadingbarParent').css({
+        $b.append("<div id='ppw-lock-loading' style='position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; background-color: #f0f9f9; padding: 10px; font-family: Arial; z-index: 999999999;'>\
+                    Loading Contents<br/><div id='ppw-loadingbarParent'><div/><div id='ppw-loadingbar'><div/></div>");
+        $('#ppw-loadingbarParent').css({
             width: '260px',
             height: '8px',
             border: 'solid 1px black',
             background: 'white',
             orverflow: 'hidden'
         });
-        $('#PPW-loadingbar').css({
+        $('#ppw-loadingbar').css({
             width: '1px',
             height: '100%',
             background: '#f66'
@@ -618,7 +622,7 @@ window.PPW= (function($, _d, console){
      */
     var _showThumbs= function(){
         
-        var el= $("#PPW-slides-container");
+        var el= $("#ppw-slides-container");
         
         if(!_conf.presentationStarted)
             return;
@@ -645,7 +649,7 @@ window.PPW= (function($, _d, console){
      */
     var _closeThumbnails= function(){
         
-        var el= $("#PPW-slides-container");
+        var el= $("#ppw-slides-container");
         
         _triggerEvent('onhidethumbs');
          
@@ -708,7 +712,7 @@ window.PPW= (function($, _d, console){
                     }
                     break;
                     
-                case 18: //alt
+                case 18: // alt
                     if(_settings.shortcutsEnable
                         && _conf.presentationStarted
                         && !_isEditableTarget(evt.target)){
@@ -1098,6 +1102,7 @@ window.PPW= (function($, _d, console){
             el= null,
             nEl= null,
             tt= '',
+            k= null,
             container= _settings.slidesContainer;
         
         if(!container.id){
@@ -1171,7 +1176,6 @@ window.PPW= (function($, _d, console){
                 
                 $('#ppw-slide-container-'+slides[i].id).append(el[0]);
                 
-                
                 $(el).find("script").each(function(count, scr){
                     
                     var f= new Function("PPW.slideIterator= this; "+scr.textContent);
@@ -1196,7 +1200,14 @@ window.PPW= (function($, _d, console){
             
             slides[i].actionIdx= 0;
             el.addClass(_conf.cons.CLASS_SLIDE + " ppw-slide-type-" + (slides[i].type||_conf.defaults.slideType));
-            
+            if(slides[i].className){
+                el.addClass(slides[i].className);
+            }
+            if(slides[i].data && el.data){
+                for(k in slides[i].data){
+                    el.data(k, slides[i].data[k]);
+                }
+            }
         }
     };
     
@@ -1286,7 +1297,7 @@ window.PPW= (function($, _d, console){
             notVisible= [],
             tmp= null;
         
-        $('#PPW-splash-screen').hide();
+        $('#ppw-splash-screen').hide();
         $('#ppw-toolbar-container').hide();
         
         
@@ -1379,8 +1390,8 @@ window.PPW= (function($, _d, console){
                         </div>\
                       </div>');
         
-        $b.append('<div id="ppw-toolbar-container" class="ppw-platform ppw-platform '+_conf.cons.CLICKABLE_ELEMENT+'">\
-                    <div id="ppw-toolbar" class="'+_conf.cons.CLICKABLE_ELEMENT+'">\
+        $b.append('<div id="ppw-toolbar-container" class="ppw-platform '+_conf.cons.CLICKABLE_ELEMENT+'">\
+                    <div id="ppw-toolbar" class="ppw-platform '+_conf.cons.CLICKABLE_ELEMENT+'">\
                         <img id="ppw-goto-icon" onclick="PPW.showGoToComponent(true);" title="Go to a specific slide" />\
                         <img id="ppw-toolbox-icon" onclick="PPW.openPresentationTool();" title="Open Presentation Tool" />\
                         <img id="ppw-search-icon" onclick="PPW.showSearchBox()" title="Search on slides"/>\
@@ -1388,7 +1399,7 @@ window.PPW= (function($, _d, console){
                         <img id="ppw-camera-icon" onclick="PPW.startCamera();" title="Start the camera"/>\
                         <img id="ppw-settings-icon" onclick="PPW.showConfiguration();" title="Settings"/>\
                     </div>\
-                    <div id="ppw-content-toolbar">\
+                    <div id="ppw-content-toolbar" class="ppw-platform">\
                         <span id="ppw-ct-text-small" title="Smaller fonts" onclick="PPW.smallerFonts();">A</span>\
                         <span id="ppw-ct-text-big" title="Bigger fonts" onclick="PPW.biggerFonts();">A</span>\
                         <img id="ppw-ct-thumbs" onclick="PPW.showThumbs();" title="Show thumbnails"/>\
@@ -1484,7 +1495,7 @@ window.PPW= (function($, _d, console){
      */
     var _biggerFonts= function(){
         _conf.fontSize+= 10;
-        _d.getElementById('PPW-slides-container').style.fontSize= _conf.fontSize+"%";
+        _d.getElementById('ppw-slides-container').style.fontSize= _conf.fontSize+"%";
     };
     
     /**
@@ -1492,7 +1503,7 @@ window.PPW= (function($, _d, console){
      */
     var _smallerFonts= function(){
         _conf.fontSize-= 10;
-        _d.getElementById('PPW-slides-container').style.fontSize= _conf.fontSize+"%";
+        _d.getElementById('ppw-slides-container').style.fontSize= _conf.fontSize+"%";
     };
     
     /**
@@ -1502,7 +1513,7 @@ window.PPW= (function($, _d, console){
      * as well as check on colors and font sizes.
      */
     var _testResolution= function(){
-        var el= $('#PPW-resolution-test-element');
+        var el= $('#ppw-resolution-test-element');
         el.css({
             width: _b.offsetWidth-6+'px', // chrome has a bug with clientWidth in fullscreen
             height: _b.clientHeight-6+'px',
@@ -1751,7 +1762,7 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
      */
     var _openPresentationTool= function(){
         var toolSrc= _settings.PPWSrc+'/_tools/presentation-tool.html',
-            toolName= 'PPW-Presentation-tool',
+            toolName= 'ppw-Presentation-tool',
             toolProps= "width=780,height=520,left=40,top=10";
         
         if(!_conf.presentationTool || !_conf.presentationTool.focus){
@@ -1880,10 +1891,10 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         if(!_conf.slidesLoaded)
             return;
         
-        $('#PPW-splash-screen-container').animate({
+        $('#ppw-splash-screen-container').animate({
             marginTop: '-460px'
         }, 200, function(){
-            $('#PPW-splash-screen').fadeOut();
+            $('#ppw-splash-screen').fadeOut();
         });
         _conf.presentationStarted= (new Date()).getTime();
         _goToSlide(_getCurrentSlideFromURL());

@@ -1,0 +1,51 @@
+.ppw-slide-element{
+    background: #f7f7f7; /* Old browsers */
+    background: -moz-linear-gradient(top, #f7f7f7 0%, #b7b7b7 80%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#f7f7f7), color-stop(80%,#b7b7b7)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, #f7f7f7 0%,#b7b7b7 80%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, #f7f7f7 0%,#b7b7b7 80%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, #f7f7f7 0%,#b7b7b7 80%); /* IE10+ */
+    background: linear-gradient(to bottom, #f7f7f7 0%,#b7b7b7 80%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f7f7f7', endColorstr='#b7b7b7',GradientType=0 ); /* IE6-9 */
+}
+.ppw-active-slide-element{
+    /*display: block;*/
+}
+
+.ppw-slide-element{
+    padding: 20px;
+    box-sizing: border-box;
+    font-family: "Sans Serif", Tahoma, Arial;
+    white-space: normal;
+    font-size: 1.5em;
+    cursor: default;
+}
+
+/**/
+.ppw-previous-slide-element{
+ 
+}
+.ppw-next-slide-element{
+
+}
+
+body{
+    
+}
+
+/**/
+.ppw-slide-container{
+    
+}
+#ppw-slides-container{
+    
+}
+section{
+}
+.ppw-slide-type-opening{
+    text-align: center;
+}
+.ppw-slide-type-opening h1, .ppw-slide-type-opening h2{
+    margin-top: 20%;
+    font-size: 2.4em;
+}

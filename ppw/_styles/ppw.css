@@ -126,7 +126,7 @@
     }
 }
 
-#PPW-splash-screen{
+#ppw-splash-screen{
     position: absolute;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -141,12 +141,12 @@
     width: 100%;
     font-family: sans-serif, Arial, Tahoma;
 }
-#PPW-splash-screen a, #PPW-splash-screen a:active, #PPW-splash-screen a:visited{
+#ppw-splash-screen a, #ppw-splash-screen a:active, #ppw-splash-screen a:visited{
     color: black;
     font-family: sans-serif, Arial, Tahoma;
 }
 
-#PPW-splash-screen-container{
+#ppw-splash-screen-container{
     border-bottom: solid 1px #666666;
     width: 100%;
     
@@ -164,13 +164,13 @@
     bottom: 4px;
 }
 
-#PPW-splash-screen-container h1{
+#ppw-splash-screen-container h1{
     padding-top: 20px;
     text-align: center;
     text-transform: uppercase;
     font-family: sans-serif, Arial, Tahoma, Verdana;
 }
-#PPW-splash-screen-menu{
+#ppw-splash-screen-menu{
     height: 232px;
 }
 #ppw-menu-icon-list{
@@ -343,7 +343,7 @@ ppw-message-content{
 
 
 
-#PPW-resolution-test-element{
+#ppw-resolution-test-element{
     position: absolute;
     left: 0px;
     top: 0px;
@@ -352,22 +352,22 @@ ppw-message-content{
     overflow: hidden;
     display: none;
 }
-#PPW-resolution-test-element div{
+#ppw-resolution-test-element div{
     float: left;
     position: relative;
     width: 50%;
     height: 100%;
 }
-#PPW-resolution-test-element div:nth-child(1){
+#ppw-resolution-test-element div:nth-child(1){
     background-color: white;
     color: black;
     text-align: right;
 }
-#PPW-resolution-test-element div:nth-child(2){
+#ppw-resolution-test-element div:nth-child(2){
     background-color: black;
     color: white;
 }
-#PPW-resolution-test-element div img{
+#ppw-resolution-test-element div img{
     position: absolute;
     bottom: 6px;
     left: 50%;
@@ -506,6 +506,7 @@ ppw-message-content{
 
 /** TOOLBOX **/
 #ppw-toolbar-container{
+    white-space: normal;
     position: absolute;
     left: 0px;
     top: -240px;
@@ -711,7 +712,7 @@ ppw-message-content{
     cursor: pointer;
 }
 
-#PPW-slides-container{
+#ppw-slides-container{
     position: relative;
     float: none;
     height: 100%;

@@ -13,7 +13,7 @@ window.PPWTheme= {
         PPWTheme.container= container;
         container.css('width', (PPW.get('slides').length * w + 10)+'px');
         
-        $('#PPW-slides-container section').css({
+        $('#PPW-slides-container .PPW-slide-container').css({
             width: w-PPWTheme.hMargin +'px',
             height: h-PPWTheme.hMargin/2 +'px'
         });
@@ -27,7 +27,6 @@ PPW.addListener('onslidechange', function(data){
     PPWTheme.onresize();
 });
 PPW.addListener('onhidethumbs', function(data){
-    console.log('}}}}}}}}}}}}}', PPW.getCurrentSlide())
     PPWTheme.onresize();
 });
 

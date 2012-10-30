@@ -1,0 +1,11 @@
+{
+    "name": "trans-slider",
+    "dependencies": {
+        "css": [
+            "styles/trans-slider.css"
+        ],
+        "js": [
+            "scripts/trans-slider.js"
+        ]
+    }
+}

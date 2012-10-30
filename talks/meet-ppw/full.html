@@ -113,7 +113,7 @@
                 // may be false or id(slide' id)
                 friendlyURL: 'id',
                 // should ppw open the splash screen first?
-                useSplashScreen: true,
+                useSplashScreen: false,
                 /**
                  * Defines the pattern to be used to load external slides.
                  * The default is SLIDE_ID_DIR, found in cons.fs.
@@ -154,8 +154,17 @@
                 *  PRESENTATION DATA                              *
                 **************************************************/
                
+                // optional...you can simply say what is the transition you want
+                // using the theme property of this settings
+                transition: 'trans-slider',
+                
                 // the theme to be used (default: default)
-                theme: "default, default-fall-n-roll",
+                // this can be an array of a list of themes separated by comma, although,
+                // be careful loading more than one theme, once they may be concurring
+                // on some rules!
+                theme: "thm-default",
+                //theme: "default",
+                
                 // special settings for a theme(changes according to the choosen theme and is not required)
                 themeSettings: {
                     shTheme: 'sh_bright'
@@ -194,11 +203,16 @@
                     },
                     {
                         type: 'content',
-                        id: 'sh'
+                        id: 'sh',
+                        data: {
+                            info: "An object containing whatever we want",
+                            howToUse: "You can access it via $('#slideid').data('yourObjectKey')"
+                        }
                     },
                     {
                         type: 'content',
-                        id: 'showCamera'
+                        id: 'showCamera',
+                        className: 'red-test'
                     },
                     {
                         type: 'closing',
