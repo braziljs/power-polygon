@@ -1,5 +1,5 @@
 {
-    "name": "default-zooming",
+    "name": "trans-fade",
     "dependencies": {
         "css": [
             "styles/default.css"

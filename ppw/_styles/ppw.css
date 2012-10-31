@@ -227,11 +227,11 @@
     background: url(../_images/start-icon.png) no-repeat -40px 0px, linear-gradient(top, rgba(255, 255, 255, .15), rgba(0, 0, 0, .25)), linear-gradient(left top, rgba(255, 255, 255, 0), rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0));
     
     color: white;
-    font-size: 30px;
+    font-size: 24px;
     font-weight: bold;
     text-align: right;
     padding-right: 10px;
-    padding-top: 30px;
+    padding-top: 55px;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
 }
@@ -733,6 +733,11 @@ ppw-message-content{
     overflow: hidden;
     float: right;
     margin-left: 4px;
+}
+#ppw-presentation-social-buttons{
+    position: absolute !IMPORTANT;
+    top: 0px;
+    right: 0px;
 }
 
 #ppw-social-buttons .gp-button{

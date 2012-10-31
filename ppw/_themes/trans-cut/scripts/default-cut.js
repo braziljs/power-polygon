@@ -1,6 +1,6 @@
 
 PPW.addListener('onstart', function(data){
-    $(PPW.getCurrentSlide().el).show();
+    $(PPW.getCurrentSlide().el.parentNode).show();
 });
 
 PPW.addListener('onslidechange', function(data){
@@ -8,8 +8,8 @@ PPW.addListener('onslidechange', function(data){
     var currentSlide= PPW.getCurrentSlide();
     
     if(data.current != data.previous){
-        $(data.previous.el).hide()
-        $(PPW.getCurrentSlide().el).show();
+        $(data.previous.el.parentNode).hide()
+        $(PPW.getCurrentSlide().el.parentNode).show();
     }
     
 });

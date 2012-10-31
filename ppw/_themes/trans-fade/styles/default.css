@@ -1,0 +1,16 @@
+.ppw-slide-element{
+    display: none;
+}
+/**/
+.ppw-slide-container{
+    display: block;
+    position:absolute;
+    height: auto;
+    bottom: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}

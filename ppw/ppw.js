@@ -476,6 +476,14 @@ window.PPW= (function($, _d, console){
              PPW.setLoadingBarStatus();
          });
          
+         
+         _tmp.lnk = _d.createElement('link');
+         _tmp.lnk.type = 'image/x-icon';
+         _tmp.lnk.rel = 'shortcut icon';
+         _tmp.lnk.href = _settings.PPWSrc+'/_images/ppw-logo.png';
+         _d.getElementsByTagName('head')[0].appendChild(_tmp.lnk);
+         delete _tmp.lnk;
+         
          _loadTheme();
          
          _bindEvents();
@@ -1472,28 +1480,24 @@ window.PPW= (function($, _d, console){
                 }, 500, _preloadSlides);
                 _triggerEvent('onsplashscreen', _d.getElementById('ppw-addons-container'));
                 
-                // applying Facebook Buttons
-                (function(d, s, id) {
-                    var js, fjs = d.getElementsByTagName(s)[0];
-                    if (d.getElementById(id)) return;
-                    js = d.createElement(s); js.id = id;
-                    js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=281929191903584";
-                    fjs.parentNode.insertBefore(js, fjs);
-                }(_d, 'script', 'facebook-jssdk'));
-                
-                // applying the g+ buttons
-                $.getScript('https://apis.google.com/js/plusone.js', function(){
-                });
-                /*$b.append('<script type="text/javascript" src="https://apis.google.com/js/plusone.js">\
-                            {parsetags: "explicit"}\
-                           </script>');*/
-                //window.gapi.plusone.go();
             });
         }else{
             //_preloadSlides();
             _setLoadingBarStatus();
             //_startPresentation();
         }
+        // applying Facebook Buttons
+        (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s); js.id = id;
+            js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=281929191903584";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(_d, 'script', 'facebook-jssdk'));
+
+        // applying the g+ buttons
+        $.getScript('https://apis.google.com/js/plusone.js', function(){
+        });
     };
     
     /**

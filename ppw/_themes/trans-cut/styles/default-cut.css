@@ -1,0 +1,13 @@
+.ppw-slide-container{
+    display: none;
+}
+
+/**/
+.ppw-slide-container{
+    background-color: white;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+}
