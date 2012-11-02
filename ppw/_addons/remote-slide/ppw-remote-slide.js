@@ -52,10 +52,27 @@ window.PPW.extend("remote-slide", (function(){
            PPW.startPresentation();
         });
         
-        remote.on('point', function(data) {});
+        remote.on('holofote', function(data) {
+            var holofote = $('#holofote');
+            holofote.css('display', 'block');
+            holofote.css({
+                top : data[1],
+                left : data[0]
+            });
+        });
+
+        remote.on('laserpoint', function(data) {
+            var laserpoint = $('#laserpoint');
+            laserpoint.css('display', 'block');
+            laserpoint.css({
+                top : data[1],
+                left : data[0]
+            });
+        });
         
         remote.on('point', function(data) {
-            
+            $('#laserpoint').css('display', 'none');
+            $('#holofote').css('display', 'none');
             var l, t;
             
             if(!_conf.pointer){
@@ -93,6 +110,7 @@ window.PPW.extend("remote-slide", (function(){
                 _conf.pointer.clearRect(0, 0, _conf.w, _conf.h);
                 _conf.drawing= false;
                 //document.getElementById('ppw-pointer').style.display= 'none';
+                $('#laserpoint').css('display', 'none');
             }
         });
         
@@ -138,6 +156,35 @@ window.PPW.extend("remote-slide", (function(){
     }    
 
     var _setup= function(data){
+        var holofote = $('<div id="holofote"/>'),
+            pointer = $('<div id="laserpoint"/>');
+        holofote.css({
+            'position': 'absolute',
+            'height': '180px',
+            'z-index': '9999',
+            'opacity': '0.6',
+            'width': '180px',
+            'border-radius': '90px',
+            'background' : 'yellow',
+            'box-shadow': '0 0 60px 100px yellow',
+            'display' : 'none'
+        });
+
+        pointer.css({
+            'position': 'absolute',
+            'height': '20px',
+            'z-index': '9999',
+            'opacity': '0.9',
+            'width': '20px',
+            'border-radius': '10px',
+            'background' : 'red',
+            'box-shadow': '0 0 20px 10px red',
+            'display' : 'none'
+        });
+
+        $('body').prepend(holofote);
+        $('body').prepend(pointer);        
+
         $(document.body).append("<canvas id='ppw-pointer' style='position: absolute; left: 0px; top: 0px; z-index: 99999999; opacity: 0.3; display: none;' width='100%' height='100%'></canvas>");
         _ppw= data;
     }

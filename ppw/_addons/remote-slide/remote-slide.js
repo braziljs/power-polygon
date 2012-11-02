@@ -1,60 +1,62 @@
+/*global window*/
 if (!window.io) {
-    throw 'Socket.io library is required. Make sure that node server is up';
+	throw 'Socket.io library is required. Make sure that node server is up';
 }
 
 (function (io) {
-    var RemoteSlide = function () {},
-    
-    priv = {
 
-        socket : null,
+	'use strict';
 
-        connected : false,
+	var RemoteSlide = function () {},
 
-        setAction : function(action, fn) {
-            priv.socket.on(action, fn);
-        }
-    };
+		priv = {
+			socket : null,
+			connected : false,
 
-    var getHash= function(str){
+			setAction : function (action, fn) {
+				priv.socket.on(action, fn);
+			},
 
-        var hash = 0, i, ch;
+			getHash : function (str) {
+				var hash = 0,
+					i = 0,
+					strLen = str.length,
+					ch = null;
 
-        if (str.length == 0)
-            return hash;
+				if (strLen === 0) {
+					return hash;
+				}
 
-        for (i = 0; i < str.length; i++) {
-            ch = str.charCodeAt(i);
-            hash = ((hash<<5)-hash)+ch;
-            hash = hash & hash; // Convert to 32bit integer
-        }
+				for (i; i < strLen; i++) {
+					ch = str.charCodeAt(i);
+					hash = ((hash << 5) - hash) + ch;
+					hash = hash & hash;
+				}
 
-        return Math.abs(hash);
-    };
+				return Math.abs(hash);
+			}
+		};
 
-    RemoteSlide.prototype.connect = function (socketserver) {
-        if (priv.connected === false) {
-            priv.socket = io.connect(socketserver);
-            priv.connected = true;
-        }
-    };
+	RemoteSlide.prototype.connect = function (socketserver) {
+		if (priv.connected === false) {
+			priv.socket = io.connect(socketserver);
+			priv.connected = true;
+		}
+	};
 
-    RemoteSlide.prototype.on = function (action, fn) {
-        if (priv.connected) {
-            priv.setAction(action,fn);
-        } else {
-            throw '#RemoteSlide - You must to connect before!';
-        }
-    };
-    
-    RemoteSlide.prototype.sync= function (pattern) {
-        pattern= getHash((pattern||location.href));
+	RemoteSlide.prototype.on = function (action, fn) {
+		if (priv.connected) {
+			priv.setAction(action, fn);
+		} else {
+			throw '#RemoteSlide - You must to connect before!';
+		}
+	};
 
-        priv.socket.emit('requestSync', pattern);
+	RemoteSlide.prototype.sync = function (pattern) {
+		pattern = priv.getHash((pattern || window.location.href));
+		priv.socket.emit('requestSync', pattern);
+		return pattern;
+	};
 
-        return pattern;
-    };
-    //sync-request
-
-    window.RemoteSlide = RemoteSlide;
-}(io));
+	window.RemoteSlide = RemoteSlide;
+}(window.io));
