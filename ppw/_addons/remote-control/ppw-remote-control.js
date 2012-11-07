@@ -1,4 +1,4 @@
-window.PPW.extend("remote-slide", (function(){
+window.PPW.extend("remote-control", (function(){
     
     var _ppw= null,
         remote= null,
@@ -30,9 +30,9 @@ window.PPW.extend("remote-slide", (function(){
             return;
         }
         
-        this.innerHTML= "<img src='"+_ppw.PPWSrc + "/_addons/remote-slide/loading.gif' height='14' />";
+        this.innerHTML= "<img src='"+_ppw.PPWSrc + "/_addons/remote-control/loading.gif' height='14' />";
         
-        remote = new RemoteSlide();
+        remote = new RemoteControl();
         remote.connect(_conf.server);
         
         remote.on('sync', function() {
@@ -124,29 +124,29 @@ window.PPW.extend("remote-slide", (function(){
         
         var head = document.getElementsByTagName('head')[0],
         //socketio = document.createElement('script'),
-        remoteslide = document.createElement('script');
+        remotecontrol = document.createElement('script');
         
         //socketio.src = ;
-        remoteslide.src = _ppw.PPWSrc + '/_addons/remote-slide/remote-slide.js';
+        remotecontrol.src = _ppw.PPWSrc + '/_addons/remote-control/remote-control.js';
 
         $.ajax({
             url: _conf.server + '/socket.io/socket.io.js',
             dataType: "script",
             success: function () {
                 console.log('[PPW Addon] Socketio loaded');
-                remoteslide.onload = function () {
+                remotecontrol.onload = function () {
 
                     // Enable button
                     $('#ppw-addon-remote-trigger').css('cursor', 'pointer')
                                                   .html("Off")
                                                   .click('click', _enable);
 
-                    console.log('[PPW Addon] Remoteslide addon loaded successfuly');
+                    console.log('[PPW Addon] remotecontrol addon loaded successfuly');
                 }
-                head.appendChild(remoteslide);
+                head.appendChild(remotecontrol);
             },
             error: function(){
-                console.error("[PPW Addon] Remoteslide failed loading the socketio.js from "+ _conf.server + '/socket.io/socket.io.js');
+                console.error("[PPW Addon] remotecontrol failed loading the socketio.js from "+ _conf.server + '/socket.io/socket.io.js');
             }
         });
 
