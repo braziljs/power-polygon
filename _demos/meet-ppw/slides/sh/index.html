@@ -69,4 +69,11 @@
             PPW.sh.focus('#focusableExample', [3, 4, 7, 9]);
         }
     });*/
+
+    PPW.onSlideDoes(function(slide){
+        console.log("Slide doing something!!", slide);
+    });
+    PPW.onSlideUndo(function(slide){
+        console.log("Slide undoing something!!", slide);
+    });
 </script>

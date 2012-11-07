@@ -1978,6 +1978,87 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
     };
     
     /**
+     * Function called when an specific slide is entered.
+     */
+    var _onSlideEnter= function(fn){
+        
+        var slideRef= PPW.slideIterator;
+        if(!slideRef || !slideRef.actions)
+            return false; // it probably is not loaded yet...will be called again when loaded
+        
+        if(fn && typeof fn == "function"){
+            slideRef.onSlideEnter= function(){
+                try{
+                    fn(slideRef);
+                }catch(e){
+                    console.error("[PPW][Slide script error] Failed during the call of the onSlideEnter", slideRef);
+                }
+            }
+        }
+        
+    };
+    
+    /**
+     * Function called when an specific slide is exited.
+     */
+    var _onSlideExit= function(fn){
+        
+        var slideRef= PPW.slideIterator;
+        if(!slideRef || !slideRef.actions)
+            return false; // it probably is not loaded yet...will be called again when loaded
+        
+        if(fn && typeof fn == "function"){
+            slideRef.onSlideExit= function(){
+                try{
+                    fn(slideRef);
+                }catch(e){
+                    console.error("[PPW][Slide script error] Failed during the call of the onSlideExit", slideRef);
+                }
+            }
+        }
+    };
+    
+    /**
+     * Function called when an specific slide does something(executes an action).
+     */
+    var _onSlideDoes= function(fn){
+        
+        var slideRef= PPW.slideIterator;
+        if(!slideRef || !slideRef.actions)
+            return false; // it probably is not loaded yet...will be called again when loaded
+        
+        if(fn && typeof fn == "function"){
+            slideRef.onSlideDoes= function(){
+                try{
+                    fn(slideRef);
+                }catch(e){
+                    console.error("[PPW][Slide script error] Failed during the call of the onSlideEnd", slideRef);
+                }
+            }
+        }
+    };
+    
+    /**
+     * Function called when an specific slide undo something(executes an action).
+     */
+    var _onSlideUndo= function(fn){
+        
+        var slideRef= PPW.slideIterator;
+        if(!slideRef || !slideRef.actions)
+            return false; // it probably is not loaded yet...will be called again when loaded
+        
+        if(fn && typeof fn == "function"){
+            slideRef.onSlideUndo= function(){
+                try{
+                    fn(slideRef);
+                }catch(e){
+                    console.error("[PPW][Slide script error] Failed during the call of the onSlideEnd", slideRef);
+                }
+            }
+        }
+    };
+    
+    /**
      * Adds an action to each speficied slide.
      */
     var _addAction= function(action){
@@ -2108,6 +2189,9 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
                 }catch(e){
                     console.error("[PPW][Slide action error] There was an error trying to execute an action of the current slide:", slide, e);
                 }
+                if(slide.onSlideUndo){
+                    slide.onSlideUndo(slide);
+                }
             }else{
                 _goPreviousSlide();
             }
@@ -2142,6 +2226,10 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
                 console.error("[PPW][Slide action error] There was an error trying to execute an action of the current slide:", slide, e);
             };
             slide.actionIdx++;
+            
+            if(slide.onSlideDoes){
+                slide.onSlideDoes(slide);
+            }
             
             nextAction= slide.actions[slide.actionIdx];
             
@@ -2240,6 +2328,13 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         _setSlideClasses(idx);
         
         // triggers the events
+        if(_settings.slides[_conf.currentSlide].onSlideEnter){
+            _settings.slides[_conf.currentSlide].onSlideEnter();
+        }
+        if(previousSlide.onSlideExit){
+            previousSlide.onSlideExit();
+        }
+        
         if(!prevent){
             _triggerEvent('ongoto', {
                 previous: previousSlide,
@@ -2527,6 +2622,10 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         biggerFonts                     : _biggerFonts,
         smallerFonts                    : _smallerFonts,
         print                           : _print,
+        onSlideEnter                    : _onSlideEnter,
+        onSlideExit                     : _onSlideExit,
+        onSlideUndo                     : _onSlideUndo,
+        onSlideDoes                     : _onSlideDoes,
         // API GETTERS/SETTERS METHODS
         getSlides                       : _getSlides,
         getValidSlides                  : _getValidSlides,
