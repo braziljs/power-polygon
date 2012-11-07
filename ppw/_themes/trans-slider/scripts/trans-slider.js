@@ -9,8 +9,6 @@ window.PPWTransSlider= {
             h= document.body.clientHeight,
             l= 0;
         
-        console.log(w, h, l)
-        
         PPWTransSlider.resized= true;
         PPWTransSlider.container= container;
         

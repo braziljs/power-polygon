@@ -6,6 +6,11 @@
         Purpose of the stylesheet follows.
 */
 
+*{
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+
 @media print{
     @page{
         size: A4 landscape;
@@ -16,15 +21,23 @@
     /* 1(ONE) slide per page */
     body.printing-1{
         overflow: auto !IMPORTANT;
-        width: 100% !IMPORTANT;
-    }
-    .printing-1 .ppw-slide-container:not(.ppw-slide-not-in-profile){
-        page-break-after: always;
+        width: 297mm !IMPORTANT;
+        height: 210mm !IMPORTANT;
     }
     
-    .ppw-slide-container:not(.ppw-slide-not-in-profile){
+    .printing-1 .ppw-slides-container{
+        width: 100% !IMPORTANT;
+        height: 100% !IMPORTANT;
+    }
+    
+    .printing-1 .ppw-slide-container:not(.ppw-slide-not-in-profile){
+        display: block !IMPORTANT;
+        width: 100% !IMPORTANT;
+        height: 100% !IMPORTANT;
+        page-break-after: always;
         page-break-inside: avoid;
     }
+    
     
     .printing-1 .ppw-slide-container:not(.ppw-slide-not-in-profile),
     .printing-1 .ppw-slide-container:not(.ppw-slide-not-in-profile) section{
@@ -413,6 +426,7 @@ ppw-message-content{
     font-size: 90%;
     text-align: center;
     margin: 0px;
+    margin-top: 16px;
     clear: both;
     color: #444 !IMPORTANT;
     font-style: italic !IMPORTANT;

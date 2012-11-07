@@ -134,7 +134,8 @@ window.PPW= (function($, _d, console){
                  * %num   = slide number
                  */
                 fs: {
-                    SLIDE_ID_DIR         : 'slides/%id/index.html', // default
+                    SLIDE_ID_DIR         : 'slides/%id/index.html',
+                    SLIDE_ID_DIR_ID      : 'slides/%id/%id.html', // default
                     SLIDE_ID_FILES       : 'slides/%id.html',
                     SLIDE_ID_MIXED       : '%id.html',
                     SLIDE_NUM_DIR        : 'slides/%num/index.html',
@@ -148,14 +149,14 @@ window.PPW= (function($, _d, console){
         
         // user defined settings
         _settings= {
-            hashSeparator: '#!/', // the separator to be used on the address bar
+            hashSeparator: '#', // the separator to be used on the address bar
             PPWSrc: "../../ppw/", // wondering the talk is in /talks/talkname for example
             shortcutsEnable: true, // enables or not, the shortcuts
             friendlyURL: 'id', // may be false(also, 'num') or id(slide' id)
             useSplashScreen: true, // should ppw open the splash screen first?
             slidesContainer: _d.createElement('div'),
             theme: _conf.defaults.theme,
-            fsPattern: _conf.cons.fs.SLIDE_ID_DIR,
+            fsPattern: _conf.cons.fs.SLIDE_ID_DIR_ID,
             alertAt: _conf.defaults.alertAt,
             duration: _conf.defaults.duration,
             showBatteryAlerts: true,
@@ -307,17 +308,67 @@ window.PPW= (function($, _d, console){
     };
     
     /**
+     * Tries to auto generate a config object from the document structure.
+     * 
+     * All the sections will be treated as slides.
+     * The document title will be treated as he talk title.
+     * First section will be the openning slide.
+     * Last section will be the closing slide.
+     * All the other sections will be of type "content".
+     */
+    var _autoGenerateConfig= function(conf){
+        var o= {
+                title: _d.title,
+                authors: [],
+                PPWSrc: "../../ppw/",
+                transition: 'trans-slider',
+                theme: 'thm-default'
+            },
+            i= 0,
+            l= 0,
+            slideList= [];
+        
+        if(conf){
+            console.log("extending", conf, o)
+            o= $.extend(o, conf);
+        }
+        
+        o.slides= [];
+        slideList= $('section');
+        l= slideList.length-1;
+        slideList.each(function(){
+            
+            if(!this.id)
+                this.id= "slide-"+i;
+            
+            o.slides.push({
+                type: (i===0)? 'opening': (i==l)? 'closing': 'content',
+                id: this.id
+            });
+            i++;
+        });
+        
+        return o;
+    };
+    
+    /**
      * Method called by the user to define the presentation settings.
      */
     var _init= function(conf){
         
         if(typeof conf != 'object'){
             
+            // conf was not sent
+            if(!conf){
+                _init(_autoGenerateConfig());
+                return;
+            }
+            
+            // conf is a string, therefore, the address of the manifest
             $.ajax({
                 url: conf,
                 dataType: 'json',
                 success: function(xhr, data, ret){
-                    console.log("OK ", xhr, data, ret);
                     _init(xhr);
                 },
                 error: function(xhr, data, ret){
@@ -325,10 +376,15 @@ window.PPW= (function($, _d, console){
                     console.error("[PPW] Error loading the init() configuration manifest! ", xhr, data, ret, "Please, verify if your json has no single quoted properties or if there is any comment on it!")
                 }
             });
-            
             return;
         }
         
+        // conf was sent, but with no slides
+        if(!conf.slides){
+            _init(_autoGenerateConfig(conf));
+            return;
+        }
+        console.log(conf)
         $.extend(_settings, conf);
         
         if(_settings.shortcutsEnable){
@@ -480,7 +536,7 @@ window.PPW= (function($, _d, console){
          _tmp.lnk = _d.createElement('link');
          _tmp.lnk.type = 'image/x-icon';
          _tmp.lnk.rel = 'shortcut icon';
-         _tmp.lnk.href = _settings.PPWSrc+'/_images/ppw-logo.png';
+         _tmp.lnk.href = _settings.PPWSrc+'/_images/power-polygon-logo.jpg';
          _d.getElementsByTagName('head')[0].appendChild(_tmp.lnk);
          delete _tmp.lnk;
          
@@ -919,8 +975,10 @@ window.PPW= (function($, _d, console){
         _w.addEventListener('popstate', function(){
             
         }, false);
+        
         _w.addEventListener('hashchange', function(){
-            if(_h.state)
+            //alert(_h.state);
+            //if(_h.state)
                 _goToSlide(_getCurrentSlideFromURL());
         }, false);
         
@@ -928,6 +986,7 @@ window.PPW= (function($, _d, console){
          * Mouse events.
          */
         $d.bind('click', function(evt){
+            
             if(_conf.presentationStarted && !_isEditableTargetContent(evt.target)){
                 if(!_conf.inThumbsMode)
                     _goNextSlide();
@@ -1096,8 +1155,8 @@ window.PPW= (function($, _d, console){
     var _getSlideURL= function(id, idx){
         
         return _settings.fsPattern
-                        .replace(/\%id/i, id)
-                        .replace(/\%num/i, idx)
+                        .replace(/\%id/gi, id)
+                        .replace(/\%num/gi, idx)
                             + (!_settings.slidesCache? ('?noCache='+(new Date()).getTime()) : '');
     }
     
@@ -2297,10 +2356,8 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         }
         
         $(el).each(function(){
-            console.log(this.className);
             this.className= this.className.replace(/ppw\-anim\-([a-zA-z0-9\-_]+)( |$)/g, '')
                                           .replace('animated', '');
-            console.log('depois', {el: this}, this.className)
         });
         
         return el;

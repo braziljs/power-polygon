@@ -1,16 +1,20 @@
 .ppw-slide-element{
-    display: none;
+}
+
+.ppw-active-slide-element{
+    z-index: 99999980;
 }
 
 /**/
 .ppw-slide-container{
-    display: block;
+    display: none;
     position:absolute;
     height: auto;
     bottom: 0;
     top: 0;
     left: 0;
     right: 0;
+    z-index: 99999900;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
 }
@@ -71,7 +75,7 @@
 }
 
 .ppw-theme-slide-change{
-    display: block;
+    display: block !IMPORTANT;
     -webkit-animation-name: slideChange;
     -webkit-animation-duration: 500ms;
     
