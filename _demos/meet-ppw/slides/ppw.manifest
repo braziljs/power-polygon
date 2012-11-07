@@ -1,0 +1,34 @@
+{
+    "title": "Title of my demo1 presentation",
+    "PPWSrc": "../../ppw/",
+    "languages": ["PT", "EN"],
+    "defaultLanguage":  "EN",
+    "slides": [
+        {
+            "type": "opexning",
+            "id": "cover"
+        },
+        {
+            "type": "content",
+            "id": "about",
+            "notes": [
+                "A note here"
+            ]
+        },
+        {
+            "type": "content",
+            "id": "profile-example-1"
+        },
+        {
+            "type": "content",
+            "id": "sh"
+        },
+        {
+            "type": "closing",
+            "id": "closing",
+            "notes": [
+                "The last slide, to thank and ask for questions"
+            ]
+        }
+    ]
+}

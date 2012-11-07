@@ -1,0 +1,134 @@
+<style type="text/css">
+    #aboutElement-pt-1, #aboutElement-en-1,
+    #aboutElement-pt-2, #aboutElement-en-2,
+    #aboutElement-pt-3, #aboutElement-en-3,
+    #aboutElement-pt-4, #aboutElement-en-4
+    {
+        display: none;
+    }
+</style>
+
+<div class="LANG-EN">
+    <h2>About PPW</h2>
+    <div id="aboutElement-en-1" class="content">
+        PowerPolygon is a powerful framework that helps you to prepare HTML5 presentations.
+    </div>
+    <div id="aboutElement-en-2" class="content">
+        You can load addons to it, use profiles and even different languages.
+    </div>
+    <div id="aboutElement-en-3" class="content">
+        Aplying themes is quite easy, as well.
+    </div>
+    <div id="aboutElement-en-4" class="content">
+        All the effects are basically HTML5 with CSS3 and JavaScript.
+    </div>
+</div>
+<div class="LANG-PT">
+    <h2>Sobre o PPW</h2>
+    <div id="aboutElement-pt-1" class="content">
+        PowerPolygon é um framework que lhe ajuda a construir apresentações em HTML5.
+    </div>
+    <div id="aboutElement-pt-2" class="content">
+        Você pode carregad addons, usar perfis de apresentação e até mesmo diferentes idiomas.
+    </div>
+    <div id="aboutElement-pt-3" class="content">
+        Aplicar temas também é muito fácil.
+    </div>
+    <div id="aboutElement-pt-4" class="content">
+        Todos os efeitos são basicamente HTML5 com CSS3 e JavaScript.
+    </div>
+</div>
+
+<script>
+    
+    PPW.addAction({
+        
+        does: function(){
+            PPW.animate("#aboutElement-en-1, #aboutElement-pt-1",
+                        'bounceInDown',
+                        {
+                            duration: '1000ms'
+                            ,onstart: function(){
+                                console.log('started the animation!!');
+                            }
+                            ,onend: function(){
+                                console.log('ended the animation!!');
+                            }
+                        });
+        },
+        undo: function(){
+            PPW.animate("#aboutElement-en-1, #aboutElement-pt-1",
+                        'bounceOutUp',
+                        {
+                            duration: '2000ms'
+                            //,delay: '1000ms'
+                            //,count: '3'
+                        });
+        }
+    });
+    
+    PPW.addAction({
+        
+        does: function(){
+            PPW.animate("#aboutElement-en-2, #aboutElement-pt-2",
+                        'fadeInLeft',
+                        {
+                            duration: '500ms'
+                            ,onstart: function(){
+                                console.log('started the animation!!');
+                            }
+                            ,onend: function(){
+                                console.log('ended the animation!!');
+                            }
+                        });
+        },
+        undo: function(){
+            PPW.animate("#aboutElement-en-2, #aboutElement-pt-2",
+                        'fadeOutLeft',
+                        {
+                            duration: '2000ms'
+                            //,delay: '1000ms'
+                            //,count: '3'
+                        });
+        }
+    });
+    
+    
+    PPW.addAction({
+        
+        does: function(){
+            PPW.animate("#aboutElement-en-3, #aboutElement-pt-3",
+                        'rotateInDownLeft',
+                        {
+                            //duration: '500ms',
+                            //delay: '1000ms',
+                            //count: '3',
+                            onstart: function(){
+                                console.log('started the animation!!');
+                            }
+                            ,onend: function(){
+                                console.log('ended the animation!!');
+                            }
+                        });
+        },
+        undo: function(){
+            PPW.animate("#aboutElement-en-3, #aboutElement-pt-3",
+                        'rotateOutUpLeft');
+        }
+    });
+    
+    
+    PPW.addAction({
+        
+        does: function(){
+            PPW.animate("#aboutElement-en-4, #aboutElement-pt-4",
+                        'lightSpeedIn');
+        },
+        undo: function(){
+            PPW.animate("#aboutElement-en-4, #aboutElement-pt-4",
+                        'lightSpeedOut');
+        }
+    });
+    
+    
+</script>

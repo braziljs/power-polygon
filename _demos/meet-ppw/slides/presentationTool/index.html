@@ -1,0 +1,59 @@
+<style type="text/css">
+    #prestool-img, #redarrow{
+        display: none;
+    }
+    #redarrow span{
+        padding-left: 40px;
+    }
+</style>
+<div style="text-align: center;">
+    <h2>Toolbar</h2>
+    <div class="presentation-toon-title-en LANG-EN">
+        You cans use the PPW Toolbar to perform quick actions.
+    </div>
+    <div class="presentation-toon-title-pt LANG-PT">
+        Use a PPW Toolbar para ações rápidas.
+    </div>
+    
+    <img id="prestool-img"
+         src="slides/presentationTool/toolbar-presentation-tool.png"
+         style="position: relative;
+                margin: auto;
+                top: 50%;" />
+    <div id="redarrow"
+         style="position: absolute;
+                top: 0px;
+                text-align: left;
+                left: -20px;">
+        <img src="slides/presentationTool/redarrow.png" /><br/>
+        <span class="LANG-EN">Bring your mouse here</span>
+        <span class="LANG-PT">Posicione seu mouse aqui</span>
+    </div>
+</div>
+<script>
+    
+    PPW.addAction({
+        timing: 1000,
+        does: function(){
+            PPW.animate("#prestool-img",
+                        'fadeIn');
+        },
+        undo: function(){
+            PPW.animate("#prestool-img",
+                        'fadeOut');
+        }
+    });
+    
+    PPW.addAction({
+        timing: 1000,
+        does: function(){
+            PPW.animate("#redarrow",
+                        'fadeInUp');
+        },
+        undo: function(){
+            PPW.animate("#redarrow",
+                        'fadeOutDown');
+        }
+    });
+    
+</script>

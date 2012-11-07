@@ -1,0 +1,72 @@
+<h2>Syntax Highlight</h2>
+<div class="LANG-EN">
+    You can also use an addon for syntax highlight of source codes when you need it.
+</div>
+<div class="LANG-PT">
+    Você também pode usar o addon para syntax highlight de seus códigos fonte quando precisa.
+</div>
+
+<pre id="focusableExample" class="sh_php">
+&lt;?php
+    function empty_dir($dir) {
+        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir),
+                                                  RecursiveIteratorIterator::CHILD_FIRST);
+        foreach ($iterator as $path) {
+          if ($path->isDir()) {
+             rmdir($path->__toString());
+          } else {
+             unlink($path->__toString());
+          }
+        }
+        // rmdir($dir);
+    }
+?></pre>
+<br/>
+<div class="LANG-EN">With no line numbers nor lines</div>
+<div class="LANG-PT">Sem números de linhas nem linhas</div>
+<pre class="sh_javascript no-numbers no-lines">
+    var o= { "prop": "value" };
+    alert(o.prop);</pre>
+
+
+<script>
+    PPW.addAction({
+        does: function(){
+            PPW.sh.focus('#focusableExample', [1, 2, 13, 14]);
+        },
+        undo: function(){
+            // removes the focus
+            PPW.sh.focus('#focusableExample');
+        }
+    });
+    
+    PPW.addAction({
+        does: function(){
+            PPW.sh.focus('#focusableExample', [5, 6, 8, 10]);
+        },
+        undo: function(){
+            // removes the focus
+            PPW.sh.focus('#focusableExample', [1, 2, 13, 14]);
+        }
+    });
+    
+    PPW.addAction({
+        does: function(){
+            PPW.sh.focus('#focusableExample', [3, 4, 7, 9]);
+        },
+        undo: function(){
+            // removes the focus
+            PPW.sh.focus('#focusableExample', [5, 6, 8, 10]);
+        }
+    });
+    
+    /*PPW.addAction({
+        does: function(){
+            PPW.sh.focus('#focusableExample');
+        },
+        undo: function(){
+            // removes the focus
+            PPW.sh.focus('#focusableExample', [3, 4, 7, 9]);
+        }
+    });*/
+</script>
