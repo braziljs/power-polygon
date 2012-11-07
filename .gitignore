@@ -11,4 +11,5 @@
 nbproject
 nbproject/*
 ./.settings/
-/projects/demo-pt/.mind/
+/talks/*
+
