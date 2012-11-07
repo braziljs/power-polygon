@@ -11,4 +11,5 @@
 nbproject
 nbproject/*
 ./.settings/
-
+/talks/
+!/talks/README
