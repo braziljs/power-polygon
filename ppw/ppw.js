@@ -329,7 +329,6 @@ window.PPW= (function($, _d, console){
             slideList= [];
         
         if(conf){
-            console.log("extending", conf, o)
             o= $.extend(o, conf);
         }
         
@@ -1373,7 +1372,6 @@ window.PPW= (function($, _d, console){
         $('#ppw-splash-screen').hide();
         $('#ppw-toolbar-container').hide();
         
-        
         if(_settings.languages && _settings.languages.length){
             $(slides).each(function(){
                 tmp= $(this.el).find(':not(:visible)');
@@ -1383,7 +1381,10 @@ window.PPW= (function($, _d, console){
             });
         }
         
+        $('#ppw-slides-container, .ppw-slide-container ').css({'width': '100%', 'height': '100%', 'margin':'auto'});
+        
         $b.addClass('printing-'+(_settings.slidesPerPage||1));
+        
         _w.print();
         $b.removeClass('printing-'+(_settings.slidesPerPage||1));
         $('#ppw-toolbar-container').show();
@@ -1807,9 +1808,10 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
      * Plays an audio so the speaker can test the sound.
      */
     var _testAudio= function(){
+        
         var el= _d.getElementById('ppw-audioTestElement');
         if(!el){
-            $b.append("<audio id='ppw-audioTestElement' loop='loop' style='display: none;'>\
+            $b.append("<audio id='ppw-audioTestElement' autoplay='false' loop='loop' style='display: none;'>\
                                 <source src='"+_settings.PPWSrc+"/_audios/water.mp3'/>\
                                 <source src='"+_settings.PPWSrc+"/_audios/water.ogg'/>\
                                </audio>");
@@ -2189,9 +2191,9 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
                 }catch(e){
                     console.error("[PPW][Slide action error] There was an error trying to execute an action of the current slide:", slide, e);
                 }
-                if(slide.onSlideUndo){
+                /*if(slide.onSlideUndo){
                     slide.onSlideUndo(slide);
-                }
+                }*/
             }else{
                 _goPreviousSlide();
             }
@@ -2227,9 +2229,9 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
             };
             slide.actionIdx++;
             
-            if(slide.onSlideDoes){
+            /*if(slide.onSlideDoes){
                 slide.onSlideDoes(slide);
-            }
+            }*/
             
             nextAction= slide.actions[slide.actionIdx];
             

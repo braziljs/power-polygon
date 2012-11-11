@@ -29,11 +29,18 @@
         width: 100% !IMPORTANT;
         height: 100% !IMPORTANT;
     }
+    .printing-1 .ppw-slide-container{
+        width: 100% !IMPORTANT;
+        height: 100% !IMPORTANT;
+    }
     
     .printing-1 .ppw-slide-container:not(.ppw-slide-not-in-profile){
         display: block !IMPORTANT;
         width: 100% !IMPORTANT;
         height: 100% !IMPORTANT;
+        overflow: hidden !IMPORTANT;
+        margin: 0px !IMPORTANT;
+        
         page-break-after: always;
         page-break-inside: avoid;
     }
@@ -51,9 +58,8 @@
         box-shadow: none !IMPORTANT;
         display: block !IMPORTANT;
         visibility: visible !IMPORTANT;
-        background: white !IMPORTANT;
+        /*background: white !IMPORTANT;*/
         border: none !IMPORTANT;
-        margin: 10px !IMPORTANT;
     }
     
     /* 4(FOUR) slides per page */
@@ -172,6 +178,7 @@
 }
 
 .ppw-powered-by{
+    width: 316px;
     position: absolute;
     right: 6px;
     bottom: 4px;
@@ -763,6 +770,7 @@ ppw-message-content{
 }
 .ppw-powered-by-link a{
     color: white !IMPORTANT;
+    font-size: 1em !IMPORTANT;
     letter-spacing: 1px;
     text-decoration: none !IMPORTANT;
     text-shadow: 0px 0px 6px black !IMPORTANT;
