@@ -202,6 +202,7 @@ window.PPW= (function($, _d, console){
         onthemeloaded           : [],
         onsplashscreen          : [],
         onshowthumbs            : [],
+        onbeforeshowthumbs      : [],
         onhidethumbs            : [],
         F10_PRESSED             : [],
         F9_PRESSED              : [],
@@ -691,6 +692,10 @@ window.PPW= (function($, _d, console){
         if(!_conf.presentationStarted)
             return;
         
+        _triggerEvent('onbeforeshowthumbs');
+        
+        //$(".ppw-slide-container:not(.ppw-slide-not-in-profile), .ppw-slide-container:not(.ppw-slide-not-in-profile) section").show();
+        
         _conf.prevStyle= {
             margin: el.css('margin'),
             padding: el.css('padding'),
@@ -1118,6 +1123,9 @@ window.PPW= (function($, _d, console){
            $t.hasClass(_conf.cons.CLICKABLE_ELEMENT) ||
            t.hasAttribute('tabindex')){
            return true;
+        }
+        if(tag == 'video' || tag == 'audio'){
+            return t.hasAttribute('controls');
         }
         return false;
     }

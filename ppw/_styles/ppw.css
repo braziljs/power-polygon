@@ -626,11 +626,14 @@ ppw-message-content{
 }
 
 .ppw-show-thumbs .ppw-slide-container{
-    width: 250px;
-    height: 150px;
+    width: 256px !IMPORTANT;
+    height: 178px !IMPORTANT;
     float: left;
     overflow: hidden;
     margin: 10px;
+    display: block !IMPORTANT;
+    opacity: 1 !IMPORTANT;
+    
     
     /*-webkit-transition: all 500ms linear;
     -moz-transition: all 500ms linear;
@@ -651,10 +654,6 @@ ppw-message-content{
     top: 0px !IMPORTANT;
     margin: 0px !IMPORTANT;
 }
-.ppw-show-thumbs .ppw-slide-container{
-    width: 256px !IMPORTANT;
-    height: 178px !IMPORTANT;
-}
 .ppw-show-thumbs div:not(.ppw-slide-not-in-profile) section{
     position: relative !IMPORTANT;
     float: left !IMPORTANT;
@@ -664,6 +663,8 @@ ppw-message-content{
     border: solid 1px black !IMPORTANT;
     overflow: hidden !IMPORTANT;
     border-radius: 0px !IMPORTANT;
+    
+    opacity: 1 !IMPORTANT;
     
     width: 860px !IMPORTANT;
     height: 600px !IMPORTANT;
@@ -681,6 +682,7 @@ ppw-message-content{
 }
 .ppw-show-thumbs>div:not(.ppw-slide-not-in-profile)
 {
+    position: relative !IMPORTANT;
     border: solid 1px black;
 }
 .ppw-show-thumbs>div:not(.ppw-slide-not-in-profile):hover{
