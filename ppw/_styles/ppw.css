@@ -10,11 +10,20 @@
     box-sizing: border-box;
     -moz-box-sizing: border-box;
 }
+.fulfill{
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+    
+    page-break-after: always;
+    page-break-inside: avoid;
+}
 
-@media print{
     @page{
         size: A4 landscape;
-        margin: 10px !IMPORTANT;
+        margin: 0px !IMPORTANT;
         padding: 0px !IMPORTANT;
     }
     
@@ -22,8 +31,11 @@
     body.printing-1{
         overflow: auto !IMPORTANT;
         width: 297mm !IMPORTANT;
-        height: 210mm !IMPORTANT;
+        height: 200mm !IMPORTANT;
     }
+    /*body.printing-1 *{
+        background: white !IMPORTANT;
+    }*/
     
     .printing-1 .ppw-slides-container{
         width: 100% !IMPORTANT;
@@ -44,12 +56,11 @@
         page-break-after: always;
         page-break-inside: avoid;
     }
-    
-    
+
     .printing-1 .ppw-slide-container:not(.ppw-slide-not-in-profile),
     .printing-1 .ppw-slide-container:not(.ppw-slide-not-in-profile) section{
         visibility: visible !IMPORTANT;
-        clear: both;
+        clear: both !IMPORTANT;
         float: none !IMPORTANT;
         border-radius: 0px !IMPORTANT;
         position: relative !IMPORTANT;
@@ -57,10 +68,19 @@
         width: 100% !IMPORTANT;
         box-shadow: none !IMPORTANT;
         display: block !IMPORTANT;
-        visibility: visible !IMPORTANT;
-        /*background: white !IMPORTANT;*/
         border: none !IMPORTANT;
+        /*background: white !IMPORTANT;*/
     }
+    
+    @media screen{
+        .printing-1 .ppw-slide-container:not(.ppw-slide-not-in-profile),
+        .printing-1 .ppw-slide-container:not(.ppw-slide-not-in-profile) section{
+            border-bottom: dashed 2px gray !IMPORTANT;
+        }
+    }
+    
+    
+    
     
     /* 4(FOUR) slides per page */
     body.printing-4{
@@ -107,7 +127,7 @@
         transform-origin: 0px 0px;
         transform: scale(0.3);
     }
-}
+
 
 .ppw-red{
     font-weight: bold;

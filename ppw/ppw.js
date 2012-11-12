@@ -352,6 +352,16 @@ window.PPW= (function($, _d, console){
     };
     
     /**
+     * Verifies whether the presentation is in printable version or not.
+     * 
+     * The presentation is in printable version if it is running on another
+     * windows, with the ppw-printing-version=true variable set on its url.
+     */
+    var _isInPrintableVersion= function(){
+        return _l.href.indexOf('ppw-printing-version=true')>=0;
+    }
+    
+    /**
      * Method called by the user to define the presentation settings.
      */
     var _init= function(conf){
@@ -384,10 +394,10 @@ window.PPW= (function($, _d, console){
             _init(_autoGenerateConfig(conf));
             return;
         }
-        console.log(conf)
+        
         $.extend(_settings, conf);
         
-        if(_settings.shortcutsEnable){
+        if(_settings.shortcutsEnable && !_isInPrintableVersion()){
             _enableFuncKeys();
         }
         _triggerEvent('onload', conf);
@@ -399,10 +409,12 @@ window.PPW= (function($, _d, console){
      * This method is used internaly only, before the splash screen.
      */
     var _setLoadingBarStatus= function(){
+        
         _conf.curLoaded++;
         var perc= _conf.curLoaded * 100 / _conf.loadSteps;
         
         $('#ppw-loadingbar').css({width: perc+'%'});
+        
         if(perc >= 100){
             _triggerEvent('onthemeloaded', _settings.themeSettings);
             if(!_settings.useSplashScreen)
@@ -540,9 +552,13 @@ window.PPW= (function($, _d, console){
          _d.getElementsByTagName('head')[0].appendChild(_tmp.lnk);
          delete _tmp.lnk;
          
-         _loadTheme();
-         
-         _bindEvents();
+        _loadTheme();
+         if(!_isInPrintableVersion()){
+            _bindEvents();
+         }else{
+             _triggerEvent('onthemeloaded', _settings.themeSettings);
+             $('#ppw-lock-loading').hide();
+         }
     };
     
     /**
@@ -665,6 +681,10 @@ window.PPW= (function($, _d, console){
             if(!_settings.useSplashScreen)
                 _startPresentation();
             
+            if(_isInPrintableVersion()){
+                _preparePrintableVersion();
+            }
+            
             $('.ppw-slide-container').click(function(evt){
                 if(_conf.inThumbsMode){
                     _goToSlide($(this).data('ppw-slide-ref'));
@@ -680,6 +700,45 @@ window.PPW= (function($, _d, console){
             width: perc+'%'
         }, 100, fn);
         
+    };
+    
+    /**
+     * Prepares the presentation to be printed.
+     */
+    var _preparePrintableVersion= function(){
+        var slides= _getValidSlides(),
+            notVisible= [],
+            tmp= null;
+        
+        $('#ppw-splash-screen').hide();
+        $('#ppw-toolbar-container').hide();
+        
+        if(_settings.languages && _settings.languages.length){
+            $(slides).each(function(){
+                tmp= $(this.el).find('*');
+                notVisible.push(tmp);
+                tmp.show();
+            });
+            _setLION(_conf.currentLang);
+        }
+        
+        $('#ppw-slides-container, .ppw-slide-container ').css({
+            'width': '100%',
+            'height': '100%',
+            'margin':'auto'
+        });
+        
+        $b.addClass('printing-'+(_settings.slidesPerPage||1));
+        
+        setTimeout(function(){
+            _w.print();
+            _w.close();
+        }, 1000);
+        return;
+        
+        $b.removeClass('printing-'+(_settings.slidesPerPage||1));
+        $('#ppw-toolbar-container').show();
+        $(notVisible).each(function(){ $(this).hide(); });
     };
     
     /**
@@ -818,11 +877,11 @@ window.PPW= (function($, _d, console){
                     break;
                     
                 case 80: // P
-                    if(evt.altKey || evt.ctrlKey){
+                    /*if(evt.altKey || evt.ctrlKey){
                         evt.preventDefault();
                         evt.stopPropagation();
                         return false;
-                    }
+                    }*/
                     break;
                 
                 default: {
@@ -851,13 +910,14 @@ window.PPW= (function($, _d, console){
             }
             
             switch(evt.keyCode){
-                case 112: // P
+                /*case 112: // P
                     if(evt.altKey || evt.ctrlKey){
                         evt.preventDefault();
                         evt.stopPropagation();
                         return false;
                     }
                     break;
+                */
             }
             
             return true;
@@ -887,12 +947,12 @@ window.PPW= (function($, _d, console){
                     break;
                 
                 case 80: // P
-                    if(evt.altKey || evt.ctrlKey){
+                    /*if(evt.altKey || evt.ctrlKey){
                         _print();
                         evt.preventDefault();
                         evt.stopPropagation();
                         return false;
-                    }
+                    }*/
                     break;
                 
                 case 117: // F6
@@ -1190,6 +1250,7 @@ window.PPW= (function($, _d, console){
             _b.appendChild(container);
         }
         
+        
         for(; i<l; i++){
             el= $('section#'+slides[i].id);
             
@@ -1373,30 +1434,8 @@ window.PPW= (function($, _d, console){
      */
     var _print= function(){
         
-        var slides= _getValidSlides(),
-            notVisible= [],
-            tmp= null;
-        
-        $('#ppw-splash-screen').hide();
-        $('#ppw-toolbar-container').hide();
-        
-        if(_settings.languages && _settings.languages.length){
-            $(slides).each(function(){
-                tmp= $(this.el).find(':not(:visible)');
-                notVisible.push(tmp);
-                tmp.show();
-                _setLION(_conf.currentLang);
-            });
-        }
-        
-        $('#ppw-slides-container, .ppw-slide-container ').css({'width': '100%', 'height': '100%', 'margin':'auto'});
-        
-        $b.addClass('printing-'+(_settings.slidesPerPage||1));
-        
-        _w.print();
-        $b.removeClass('printing-'+(_settings.slidesPerPage||1));
-        $('#ppw-toolbar-container').show();
-        $(notVisible).each(function(){ $(this).hide(); });
+        var printW= window.open(_l.origin + _l.pathname+'?ppw-printing-version=true');
+        return;
     };
     
     /**
@@ -1454,6 +1493,12 @@ window.PPW= (function($, _d, console){
         $b= $(_b);
         
         _preparePPW();
+        
+        if(_isInPrintableVersion()){
+            $b.addClass('printing-1');
+            _preloadSlides();
+            return true;
+        }
         
         // APPENDING THE CAMERA, TOOLBAR, SOCIAL BUTTONS AND MESSAGE-BOX TO THE DOCUMENT
         $b.append('<div id="fb-root"></div>');
@@ -2588,8 +2633,12 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
      **************************************************/
     var _constructor= function(){
         _createSplashScreen();
-        _conf.currentSlide= _getCurrentSlideFromURL();
-        _goToSlide(_conf.currentSlide);
+        if(!_isInPrintableVersion()){
+            _conf.currentSlide= _getCurrentSlideFromURL();
+            _goToSlide(_conf.currentSlide);
+        }else{
+            _goToSlide(0);
+        }
     };
     
     //$(_d).ready(_constructor);

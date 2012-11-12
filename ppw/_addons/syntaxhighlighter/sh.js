@@ -113,6 +113,7 @@ window.PPW.extend("sh", (function(){
     
     var _themeLoaded= function(settings){
         theme= settings.shTheme||theme;
+        
         $("<link/>", {
             rel: "stylesheet",
             type: "text/css",
