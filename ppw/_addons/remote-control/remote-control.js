@@ -7,7 +7,7 @@ if (!window.io) {
 
 	'use strict';
 
-	var RemoteSlide = function () {},
+	var RemoteControl = function () {},
 
 		priv = {
 			socket : null,
@@ -37,26 +37,26 @@ if (!window.io) {
 			}
 		};
 
-	RemoteSlide.prototype.connect = function (socketserver) {
+	RemoteControl.prototype.connect = function (socketserver) {
 		if (priv.connected === false) {
 			priv.socket = io.connect(socketserver);
 			priv.connected = true;
 		}
 	};
 
-	RemoteSlide.prototype.on = function (action, fn) {
+	RemoteControl.prototype.on = function (action, fn) {
 		if (priv.connected) {
 			priv.setAction(action, fn);
 		} else {
-			throw '#RemoteSlide - You must to connect before!';
+			throw '#RemoteControl - You must to connect before!';
 		}
 	};
 
-	RemoteSlide.prototype.sync = function (pattern) {
+	RemoteControl.prototype.sync = function (pattern) {
 		pattern = priv.getHash((pattern || window.location.href));
 		priv.socket.emit('requestSync', pattern);
 		return pattern;
 	};
 
-	window.RemoteSlide = RemoteSlide;
+	window.RemoteControl = RemoteControl;
 }(window.io));
