@@ -548,7 +548,7 @@ window.PPW= (function($, _d, console){
          _tmp.lnk = _d.createElement('link');
          _tmp.lnk.type = 'image/x-icon';
          _tmp.lnk.rel = 'shortcut icon';
-         _tmp.lnk.href = _settings.PPWSrc+'/_images/power-polygon-logo.jpg';
+         _tmp.lnk.href = _settings.PPWSrc+'/_images/power-polygon-icon.png';
          _d.getElementsByTagName('head')[0].appendChild(_tmp.lnk);
          delete _tmp.lnk;
          
