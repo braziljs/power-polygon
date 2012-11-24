@@ -10,7 +10,7 @@
         
         <script src="../../ppw/ppw.js"></script>
         <!-- ADDONS -->
-        <script src="../../ppw/_addons/remote-slide/ppw-remote-slide.js"></script>
+        <script src="../../ppw/_addons/remote-control/ppw-remote-control.js"></script>
         <script src="../../ppw/_addons/syntaxhighlighter/sh.js"></script>
         <script src="../../ppw/_addons/social/social.js"></script>
         <script src="../../ppw/_addons/caniuse/caniuse.js"></script>
@@ -116,7 +116,7 @@
                 // may be false or id(slide' id)
                 friendlyURL: 'id',
                 // should ppw open the splash screen first?
-                useSplashScreen: true,
+                useSplashScreen: false,
                 /**
                  * Defines the pattern to be used to load external slides.
                  * The default is SLIDE_ID_DIR, found in cons.fs.
@@ -129,7 +129,7 @@
                  * is as follows:
                  *    fsPattern: 'slides/%id/index.html' // this is the default pattern
                  */
-                fsPattern: PPW.cons.fs.SLIDE_ID_DIR,
+                fsPattern: PPW.cons.fs.SLIDE_ID_DIR_ID,
                 // should show battery alerts WHEN SUPPORTED?
                 showBatteryAlerts: true,
                 // should show a notification when goes offline?
@@ -159,7 +159,7 @@
                
                 // optional...you can simply say what is the transition you want
                 // using the theme property of this settings
-                transition: 'trans-slider',
+                transition: 'trans-3d-5',
                 ////transition: 'trans-fall',
                 //transition: 'trans-zooming',
                 //transition: 'trans-fall-n-roll',

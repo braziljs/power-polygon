@@ -6,6 +6,10 @@ You can create a new theme, or customise an existing one. Also, creating new tra
 For detailed information and documentation, please read the wiki:
 [https://github.com/braziljs/PowerPolygon/wiki](https://github.com/braziljs/PowerPolygon/wiki)
 
+### Videos tutorial
+Watch a video tutorial with some examples(in portuguese, with english subtitles).
+// TODO: add the video link here
+
 ### See a live demo
 You can access this address and see a live demo of some of the main tools PowerPolygon provides you.
 [Live demo Presentation in Power Polygon](http://felipenmoura.org/talks/meet-ppw/)

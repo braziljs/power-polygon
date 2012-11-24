@@ -198,7 +198,8 @@
 }
 
 .ppw-powered-by{
-    width: 316px;
+    text-align: right;
+    width: 400px;
     position: absolute;
     right: 6px;
     bottom: 4px;

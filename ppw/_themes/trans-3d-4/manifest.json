@@ -1,0 +1,8 @@
+{
+    "name": "trans-3d-4",
+    "dependencies": {
+        "css": [
+            "styles/default.css"
+        ]
+    }
+}

@@ -121,26 +121,29 @@ window.PPW= (function($, _d, console){
                 containerID: 'ppw-slides-container'
             },
             cons: {
-                CLASS_SLIDE             : 'ppw-slide-element',
-                CLASS_ACTIVE_SLIDE      : 'ppw-active-slide-element',
-                CLASS_PREVIOUS_SLIDE    : 'ppw-previous-slide-element',
-                CLASS_NEXT_SLIDE        : 'ppw-next-slide-element',
-                CLASS_FULLSCREEN        : 'ppw-fullscreen',
-                FOCUSABLE_ELEMENT       : 'ppw-focusable',
-                CLICKABLE_ELEMENT       : 'ppw-clickable',
+                CLASS_SLIDE               : 'ppw-slide-element',
+                CLASS_ACTIVE_SLIDE        : 'ppw-active-slide-element',
+                CLASS_ACTIVE_SLIDE_CONT   : 'ppw-active-slide-element-container',
+                CLASS_PREVIOUS_SLIDE      : 'ppw-previous-slide-element',
+                CLASS_PREVIOUS_SLIDE_CONT : 'ppw-previous-slide-element-container',
+                CLASS_NEXT_SLIDE          : 'ppw-next-slide-element',
+                CLASS_NEXT_SLIDE_CONT     : 'ppw-next-slide-element-container',
+                CLASS_FULLSCREEN          : 'ppw-fullscreen',
+                FOCUSABLE_ELEMENT         : 'ppw-focusable',
+                CLICKABLE_ELEMENT         : 'ppw-clickable',
                 /**
                  * used for the fsPattern settings.
                  * %id    = slide identifier
                  * %num   = slide number
                  */
                 fs: {
-                    SLIDE_ID_DIR         : 'slides/%id/index.html',
-                    SLIDE_ID_DIR_ID      : 'slides/%id/%id.html', // default
-                    SLIDE_ID_FILES       : 'slides/%id.html',
-                    SLIDE_ID_MIXED       : '%id.html',
-                    SLIDE_NUM_DIR        : 'slides/%num/index.html',
-                    SLIDE_NUM_FILES      : 'slides/%num.html',
-                    SLIDE_NUM_MIXED      : '%num.html'
+                    SLIDE_ID_DIR          : 'slides/%id/index.html',
+                    SLIDE_ID_DIR_ID       : 'slides/%id/%id.html', // default
+                    SLIDE_ID_FILES        : 'slides/%id.html',
+                    SLIDE_ID_MIXED        : '%id.html',
+                    SLIDE_NUM_DIR         : 'slides/%num/index.html',
+                    SLIDE_NUM_FILES       : 'slides/%num.html',
+                    SLIDE_NUM_MIXED       : '%num.html'
                 }
             },
             currentSlide: 0,
@@ -148,6 +151,7 @@ window.PPW= (function($, _d, console){
         },
         
         // user defined settings
+        
         _settings= {
             hashSeparator: '#', // the separator to be used on the address bar
             PPWSrc: "../../ppw/", // wondering the talk is in /talks/talkname for example
@@ -156,6 +160,7 @@ window.PPW= (function($, _d, console){
             useSplashScreen: true, // should ppw open the splash screen first?
             slidesContainer: _d.createElement('div'),
             theme: _conf.defaults.theme,
+            transition: _conf.defaults.transition,
             fsPattern: _conf.cons.fs.SLIDE_ID_DIR_ID,
             alertAt: _conf.defaults.alertAt,
             duration: _conf.defaults.duration,
@@ -322,8 +327,8 @@ window.PPW= (function($, _d, console){
                 title: _d.title,
                 authors: [],
                 PPWSrc: "../../ppw/",
-                transition: 'trans-slider',
-                theme: 'thm-default'
+                transition: _conf.defaults.transition,
+                theme: _conf.defaults.theme
             },
             i= 0,
             l= 0,
@@ -1523,7 +1528,7 @@ window.PPW= (function($, _d, console){
                         <img id="ppw-toolbox-icon" onclick="PPW.openPresentationTool();" title="Open Presentation Tool" />\
                         <img id="ppw-search-icon" onclick="PPW.showSearchBox()" title="Search on slides"/>\
                         <img id="ppw-fullscreen-icon" onclick="PPW.enterFullScreen()" title="Go Fullscreen"/>\
-                        <img id="ppw-camera-icon" onclick="PPW.startCamera();" title="Start the camera"/>\
+                        <img id="ppw-camera-icon" onclick="PPW.toggleCamera();" title="Start the camera"/>\
                         <img id="ppw-settings-icon" onclick="PPW.showConfiguration();" title="Settings"/>\
                     </div>\
                     <div id="ppw-content-toolbar" class="ppw-platform">\
@@ -2469,32 +2474,43 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         // setting the active slide class
         $(_d.querySelector("."+_conf.cons.CLASS_ACTIVE_SLIDE))
             .removeClass(_conf.cons.CLASS_ACTIVE_SLIDE);
+        $(_d.querySelector("."+_conf.cons.CLASS_ACTIVE_SLIDE_CONT))
+            .removeClass(_conf.cons.CLASS_ACTIVE_SLIDE_CONT);
         $('#'+_settings.slides[idx].id).addClass(_conf.cons.CLASS_ACTIVE_SLIDE);
+        $('#'+_settings.slides[idx].id).parent().addClass(_conf.cons.CLASS_ACTIVE_SLIDE_CONT);
         
         // setting the previous slide class
         $(_d.querySelector("."+_conf.cons.CLASS_PREVIOUS_SLIDE))
             .removeClass(_conf.cons.CLASS_PREVIOUS_SLIDE);
+        $(_d.querySelector("."+_conf.cons.CLASS_PREVIOUS_SLIDE_CONT))
+            .removeClass(_conf.cons.CLASS_PREVIOUS_SLIDE_CONT);
             
         id= idx;
         do{
             id--;
         }while(_settings.slides[id] && !_isValidProfile(_settings.slides[id]));
         
-        if(_settings.slides[id])
+        if(_settings.slides[id]){
             $('#'+_settings.slides[id].id).addClass(_conf.cons.CLASS_PREVIOUS_SLIDE);
+            $('#'+_settings.slides[id].id).parent().addClass(_conf.cons.CLASS_PREVIOUS_SLIDE_CONT);
+        }
         
         
         // setting the next slide class
         $(_d.querySelector("."+_conf.cons.CLASS_NEXT_SLIDE))
             .removeClass(_conf.cons.CLASS_NEXT_SLIDE);
+        $(_d.querySelector("."+_conf.cons.CLASS_NEXT_SLIDE_CONT))
+            .removeClass(_conf.cons.CLASS_NEXT_SLIDE_CONT);
         
         id= idx;
         do{
             id++;
         }while(_settings.slides[id] && !_isValidProfile(_settings.slides[id]));
         
-        if(_settings.slides[id])
+        if(_settings.slides[id]){
             $('#'+_settings.slides[id].id).addClass(_conf.cons.CLASS_NEXT_SLIDE);
+            $('#'+_settings.slides[id].id).parent().addClass(_conf.cons.CLASS_NEXT_SLIDE_CONT);
+        }
     };
     
     var _removeAnimateCSSClasses= function(el){
