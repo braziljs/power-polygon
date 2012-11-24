@@ -78,3 +78,19 @@ body{
 }
 .ppw-slide-container section{
 }
+
+
+
+
+/* FIXING a bug GOOGLE CHROME has related to z-index and 3D transform in css */
+.ppw-slide-container{
+    display: none;
+}
+.ppw-previous-slide-element-container, .ppw-next-slide-element-container{
+    display: block;
+    z-index: -999;
+}
+.ppw-active-slide-element-container{
+    display: block !IMPORTANT;
+    z-index: 999;
+}

@@ -649,9 +649,9 @@ ppw-message-content{
 .ppw-show-thumbs .ppw-slide-container{
     width: 256px !IMPORTANT;
     height: 178px !IMPORTANT;
-    float: left;
-    overflow: hidden;
-    margin: 10px;
+    float: left !IMPORTANT;
+    overflow: hidden !IMPORTANT;
+    margin: 10px !IMPORTANT;
     display: block !IMPORTANT;
     opacity: 1 !IMPORTANT;
     
@@ -690,16 +690,16 @@ ppw-message-content{
     width: 860px !IMPORTANT;
     height: 600px !IMPORTANT;
     
-    -webkit-transform-origin: 0px 0px;
-    -webkit-transform: scale(0.3);
-    -moz-transform-origin: 0px 0px;
-    -moz-transform: scale(0.3);
-    -ms-transform-origin: 0px 0px;
-    -ms-transform: scale(0.3);
-    -o-transform-origin: 0px 0px;
-    -o-transform: scale(0.3);
-    transform-origin: 0px 0px;
-    transform: scale(0.3);
+    -webkit-transform-origin: 0px 0px !IMPORTANT;
+    -webkit-transform: scale(0.3) translate(0px) scale(1) rotate(0deg) !IMPORTANT;
+    -moz-transform-origin: 0px 0px !IMPORTANT;
+    -moz-transform: scale(0.3) translate(0px) scale(1) rotate(0deg) !IMPORTANT;
+    -ms-transform-origin: 0px 0px !IMPORTANT;
+    -ms-transform: scale(0.3) translate(0px) scale(1) rotate(0deg) !IMPORTANT;
+    -o-transform-origin: 0px 0px !IMPORTANT;
+    -o-transform: scale(0.3) translate(0px) scale(1) rotate(0deg) !IMPORTANT;
+    transform-origin: 0px 0px !IMPORTANT;
+    transform: scale(0.3) translate(0px) scale(1) rotate(0deg) !IMPORTANT;
 }
 .ppw-show-thumbs>div:not(.ppw-slide-not-in-profile)
 {

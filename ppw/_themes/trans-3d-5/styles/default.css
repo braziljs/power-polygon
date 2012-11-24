@@ -38,7 +38,11 @@ body{
     position: absolute;
     width: 800px;
     height: 600px;
+    z-index: 1;
     
+    -webkit-transform-style: preserve-3d;
+    -moz-transform-style: preserve-3d;
+    transform-style: preserve-3d;
 }
 
 .ppw-slide-element{
@@ -50,6 +54,12 @@ body{
     -moz-transition: all .3s linear;
 }
 
+.ppw-active-slide-element-container{
+    z-index: 3;
+}
+.ppw-next-slide-element-container{
+    z-index: 5;
+}
 .ppw-active-slide-element{
     -webkit-transform: rotate(0deg) translateX(112px) translateY(40px) !IMPORTANT;
     -moz-transform: rotate(0deg) translateX(112px) translateY(40px) !IMPORTANT;
@@ -75,5 +85,19 @@ body{
     -moz-transform: rotate(0deg) translateX(112px) translateY(40px);
     transform: rotate(0deg) translateX(112px) translateY(40px);
 }
-.ppw-slide-container section{
+
+
+
+
+/* FIXING a bug GOOGLE CHROME has related to z-index and 3D transform in css */
+.ppw-slide-container{
+    display: none;
+}
+.ppw-previous-slide-element-container, .ppw-next-slide-element-container{
+    display: block;
+    z-index: -999;
+}
+.ppw-active-slide-element-container{
+    display: block !IMPORTANT;
+    z-index: 999;
 }
