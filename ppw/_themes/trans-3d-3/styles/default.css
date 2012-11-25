@@ -62,7 +62,7 @@ body{
 }
 
 .ppw-slide-element{
-    box-shadow: 0px 0px 20px black;
+    box-shadow: 0px 0px 160px 0px white, 0px 0px 30px black;
     
     opacity: 0;
     -webkit-transform: rotateY(90deg) translateX(250px) translateY(-400px) translateZ(450px) scale(.8);
