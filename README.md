@@ -1,3 +1,6 @@
+*[Leia a documentação em Português](https://github.com/braziljs/power-polygon/blob/master/README-pt.md)*
+
+---
 # Power Polygon
 Power Polygon is the tool that will allow you to create impressive presentations with many different themes and transitions, based in HTML5, CSS3 and JavaScript, running in your browser.
 You can create a new theme, or customise an existing one. Also, creating new transitions is quite simple!
