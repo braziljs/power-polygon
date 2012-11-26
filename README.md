@@ -4,7 +4,7 @@ You can create a new theme, or customise an existing one. Also, creating new tra
 
 ### Documentation
 For detailed information and documentation, please read the wiki:
-[https://github.com/braziljs/PowerPolygon/wiki](https://github.com/braziljs/PowerPolygon/wiki)
+[https://github.com/braziljs/power-polygon/wiki](https://github.com/braziljs/power-polygon/wiki)
 
 ### See a live demo
 You can access this address and see a live demo of some of the main tools PowerPolygon provides you.
@@ -13,7 +13,7 @@ You can access this address and see a live demo of some of the main tools PowerP
 ### Get involved
 * For PowerPolygon, test it and share your opinion and experience with us!
 * Send your feedback, ideas or suggestions!
-* Report bugs [adding issues](https://github.com/braziljs/PowerPolygon/issues?milestone=2&state=open) with the label bug.
+* Report bugs [adding issues](https://github.com/braziljs/power-polygon/issues?milestone=2&state=open) with the label bug.
 * Want to code and create new features, send us a pullrequest :)
 
 ### Who is behind it
