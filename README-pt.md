@@ -25,3 +25,6 @@ Veja a lista de committers para ver quem criou temas e transições.
 
 ### Suporte ou Contato
 Tem algum problema ou nova ideia? Entre no nosso [grupo de discussões](https://groups.google.com/forum/?fromgroups#!forum/braziljs-foundation).
+
+### Licenças
+[Lista de licenças](https://github.com/braziljs/power-polygon/tree/master/ppw/_licenses)
