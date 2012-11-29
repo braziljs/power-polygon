@@ -6,7 +6,7 @@ Novas transições também podem ser facilmente criadas.
 
 ### Documentação
 Para obter informações detalhadas, acesse a wiki do Power Polygon:
-[https://github.com/braziljs/power-polygon/wiki](https://github.com/braziljs/power-polygon/wiki)
+[https://github.com/braziljs/power-polygon/wiki](https://github.com/braziljs/power-polygon/wiki/In%C3%ADcio)
 
 ### Veja uma apresentação demo
 Veja no endereço abaixo um demo de uma apresentação com as principais funcionalidades que Power Polygon fornece  
