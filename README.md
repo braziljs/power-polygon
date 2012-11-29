@@ -7,7 +7,7 @@ You can create a new theme, or customise an existing one. Also, creating new tra
 
 ### Documentation
 For detailed information and documentation, please read the wiki:
-[https://github.com/braziljs/power-polygon/wiki](https://github.com/braziljs/power-polygon/wiki)
+[https://github.com/braziljs/power-polygon/wiki](https://github.com/braziljs/power-polygon/wiki/Start)
 
 ### See a live demo
 You can access this address and see a live demo of some of the main tools PowerPolygon provides you.
