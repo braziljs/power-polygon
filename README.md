@@ -25,3 +25,6 @@ Check the committers to see the credits for the created themes and transitions!
 
 ### Support or Contact
 Having trouble? Or new ideas? Discuss it with us in the BrazilJS [mail list](https://groups.google.com/forum/?fromgroups#!forum/braziljs-foundation). Also, feel free to propose new issues.
+
+### Licenses
+[List of licenses](https://github.com/braziljs/power-polygon/tree/master/ppw/_licenses)
