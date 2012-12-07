@@ -429,6 +429,17 @@ window.PPW= (function($, _d, console){
     };
     
     /**
+     * Returns the value of the given param in the URL.
+     * @return Mixed Empty array, or 
+     */
+    var _querystring= function(key) {
+        var re=new RegExp('(?:\\?|&)'+key+'=(.*?)(?=&|$)','gi');
+        var r=[], m;
+        while ((m=re.exec(_l.search)) != null) r.push(m[1]);
+        return r.length? r[0]: false;
+    }
+    
+    /**
      * Loads the theme's files.
      * 
      * This method loads the theme' manifes.json file, and then, its
@@ -436,10 +447,15 @@ window.PPW= (function($, _d, console){
      */
     var _loadTheme= function(){
         
-        var theme= null;
+        var theme= null,
+            transition= _querystring('transition');
         
         if(typeof _settings.theme == 'string')
             _settings.theme= _settings.theme.replace(/ /g, '').split(',');
+        
+        if(transition){
+            _settings.transition= transition;
+        }
         
         if(_settings.transition)
             _settings.theme.push(_settings.transition);
@@ -1284,6 +1300,7 @@ window.PPW= (function($, _d, console){
                                                 tt= tt? tt.innerHTML: el.textContent.substring(0, _conf.defaults.slideTitleSize);
                                                 _settings.slides[i].title= tt;
                                                 _settings.slides[i].index= i+1;
+                                                _settings.slides[i].errors= 0;
                                                 
                                                 $(el).find("script").each(function(i, scr){
                                                     
@@ -1298,12 +1315,28 @@ window.PPW= (function($, _d, console){
                                                 _slidePreloaderNext(_settings.slides[i]);
                                             }
                                 })(slides[i], i),
-                        error: (function(slide){
+                        error: (function(slide, i){
                             return function(){
+                                //alert(slide.id)
+                                var el= _d.getElementById(slide.id),
+                                    addr= _settings.fsPattern.replace(/\%id/g, slide.id);
+                                
+                                _settings.slides[i].el= el;
+                                _settings.slides[i].title= tt;
+                                _settings.slides[i].index= i+1;
+                                _settings.slides[i].errors= 1;
+                                
+                                $(el).addClass('ppw-slide-not-found')
+                                     .html("<h4 style='font-size: 22px;'>Failed loading slide <span class='ppw-slide-fail'>"+slide.id+"</span>!</h4>"+
+                                           "<div class='ppw-slide-fail-help' style='font-size:13px;'>Please verify the slide id.<br/>Power Polygon looks for the slide's content following these rules:<br/>"+
+                                           "<br/>* A section element on the page, with the given id:<br/>Eg.: &lt;section id='"+slide.id+"'>Your content&lt;/section><br/>"+
+                                           "<br/>* A file in the fsPattern location.<br/>Currently looking at: <span class='ppw-slide-fail'>"+addr+"</span><br/><br/>"+
+                                           "The content could not be found in any of these expected places!</div>");
+                                
                                 console.error("[PPW][Slide loading]: Slide not found!", slide);
                                 _slidePreloaderNext();
                             }
-                        })(slides[i])
+                        })(slides[i], i)
                     });
                 el= $('section#'+slides[i].id);
             }else{ // the slide content is already on the DOM
@@ -2741,5 +2774,4 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
                 });
                 
         };
-        //
 })();

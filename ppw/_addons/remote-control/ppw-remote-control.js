@@ -3,8 +3,8 @@ window.PPW.extend("remote-control", (function(){
     var _ppw= null,
         remote= null,
         _conf= {
-            server: 'http://localhost:81',
-            controller: 'http://localhost:81',
+            server: 'http://192.168.0.179:3000',
+            controller: 'http://192.168.0.179:3000',
             hash: null,
             pointer: false,
             drawing: false,

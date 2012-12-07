@@ -173,7 +173,8 @@
     top: 0px;
     z-index: 999999995;
     /*background: url(../_images/ppw-gray-bg.png);*/
-    background: url(../_images/splash-screen-bg-3.png);
+    /*background: url(../_images/splash-screen-bg-3.png);*/
+    background: url(../_images/splash-screen-bg.jpg);
     background-size: 100% 100%;
     /*background: url(http://www.hannytech.com/wallpapers/walls/3d__abstract_wallpaper_85-normal.jpg);*/
     height: 100%;
@@ -812,3 +813,39 @@ ppw-message-content{
     margin-top: 5px !IMPORTANT;
     float: right !IMPORTANT;
 }
+
+.ppw-slide-not-found, .ppw-slide-not-found section{
+    /*background: black !IMPORTANT;*/
+    color: white !IMPORTANT;
+    background: rgb(76,76,76); /* Old browsers */
+    background: -moz-linear-gradient(-45deg, rgba(76,76,76,1) 0%, rgba(89,89,89,1) 12%, rgba(102,102,102,1) 25%, rgba(71,71,71,1) 39%, rgba(44,44,44,1) 50%, rgba(0,0,0,1) 51%, rgba(17,17,17,1) 60%, rgba(43,43,43,1) 76%, rgba(28,28,28,1) 91%, rgba(19,19,19,1) 100%) !IMPORTANT; /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, right bottom, color-stop(0%,rgba(76,76,76,1)), color-stop(12%,rgba(89,89,89,1)), color-stop(25%,rgba(102,102,102,1)), color-stop(39%,rgba(71,71,71,1)), color-stop(50%,rgba(44,44,44,1)), color-stop(51%,rgba(0,0,0,1)), color-stop(60%,rgba(17,17,17,1)), color-stop(76%,rgba(43,43,43,1)), color-stop(91%,rgba(28,28,28,1)), color-stop(100%,rgba(19,19,19,1))) !IMPORTANT; /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(-45deg, rgba(76,76,76,1) 0%,rgba(89,89,89,1) 12%,rgba(102,102,102,1) 25%,rgba(71,71,71,1) 39%,rgba(44,44,44,1) 50%,rgba(0,0,0,1) 51%,rgba(17,17,17,1) 60%,rgba(43,43,43,1) 76%,rgba(28,28,28,1) 91%,rgba(19,19,19,1) 100%) !IMPORTANT; /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(-45deg, rgba(76,76,76,1) 0%,rgba(89,89,89,1) 12%,rgba(102,102,102,1) 25%,rgba(71,71,71,1) 39%,rgba(44,44,44,1) 50%,rgba(0,0,0,1) 51%,rgba(17,17,17,1) 60%,rgba(43,43,43,1) 76%,rgba(28,28,28,1) 91%,rgba(19,19,19,1) 100%) !IMPORTANT; /* Opera 11.10+ */
+    background: -ms-linear-gradient(-45deg, rgba(76,76,76,1) 0%,rgba(89,89,89,1) 12%,rgba(102,102,102,1) 25%,rgba(71,71,71,1) 39%,rgba(44,44,44,1) 50%,rgba(0,0,0,1) 51%,rgba(17,17,17,1) 60%,rgba(43,43,43,1) 76%,rgba(28,28,28,1) 91%,rgba(19,19,19,1) 100%) !IMPORTANT; /* IE10+ */
+    background: linear-gradient(135deg, rgba(76,76,76,1) 0%,rgba(89,89,89,1) 12%,rgba(102,102,102,1) 25%,rgba(71,71,71,1) 39%,rgba(44,44,44,1) 50%,rgba(0,0,0,1) 51%,rgba(17,17,17,1) 60%,rgba(43,43,43,1) 76%,rgba(28,28,28,1) 91%,rgba(19,19,19,1) 100%) !IMPORTANT; /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4c4c4c', endColorstr='#131313',GradientType=1 ) !IMPORTANT; /* IE6-9 fallback on horizontal gradient */
+}
+.ppw-slide-not-found:before{
+    color: red !IMPORTANT;
+    content: "!";
+    position: absolute;
+    font-weight: bold;
+    font-size: 10em;
+    width: 100px;
+    text-align: center;
+    right: 0px;
+    bottom: 0px;
+}
+.ppw-slide-fail{
+    color: red !IMPORTANT;
+    font-weight: bold !IMPORTANT;
+    text-shadow: 0px 0px 2px black !IMPORTANT;
+}
+.ppw-slide-fail-help{
+    text-size: 10px !IMPORTANT;
+}
+/*.ppw-slide-not-found:after{
+    color: white;
+    content: "Failed loading slide content!";
+}*/
