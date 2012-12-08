@@ -1557,12 +1557,12 @@ window.PPW= (function($, _d, console){
         
         $b.append('<div id="ppw-toolbar-container" class="ppw-platform '+_conf.cons.CLICKABLE_ELEMENT+'">\
                     <div id="ppw-toolbar" class="ppw-platform '+_conf.cons.CLICKABLE_ELEMENT+'">\
-                        <img id="ppw-goto-icon" onclick="PPW.showGoToComponent(true);" title="Go to a specific slide" />\
-                        <img id="ppw-toolbox-icon" onclick="PPW.openPresentationTool();" title="Open Presentation Tool" />\
-                        <img id="ppw-search-icon" onclick="PPW.showSearchBox()" title="Search on slides"/>\
-                        <img id="ppw-fullscreen-icon" onclick="PPW.enterFullScreen()" title="Go Fullscreen"/>\
-                        <img id="ppw-camera-icon" onclick="PPW.toggleCamera();" title="Start the camera"/>\
-                        <img id="ppw-settings-icon" onclick="PPW.showConfiguration();" title="Settings"/>\
+                        <div class="img"><img id="ppw-goto-icon" onclick="PPW.showGoToComponent(true);" title="Go to a specific slide" /></div>\
+                        <div class="img"><img id="ppw-toolbox-icon" onclick="PPW.openPresentationTool();" title="Open Presentation Tool" /></div>\
+                        <div class="img"><img id="ppw-search-icon" onclick="PPW.showSearchBox()" title="Search on slides"/></div>\
+                        <div class="img"><img id="ppw-fullscreen-icon" onclick="PPW.enterFullScreen()" title="Go Fullscreen"/></div>\
+                        <div class="img"><img id="ppw-camera-icon" onclick="PPW.toggleCamera();" title="Start the camera"/></div>\
+                        <div class="img"><img id="ppw-settings-icon" onclick="PPW.showConfiguration();" title="Settings"/></div>\
                     </div>\
                     <div id="ppw-content-toolbar" class="ppw-platform">\
                         <span id="ppw-ct-text-small" title="Smaller fonts" onclick="PPW.smallerFonts();">A</span>\
