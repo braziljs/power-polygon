@@ -41,6 +41,7 @@ window.PPW= (function($, _d, console){
             slidesLoaded: false,
             themeLoaded: false,
             fontSize: 100,
+            testingResolution: false,
             
             // MODES
             inThumbsMode: false,
@@ -196,6 +197,7 @@ window.PPW= (function($, _d, console){
         onslidesloaded          : [],
         onslideloaded           : [],
         ongoto                  : [],
+        onresize                : [],
         onslidechange           : [],
         onfullscreen            : [],
         onshowcamera            : [],
@@ -870,7 +872,7 @@ window.PPW= (function($, _d, console){
                     if(_settings.shortcutsEnable
                         && _conf.presentationStarted
                         && !_isEditableTarget(evt.target)){
-                        _showGoToComponent();
+                        _showGoToComponent(true);
                         evt.preventDefault();
                         evt.stopPropagation();
                         return false;
@@ -880,6 +882,7 @@ window.PPW= (function($, _d, console){
                 case 27: // esc
                     if(_d.getElementById('ppw-message-box').style.display != 'none'){
                         _closeMessage();
+                        _pauseCamera();
                         evt.preventDefault();
                         evt.stopPropagation();
                         return false;
@@ -1127,6 +1130,10 @@ window.PPW= (function($, _d, console){
             }
             
         }, false);
+        
+        _w.addEventListener('resize', function(e){
+            _triggerEvent('onresize', {window: _w, event: e});
+        });
         
         _w.onbeforeunload= function(){
             
@@ -1396,6 +1403,7 @@ window.PPW= (function($, _d, console){
     var _showGoToComponent= function(useEnter){
         
         var el= null, fn;
+        
         if(useEnter){
             
             _showMessage("Go to slide:<br/><input style='margin: auto;' type='integer' id='ppw-go-to-slide' value='' />",
@@ -1413,7 +1421,7 @@ window.PPW= (function($, _d, console){
             }, false);
             el.focus();
         }else{
-            _showMessage("Go to slide:<br/><input style='margin: auto;' type='integer' id='ppw-go-to-slide' value='' />", false, true);
+            _showMessage("Go to slide:<br/><input style='margin: auto;' type='integer' id='ppw-go-to-slide' value='' />", false, false);
         }
     };
     
@@ -1483,8 +1491,8 @@ window.PPW= (function($, _d, console){
      */
     var _showSearchBox= function(){
         var content= "Search into slides:<br/>\
-                      <input style='margin: auto;' type='text' id='ppw-search-slide' value='' />\
-                      <span id='ppw-search-prev' class='ppw-clickable' title='Find in previous slides(shift+enter)'>◄</span> <span id='ppw-search-next' title='Find in next slides(enter)' class='ppw-clickable'>►</span><br/><br/><span id='ppw-search-found' class='ppw-clickable'></span>",
+                      <div><input style='margin: auto;' type='search' id='ppw-search-slide' value='' />\
+                      <span id='ppw-search-prev' class='ppw-clickable' title='Find in previous slides(shift+enter)'>◄</span> <span id='ppw-search-next' title='Find in next slides(enter)' class='ppw-clickable'>►</span></div><div id='ppw-search-found' class='ppw-clickable'></div>",
             el= null;
         _showMessage(content);
         
@@ -1541,7 +1549,7 @@ window.PPW= (function($, _d, console){
         // APPENDING THE CAMERA, TOOLBAR, SOCIAL BUTTONS AND MESSAGE-BOX TO THE DOCUMENT
         $b.append('<div id="fb-root"></div>');
         
-        $b.append('<div id="ppw-message-box"  class="ppw-clickable glass ppw-platform">\
+        $b.append('<div id="ppw-message-box"  class="ppw-clickable ppw-platform">\
                         <div id="ppw-message-content" class="ppw-clickable"></div>\
                         <div id="ppw-message-box-ok-button" class="ppw-clickable">\
                             <input type="button" id="ppw-message-box-button" value="Close" />\
@@ -1557,7 +1565,7 @@ window.PPW= (function($, _d, console){
         
         $b.append('<div id="ppw-toolbar-container" class="ppw-platform '+_conf.cons.CLICKABLE_ELEMENT+'">\
                     <div id="ppw-toolbar" class="ppw-platform '+_conf.cons.CLICKABLE_ELEMENT+'">\
-                        <div class="img"><img id="ppw-goto-icon" onclick="PPW.showGoToComponent(true);" title="Go to a specific slide" /></div>\
+                        <div class="img"><img id="ppw-goto-icon" onclick="PPW.showGoToComponent(false);" title="Go to a specific slide" /></div>\
                         <div class="img"><img id="ppw-toolbox-icon" onclick="PPW.openPresentationTool();" title="Open Presentation Tool" /></div>\
                         <div class="img"><img id="ppw-search-icon" onclick="PPW.showSearchBox()" title="Search on slides"/></div>\
                         <div class="img"><img id="ppw-fullscreen-icon" onclick="PPW.enterFullScreen()" title="Go Fullscreen"/></div>\
@@ -1619,7 +1627,7 @@ window.PPW= (function($, _d, console){
                 $('#ppw-goFullScreen-trigger').click(_enterFullScreen);
                 $('#ppw-testResolution-trigger').click(_testResolution);
                 $('#ppw-testAudio-trigger').click(_testAudio);
-                $('#ppw-testCamera-trigger').click(_startCamera);
+                $('#ppw-testCamera-trigger').click(PPW.toggleCamera);
                 $('#ppw-testConnection-trigger').click(_testConnection);
                 $('#ppw-talk-title').html(_settings.title);
                 
@@ -1629,8 +1637,17 @@ window.PPW= (function($, _d, console){
                 $('#ppw-slides-loader-bar').stop().animate({
                     marginTop: '0px'
                 }, 500, _preloadSlides);
-                _triggerEvent('onsplashscreen', _d.getElementById('ppw-addons-container'));
                 
+                _conf.screenSize= _conf.screenSize||$("#ppw-resolution-test-element")[0];
+                
+                _addListener('onresize', function(obj){
+                    if(_conf.testingResolution){
+                        _updateScreenSizes();
+                    }
+                });
+                
+                _triggerEvent('onsplashscreen', _d.getElementById('ppw-addons-container'));
+               
             });
         }else{
             //_preloadSlides();
@@ -1651,12 +1668,20 @@ window.PPW= (function($, _d, console){
         });
     };
     
+    var _updateScreenSizes= function(){
+        _d.getElementById('ppw-resolution-sizes').innerHTML= _conf.screenSize.offsetWidth + ' X ' + _conf.screenSize.offsetHeight;
+    };
     /**
      * Set the font sizes 10% bigger.
      */
     var _biggerFonts= function(){
         _conf.fontSize+= 10;
+        
         _d.getElementById('ppw-slides-container').style.fontSize= _conf.fontSize+"%";
+        
+        if(_conf.testingResolution){
+            _d.getElementById('ppw-resolution-test-element').style.fontSize= _conf.fontSize+"%";
+        }
     };
     
     /**
@@ -1665,6 +1690,10 @@ window.PPW= (function($, _d, console){
     var _smallerFonts= function(){
         _conf.fontSize-= 10;
         _d.getElementById('ppw-slides-container').style.fontSize= _conf.fontSize+"%";
+        
+        if(_conf.testingResolution){
+            _d.getElementById('ppw-resolution-test-element').style.fontSize= _conf.fontSize+"%";
+        }
     };
     
     /**
@@ -1675,14 +1704,13 @@ window.PPW= (function($, _d, console){
      */
     var _testResolution= function(){
         var el= $('#ppw-resolution-test-element');
-        el.css({
-            width: _b.offsetWidth-6+'px', // chrome has a bug with clientWidth in fullscreen
-            height: _b.clientHeight-6+'px',
-            display: 'block'
-        });
-        _showMessage("This tool helps you to identify the borders of the screen in the projector, reajust it and the resolution, as well as, for example, resize the window if necessary.<br/>\
-This message should be in the center of the screen<br/><br/>Click ok when finished", function(){
+        el.show();
+        _updateScreenSizes();
+        _conf.testingResolution= true;
+        _showMessage("This tool helps you to identify the boundaries of the screen and adjust colors or font sizes as necessary.<br/>\
+<br/>Click in \"close\" when finished", function(){
             el.hide();
+            _conf.testingResolution= false;
         });
     };
     
@@ -1731,10 +1759,12 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
             func= null;
         
         $('#ppw-message-content').html(msg);
-        box.show()
-           .css({
-               marginLeft: -(box[0].offsetWidth/2)+'px',
-               marginTop: -(box[0].offsetHeight/2)+'px'
+        PPW.animate(box, 'fadeInDownBig', {
+            duration: '1s'
+        });
+        box.css({
+               marginLeft: -(box[0].offsetWidth/2)+'px'
+               //, marginTop: -(box[0].offsetHeight/2)+'px'
            });
         
         if(hideButton)
@@ -1743,12 +1773,20 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
             $('#ppw-message-box-button').show();
         
         func= function(){
-            if(fn && typeof fn == 'function')
-                fn();
-            _closeMessage();
+            if(fn && typeof fn == 'function'){
+                try{
+                    fn();
+                }catch(e){
+                    console.error('Failed executing callback on closing message', e, fn);
+                }
+            }
+                
+            //_closeMessage();
         }
         
-        $('#ppw-message-box-button').one('click', func);
+        box.data('closeCallback', func)
+        
+        $('#ppw-message-box-button').one('click', _closeMessage);
         setTimeout(function(){
             _d.getElementById('ppw-message-box-button').focus();
         }, 100);
@@ -1758,8 +1796,19 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
      * Closes the message box
      */
     var _closeMessage= function(){
-        _d.getElementById('ppw-message-box').style.display= 'none';
-        _d.getElementById('ppw-message-content').innerHTML= '';
+        
+        var box= $('#ppw-message-box'),
+            fn= box.data('closeCallback');
+        
+        PPW.animate(box, 'fadeOutUpBig', {
+                duration: '1s',
+                onstart: function(){
+                    fn();
+                    //_d.getElementById('ppw-message-content').innerHTML= '';
+                }
+        });
+        //_d.getElementById('ppw-message-box').style.display= 'none';
+        //_d.getElementById('ppw-message-content').innerHTML= '';
     }
     
     /**
@@ -1900,19 +1949,28 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
      */
     var _testAudio= function(){
         
-        var el= _d.getElementById('ppw-audioTestElement');
+        /*var el= _d.getElementById('ppw-audioTestElement');
         if(!el){
-            $b.append("<audio id='ppw-audioTestElement' autoplay='false' loop='loop' style='display: none;'>\
+            $b.append("<audio id='ppw-audioTestElement' autoplay='autoplay' loop='loop' controls='controls'>\
                                 <source src='"+_settings.PPWSrc+"/_audios/water.mp3'/>\
                                 <source src='"+_settings.PPWSrc+"/_audios/water.ogg'/>\
                                </audio>");
             el= _d.getElementById('ppw-audioTestElement');
-        }
-        el.play();
-        _showMessage("Playing audio<br/><img src='"+_settings.PPWSrc+"/_images/loadingBar.gif' style='position: relative; left: 50%; margin-left: -100px;' width='200' />",
+        }*/
+        //el.play();
+        _showMessage("Playing audio<br/><div style='background: url("+_settings.PPWSrc+"/_images/animated-wave-sound.gif) 0px -37px no-repeat; position: relative; width: 220px; height: 30px; margin: auto; background-size: 248px 108px; border-left: solid 1px #fcc; border-right: solid 1px #fcc;' onclick='console.log(document.getElementById(\"ppw-audioTestElement\").pause())' /><div id='ppw-audioPlaceHolder'>",
                      function(){
-                        _d.getElementById('ppw-audioTestElement').pause();
+                         
+                         var el= _d.getElementById('ppw-audioTestElement'),
+                            audio= new Audio(el);
+                         //el.volume= 0;
+                         el.pause();
+                         audio.pause();
                      });
+        $('#ppw-audioPlaceHolder').append("<audio id='ppw-audioTestElement' autoplay='autoplay' loop='loop' >\
+                                <source src='"+_settings.PPWSrc+"/_audios/water.mp3'/>\
+                                <source src='"+_settings.PPWSrc+"/_audios/water.ogg'/>\
+                               </audio>");
     };
     
     /**
