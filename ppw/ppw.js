@@ -1065,8 +1065,6 @@ window.PPW= (function($, _d, console){
         }, false);
         
         _w.addEventListener('hashchange', function(){
-            //alert(_h.state);
-            //if(_h.state)
                 _goToSlide(_getCurrentSlideFromURL());
         }, false);
         
@@ -1324,7 +1322,7 @@ window.PPW= (function($, _d, console){
                                 })(slides[i], i),
                         error: (function(slide, i){
                             return function(){
-                                //alert(slide.id)
+                                
                                 var el= _d.getElementById(slide.id),
                                     addr= _settings.fsPattern.replace(/\%id/g, slide.id);
                                 
@@ -1743,7 +1741,7 @@ window.PPW= (function($, _d, console){
                       }
                       else{
                         status= false;
-                        alert("Your browser does not support Fullscreen from JavaScript!\nPlease, start your fullscreen with your keyboard!");
+                        alert("[PPW] Your browser does not support Fullscreen from JavaScript!\nPlease, start your fullscreen with your keyboard!");
                       }
             $b.addClass(_conf.cons.CLASS_FULLSCREEN);
             _triggerEvent('onfullscreen', status);
@@ -1902,7 +1900,7 @@ window.PPW= (function($, _d, console){
                     return false;
                 });
             }else{
-                alert("Could NOT start the video!");
+                alert("[PPW] Could NOT start the video!");
                 console.error("[PPW Error]: Could now open the camera! It looks like your browser does not support it!", data);
                 return false;
             }
@@ -2703,7 +2701,7 @@ window.PPW= (function($, _d, console){
     };
     
     /**
-     * Zooms to a coordinate.
+     * Zooms(and rotate) to a coordinate.
      * 
      * This method goes to a specific coordinate and amplifies it the given
      * times.
@@ -2716,10 +2714,10 @@ window.PPW= (function($, _d, console){
      * @param Real How many times it should amplify it.
      * @param Int Horizintal coordinate. [optional].
      * @param Int Vertical coordinate. [optional].
-     * @param jQueryElement A target to suffer the zoom(body is the default value).
+     * @param Int Degrees to rotate while zooming
      * @return PPW.
      **/
-    var _zoomTo= function(times, left, top, target){
+    var _zoomTo= function(times, left, top, rotate){
         
         var vendor= $.browser.webkit? '-webkit-':
                         $.browser.mozilla? '-moz-':
@@ -2727,9 +2725,13 @@ window.PPW= (function($, _d, console){
             curTransform= $b.css(vendor+'transform'),
             matrix= [1, 0, 0, 1, 0, 0],
             mx= null,
-            target= target||$b,
+            target= $b,
             center= null,
+            curDeg= 0,
             l, t, w, h, hCenter, vCenter, hLimit, vLimit;
+        
+        if(!_conf.presentationStarted)
+            return false;
         
         if(!target[0]){
             console.error("[PPW] Invalid target element!", target);
@@ -2786,23 +2788,28 @@ window.PPW= (function($, _d, console){
         
         $b.css(vendor+'transform-origin', left+'px '+top+'px');
         
-        console.log(curTransform)
         if(!curTransform || curTransform == 'none'){
             curTransform= '';
         }else{
-            if(mx= curTransform.match(/matrix\(([0-9\,\. ]+)\)/)){
+            if(mx= curTransform.match(/matrix\(([0-9\,\.\- ]+)\)/)){
                 if(mx[1]){
-                    curTransform= curTransform.replace(/matrix\(([0-9\,\. ]+)\)/, '');
+                    curTransform= curTransform.replace(/matrix\(([0-9\,\.\- ]+)\)/g, '');
                     mx= mx[1].replace(/ /g, '').split(',');
                 }
             }
-            curTransform= curTransform.replace(/scale\(([0-9\,\. ]+)\)/, '');
+            curTransform= curTransform.replace(/scale\(([0-9\,\.\- ]+)\)/, '');
         }
         if(!mx)
             mx= matrix;
         
         mx[0]= mx[3]= times;
-        console.log(mx);
+        
+        if(rotate != undefined){
+            mx[1]= mx[2] = 0;
+            curTransform= curTransform.replace(/rotate\(([0-9\,\.\- ]+)\)/g, '');
+            curTransform+= " rotate("+rotate+"deg)";
+        }
+        
         curTransform+= " matrix(" + mx.join(', ')+") ";
         $b.css(vendor+'transform', curTransform);
         
@@ -2811,6 +2818,10 @@ window.PPW= (function($, _d, console){
     
     /**
      * Rotate the canvas.
+     * 
+     * Notice that, this rotate method will probably reset any applied zoom.
+     * If you want to both zoom and rotate, use the zoomTo method with its fourth
+     * parameter.
      * 
      * @param Real Degrees to rotate.
      * @return PPW.
@@ -2835,6 +2846,7 @@ window.PPW= (function($, _d, console){
         }else{
             curTransform+= ' rotate('+deg+'deg)';
         }
+        
         $b.css(vendor+'transform', curTransform);
         
         return PPW;
