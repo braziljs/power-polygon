@@ -42,6 +42,8 @@ window.PPW= (function($, _d, console){
             themeLoaded: false,
             fontSize: 100,
             testingResolution: false,
+            currentZoom: 1,
+            zoomMax: 40,
             
             // MODES
             inThumbsMode: false,
@@ -819,7 +821,8 @@ window.PPW= (function($, _d, console){
      */
     var _bindEvents= function(){
         var t= null,
-            k= 0;
+            k= 0,
+            mouseWheelFn= null;
         
         /**
          * Keyboard events.
@@ -830,8 +833,13 @@ window.PPW= (function($, _d, console){
             
             // if the element is an input or has the ppw-focusable class
             // then no shortcut will be executed.
-            if(_isEditableTarget(evt.target) && evt.keyCode != 27/*esc*/)
+            if(_isEditableTarget(evt.target) &&
+               evt.keyCode != 27/*esc*/ &&
+               evt.keyCode != 32/*space*/ &&
+               evt.keyCode != 70/*F*/
+              ){
                 return true;
+              }
                 
             switch(evt.keyCode){
                 case 37: // left
@@ -890,15 +898,16 @@ window.PPW= (function($, _d, console){
                     }
                     if(_conf.inThumbsMode){
                         _goToSlide(_conf.currentSlide);
-                        //_closeThumbnails();
                     }
                     break;
                     
                 case 70: // F
-                    _showSearchBox();
-                    evt.preventDefault();
-                    evt.stopPropagation();
-                    return false;
+                    if(evt.altKey){
+                        _showSearchBox();
+                        evt.preventDefault();
+                        evt.stopPropagation();
+                        return false;
+                    }
                     break;
                     
                 case 80: // P
@@ -1026,7 +1035,7 @@ window.PPW= (function($, _d, console){
                     break;
             }
             
-            // for when the user holds a key
+            // when the user holds a key
             $d.bind('keypress', function(evt){
                 
                 if(!evt.altKey)
@@ -1051,10 +1060,6 @@ window.PPW= (function($, _d, console){
                     break;
                 }
             });
-                        
-            
-            
-            
             return true;
         });
         
@@ -1075,14 +1080,38 @@ window.PPW= (function($, _d, console){
         $d.bind('click', function(evt){
             
             if(_conf.presentationStarted && !_isEditableTargetContent(evt.target)){
-                if(!_conf.inThumbsMode)
-                    _goNextSlide();
+                
+                if(_conf.currentZoom !== 1){
+                    _zoomTo(1, 0, 0, 0);
+                    _conf.currentZoom= 1;
+                }else{
+                    if(!_conf.inThumbsMode)
+                        _goNextSlide();
+                }
+                
                 evt.stopPropagation();
                 evt.preventDefault();
                 return false;
             }
             return true;
         });
+        
+        mouseWheelFn= function(evt){
+            
+            if(_conf.presentationStarted && !_isEditableTargetContent(evt.target)){
+                evt= evt.originalEvent;
+                var delta = evt.detail < 0 || evt.wheelDelta > 0 ? 1 : -1;
+
+                if(delta < 0){ // down
+                    _zoomBy(0.1, evt.clientX, evt.clientY);
+                }else{ // up
+                    _zoomBy(-0.1, evt.clientX, evt.clientY);
+                }
+            }
+        }
+        
+        $d.bind('DOMMouseScroll', mouseWheelFn);
+        $d.bind('mousewheel', mouseWheelFn);
         
         /**
          * Online/Offline events
@@ -1166,6 +1195,7 @@ window.PPW= (function($, _d, console){
                   ALT: Go to slide<br/>\
                   ALT+F: Search into slides<br/>\
                   ALT+Space: Show slides thumbnails<br/>\
+                  Scroll: Applies zoom in and out<br/>\
                   F6, F7, F8, F9, F10: Custom"
         _showMessage(msg);
     }
@@ -1227,7 +1257,7 @@ window.PPW= (function($, _d, console){
      * if any of them is editable, it returns true.
      */
     var _isEditableTargetContent= function(target){
-        while(target.tagName.toLowerCase() != 'body'){
+        while(target.tagName && target.tagName.toLowerCase() != 'body'){
             if(_isEditableTarget(target)){
                 return true;
             }
@@ -1779,8 +1809,7 @@ window.PPW= (function($, _d, console){
                     console.error('Failed executing callback on closing message', e, fn);
                 }
             }
-                
-            //_closeMessage();
+            
         }
         
         box.data('closeCallback', func)
@@ -1803,7 +1832,7 @@ window.PPW= (function($, _d, console){
                 duration: '1s',
                 onstart: function(){
                     fn();
-                    //_d.getElementById('ppw-message-content').innerHTML= '';
+                    _d.getElementById('ppw-message-content').innerHTML= '';
                 }
         });
         //_d.getElementById('ppw-message-box').style.display= 'none';
@@ -2414,8 +2443,10 @@ window.PPW= (function($, _d, console){
         if(!_conf.presentationStarted)
             return false;
         
-        if(_settings.fixTransformsOnSlideChange)
+        if(_settings.fixTransformsOnSlideChange){
             _zoomTo(1, 0, 0, 0);
+            _conf.currentZoom= 1;
+        }
         
         // let' clean the previos timeout, if any
         if(previousSlide._timer){
@@ -2765,6 +2796,9 @@ window.PPW= (function($, _d, console){
         }
         
         times= ((times||1));
+        if(times <= 0) times= 0.1;
+        if(times > _conf.zoomMax) times= _conf.zoomMax;
+        
         l= target[0].offsetLeft;
         t= target[0].offsetTop;
         w= target[0].offsetWidth;
@@ -2817,6 +2851,11 @@ window.PPW= (function($, _d, console){
         
         return PPW;
     };
+    
+    var _zoomBy= function(by, left, top, rotate){
+        _conf.currentZoom+= by;
+        _zoomTo(_conf.currentZoom, left, top, rotate);
+    }
     
     /**
      * Rotate the canvas.
