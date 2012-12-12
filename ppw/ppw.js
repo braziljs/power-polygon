@@ -169,6 +169,7 @@ window.PPW= (function($, _d, console){
             showOfflineAlerts: true,
             slidesCache: true,
             profile: 'none',
+            fixTransformsOnSlideChange: true,
             slidesPerPage: 1 // not working properly because no browser support 100%it by now
         },
         // a local reference to the $(document)
@@ -2413,7 +2414,8 @@ window.PPW= (function($, _d, console){
         if(!_conf.presentationStarted)
             return false;
         
-        _zoomTo(1);
+        if(_settings.fixTransformsOnSlideChange)
+            _zoomTo(1, 0, 0, 0);
         
         // let' clean the previos timeout, if any
         if(previousSlide._timer){
