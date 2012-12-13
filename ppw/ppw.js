@@ -1096,20 +1096,20 @@ window.PPW= (function($, _d, console){
             return true;
         });
         
+        // scrolling, for zoom
         mouseWheelFn= function(evt){
             
             if(_conf.presentationStarted && !_isEditableTargetContent(evt.target)){
                 evt= evt.originalEvent;
                 var delta = evt.detail < 0 || evt.wheelDelta > 0 ? 1 : -1;
 
-                if(delta < 0){ // down
+                if(delta > 0){ // up
                     _zoomBy(0.1, evt.clientX, evt.clientY);
-                }else{ // up
+                }else{ // down
                     _zoomBy(-0.1, evt.clientX, evt.clientY);
                 }
             }
         }
-        
         $d.bind('DOMMouseScroll', mouseWheelFn);
         $d.bind('mousewheel', mouseWheelFn);
         
@@ -2734,23 +2734,17 @@ window.PPW= (function($, _d, console){
     };
     
     /**
-     * Zooms(and rotate) to a coordinate.
+     * Viewports(zoom and rotate) to a coordinate or element.
      * 
      * This method goes to a specific coordinate and amplifies it the given
      * times.
      * 
-     * In case the first parameter is a string selector or an element, it takes
-     * the coordinates of that element to zoom focusing on it. In that case,
-     * the left paramether becomes the number of times it is zooming, or gets
-     * 2x as default.
+     * The object can combine properties to apply both rotation effect and zoom.
      * 
-     * @param Real How many times it should amplify it.
-     * @param Int Horizintal coordinate. [optional].
-     * @param Int Vertical coordinate. [optional].
-     * @param Int Degrees to rotate while zooming
+     * @param Object An object that may contain: zoom, target, left, top, rotate
      * @return PPW.
      **/
-    var _zoomTo= function(times, left, top, rotate){
+    var _viewPort= function(times, left, top, rotate){
         
         var vendor= $.browser.webkit? '-webkit-':
                         $.browser.mozilla? '-moz-':
@@ -2759,40 +2753,40 @@ window.PPW= (function($, _d, console){
             matrix= [1, 0, 0, 1, 0, 0],
             mx= null,
             target= $b,
-            center= null,
-            curDeg= 0,
+            callback= false,
+            useObjectConfig= false,
+            container= $('.ppw-active-slide-element-container').eq(0),
             l, t, w, h, hCenter, vCenter, hLimit, vLimit;
         
         if(!_conf.presentationStarted)
             return false;
         
-        if(!target[0]){
-            console.error("[PPW] Invalid target element!", target);
-            return false;
-        }
-        
         if(!times)
             times= 2;
         
-        if(isNaN(times)){
-            if(times.offsetLeft || times[0].offsetLeft){
-                target= times;
-            }else if(times= _d.querySelector(times)){
-                    target= times;
-                  }else{
-                      target= false;
-                  }
+        if(typeof times == 'object' && (times.zoom || times.target)){
             
-            if(times){
-                target= times;
-                times= left||2;
-                left= target.offsetLeft + target.offsetWidth/2;
-                top= target.offsetTop + target.offsetHeight/2;
-                target= $(target);
-            }else{
-                console.error("[PPW] Invalid operator for zoomTo method");
-                return false;
+            useObjectConfig= true;
+            
+            if(times.left)
+                left= times.left;
+            if(times.top)
+                top= times.top;
+            if(times.target){
+                target= (typeof times.target == 'string')? $(times.target).eq(0): times.target;
             }
+            if(times.rotate)
+                rotate= times.rotate;
+            if(times.callback){
+                callback= times.callback;
+            }
+            
+            times= times.zoom||2;
+        }
+        
+        if(useObjectConfig){
+            left= target[0].offsetLeft + target[0].offsetWidth/2;
+            top= target[0].offsetTop + target[0].offsetHeight/2;
         }
         
         times= ((times||1));
@@ -2809,8 +2803,8 @@ window.PPW= (function($, _d, console){
         if(left < 0) left= 0;
         if(top < 0) top= 0;
         
-        left= (left == undefined)? hCenter: parseInt(left, 10);
-        top = (top == undefined)? vCenter: parseInt(top, 10);
+        left= (left == undefined || left === false)? hCenter: parseInt(left, 10);
+        top = (top == undefined || top === false)? vCenter: parseInt(top, 10);
         
         hLimit= l+w - (l*times)/2;
         vLimit= t+h - (t*times)/2;
@@ -2821,8 +2815,6 @@ window.PPW= (function($, _d, console){
         if(top >= vLimit){
             top= vLimit;
         }
-        
-        $b.css(vendor+'transform-origin', left+'px '+top+'px');
         
         if(!curTransform || curTransform == 'none'){
             curTransform= '';
@@ -2847,7 +2839,8 @@ window.PPW= (function($, _d, console){
         }
         
         curTransform+= " matrix(" + mx.join(', ')+") ";
-        $b.css(vendor+'transform', curTransform);
+        container.css(vendor+'transform-origin', left+'px '+top+'px');
+        container.css(vendor+'transform', curTransform);
         
         return PPW;
     };
@@ -2987,7 +2980,7 @@ window.PPW= (function($, _d, console){
         onSlideExit                     : _onSlideExit,
         onSlideUndo                     : _onSlideUndo,
         onSlideDoes                     : _onSlideDoes,
-        zoomTo                          : _zoomTo,
+        viewPort                        : _viewPort,
         rotate                          : _rotate,
         // API GETTERS/SETTERS METHODS
         getSlides                       : _getSlides,

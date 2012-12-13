@@ -911,7 +911,7 @@ background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(229,229,229,1
 
 
 /* focusing/zooming feature */
-body{
+body, .ppw-active-slide-element-container{
     -webkit-transition: -webkit-transform 500ms linear, -webkit-transform-origin 500ms linear;
     -moz-transition: -moz-transform 500ms linear, -moz-transform-origin 500ms linear;
     -ms-transition: -ms-transform 500ms linear, -ms-transform-origin 500ms linear;
