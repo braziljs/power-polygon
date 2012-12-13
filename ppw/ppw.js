@@ -43,6 +43,7 @@ window.PPW= (function($, _d, console){
             fontSize: 100,
             testingResolution: false,
             currentZoom: 1,
+            currentRotate: 0,
             zoomMax: 40,
             
             // MODES
@@ -1082,7 +1083,7 @@ window.PPW= (function($, _d, console){
             if(_conf.presentationStarted && !_isEditableTargetContent(evt.target)){
                 
                 if(_conf.currentZoom !== 1){
-                    _zoomTo(1, 0, 0, 0);
+                    _viewport(1, 0, 0, 0);
                     _conf.currentZoom= 1;
                 }else{
                     if(!_conf.inThumbsMode)
@@ -2444,7 +2445,7 @@ window.PPW= (function($, _d, console){
             return false;
         
         if(_settings.fixTransformsOnSlideChange){
-            _zoomTo(1, 0, 0, 0);
+            _viewport(1, 0, 0, 0);
             _conf.currentZoom= 1;
         }
         
@@ -2744,7 +2745,7 @@ window.PPW= (function($, _d, console){
      * @param Object An object that may contain: zoom, target, left, top, rotate
      * @return PPW.
      **/
-    var _viewPort= function(times, left, top, rotate){
+    var _viewport= function(times, left, top, rotate){
         
         var vendor= $.browser.webkit? '-webkit-':
                         $.browser.mozilla? '-moz-':
@@ -2755,6 +2756,7 @@ window.PPW= (function($, _d, console){
             target= $b,
             callback= false,
             useObjectConfig= false,
+            sentTarget= false,
             container= $('.ppw-active-slide-element-container').eq(0),
             l, t, w, h, hCenter, vCenter, hLimit, vLimit;
         
@@ -2768,12 +2770,13 @@ window.PPW= (function($, _d, console){
             
             useObjectConfig= true;
             
-            if(times.left)
+            if(times.left || times.left === 0)
                 left= times.left;
-            if(times.top)
+            if(times.top || times.top === 0)
                 top= times.top;
             if(times.target){
                 target= (typeof times.target == 'string')? $(times.target).eq(0): times.target;
+                sentTarget= true;
             }
             if(times.rotate)
                 rotate= times.rotate;
@@ -2784,7 +2787,7 @@ window.PPW= (function($, _d, console){
             times= times.zoom||2;
         }
         
-        if(useObjectConfig){
+        if(sentTarget){
             left= target[0].offsetLeft + target[0].offsetWidth/2;
             top= target[0].offsetTop + target[0].offsetHeight/2;
         }
@@ -2836,18 +2839,19 @@ window.PPW= (function($, _d, console){
             mx[1]= mx[2] = 0;
             curTransform= curTransform.replace(/rotate\(([0-9\,\.\- ]+)\)/g, '');
             curTransform+= " rotate("+rotate+"deg)";
+            _conf.currentRotate= rotate;
         }
         
         curTransform+= " matrix(" + mx.join(', ')+") ";
         container.css(vendor+'transform-origin', left+'px '+top+'px');
         container.css(vendor+'transform', curTransform);
-        
+        _conf.currentZoom= times;
         return PPW;
     };
     
     var _zoomBy= function(by, left, top, rotate){
         _conf.currentZoom+= by;
-        _zoomTo(_conf.currentZoom, left, top, rotate);
+        _viewport(_conf.currentZoom, left, top, rotate);
     }
     
     /**
@@ -2980,7 +2984,7 @@ window.PPW= (function($, _d, console){
         onSlideExit                     : _onSlideExit,
         onSlideUndo                     : _onSlideUndo,
         onSlideDoes                     : _onSlideDoes,
-        viewPort                        : _viewPort,
+        viewport                        : _viewport,
         rotate                          : _rotate,
         // API GETTERS/SETTERS METHODS
         getSlides                       : _getSlides,
