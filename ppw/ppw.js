@@ -173,6 +173,7 @@ window.PPW= (function($, _d, console){
             slidesCache: true,
             profile: 'none',
             fixTransformsOnSlideChange: true,
+            zoomOnScroll: true,
             slidesPerPage: 1 // not working properly because no browser support 100%it by now
         },
         // a local reference to the $(document)
@@ -895,6 +896,9 @@ window.PPW= (function($, _d, console){
                         _pauseCamera();
                         evt.preventDefault();
                         evt.stopPropagation();
+                        if(_conf.currentZoom != 1){
+                            _resetViewport();
+                        }
                         return false;
                     }
                     if(_conf.inThumbsMode){
@@ -1083,8 +1087,7 @@ window.PPW= (function($, _d, console){
             if(_conf.presentationStarted && !_isEditableTargetContent(evt.target)){
                 
                 if(_conf.currentZoom !== 1){
-                    _viewport(1, 0, 0, 0);
-                    _conf.currentZoom= 1;
+                    _resetViewport();
                 }else{
                     if(!_conf.inThumbsMode)
                         _goNextSlide();
@@ -1098,21 +1101,23 @@ window.PPW= (function($, _d, console){
         });
         
         // scrolling, for zoom
-        mouseWheelFn= function(evt){
-            
-            if(_conf.presentationStarted && !_isEditableTargetContent(evt.target)){
-                evt= evt.originalEvent;
-                var delta = evt.detail < 0 || evt.wheelDelta > 0 ? 1 : -1;
+        if(_settings.zoomOnScroll){
+            mouseWheelFn= function(evt){
 
-                if(delta > 0){ // up
-                    _zoomBy(0.1, evt.clientX, evt.clientY);
-                }else{ // down
-                    _zoomBy(-0.1, evt.clientX, evt.clientY);
+                if(_conf.presentationStarted && !_isEditableTargetContent(evt.target)){
+                    evt= evt.originalEvent;
+                    var delta = evt.detail < 0 || evt.wheelDelta > 0 ? 1 : -1;
+
+                    if(delta > 0){ // up
+                        _zoomBy(0.1, evt.clientX, evt.clientY);
+                    }else{ // down
+                        _zoomBy(-0.1, evt.clientX, evt.clientY);
+                    }
                 }
             }
+            $d.bind('DOMMouseScroll', mouseWheelFn);
+            $d.bind('mousewheel', mouseWheelFn);
         }
-        $d.bind('DOMMouseScroll', mouseWheelFn);
-        $d.bind('mousewheel', mouseWheelFn);
         
         /**
          * Online/Offline events
@@ -2445,8 +2450,7 @@ window.PPW= (function($, _d, console){
             return false;
         
         if(_settings.fixTransformsOnSlideChange){
-            _viewport(1, 0, 0, 0);
-            _conf.currentZoom= 1;
+            _resetViewport();
         }
         
         // let' clean the previos timeout, if any
@@ -2734,6 +2738,13 @@ window.PPW= (function($, _d, console){
         }
     };
     
+    var _resetViewport= function(){
+        if(_conf.currentZoom){
+            _viewport(1, 0, 0, 0);
+            _conf.currentZoom= 1;
+        }
+    }
+    
     /**
      * Viewports(zoom and rotate) to a coordinate or element.
      * 
@@ -2858,7 +2869,7 @@ window.PPW= (function($, _d, console){
      * Rotate the canvas.
      * 
      * Notice that, this rotate method will probably reset any applied zoom.
-     * If you want to both zoom and rotate, use the zoomTo method with its fourth
+     * If you want to both zoom and rotate, use the viewport method with its fourth
      * parameter.
      * 
      * @param Real Degrees to rotate.
