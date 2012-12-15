@@ -1102,16 +1102,29 @@ window.PPW= (function($, _d, console){
         
         // scrolling, for zoom
         if(_settings.zoomOnScroll){
-            mouseWheelFn= function(evt){
+            mouseWheelFn= function(event){
+
+                var container= $('.ppw-active-slide-element-container').eq(0)[0],
+                    centerH= container.offsetWidth/2,
+                    centerV= container.offsetHeight/2,
+                    evt= event.originalEvent,
+                    delta = evt.detail < 0 || evt.wheelDelta > 0 ? 1 : -1,
+                    zommAdd= delta>0? 0.1: -0.1,
+                    newZoom= _conf.currentZoom + zommAdd,
+                    posH= evt.offsetX, posV= evt.offsetY,
+                    finalH= posH,//(centerH + ((centerH - posH)*-1)) * newZoom,
+                    finalV= posV;
+
+// todo: Find a better way of applying a zoom referencing the mouse position
+//console.log({posH: posH, centerH: centerH, finalH: finalH, newZoom: newZoom});
 
                 if(_conf.presentationStarted && !_isEditableTargetContent(evt.target)){
                     evt= evt.originalEvent;
-                    var delta = evt.detail < 0 || evt.wheelDelta > 0 ? 1 : -1;
 
                     if(delta > 0){ // up
-                        _zoomBy(0.1, evt.clientX, evt.clientY);
+                        _zoomBy(0.1, finalH, finalV);
                     }else{ // down
-                        _zoomBy(-0.1, evt.clientX, evt.clientY);
+                        _zoomBy(-0.1, finalH, finalV);
                     }
                 }
             }
@@ -2740,7 +2753,7 @@ window.PPW= (function($, _d, console){
     
     var _resetViewport= function(){
         if(_conf.currentZoom){
-            _viewport(1, 0, 0, 0);
+            _viewport({zoom: 1});
             _conf.currentZoom= 1;
         }
     }
@@ -2756,7 +2769,7 @@ window.PPW= (function($, _d, console){
      * @param Object An object that may contain: zoom, target, left, top, rotate
      * @return PPW.
      **/
-    var _viewport= function(times, left, top, rotate){
+    var _viewport= function(data){
         
         var vendor= $.browser.webkit? '-webkit-':
                         $.browser.mozilla? '-moz-':
@@ -2774,38 +2787,35 @@ window.PPW= (function($, _d, console){
         if(!_conf.presentationStarted)
             return false;
         
-        if(!times)
-            times= 2;
-        
-        if(typeof times == 'object' && (times.zoom || times.target)){
+        //if(typeof times == 'object' && (times.zoom || times.target)){
             
             useObjectConfig= true;
             
-            if(times.left || times.left === 0)
-                left= times.left;
-            if(times.top || times.top === 0)
-                top= times.top;
-            if(times.target){
-                target= (typeof times.target == 'string')? $(times.target).eq(0): times.target;
+            if(data.left || data.left === 0)
+                data.left= data.left;
+            if(data.top || data.top === 0)
+                data.top= data.top;
+            if(data.target){
+                data.target= (typeof data.target == 'string')? $(data.target).eq(0): data.target;
                 sentTarget= true;
             }
-            if(times.rotate)
-                rotate= times.rotate;
-            if(times.callback){
-                callback= times.callback;
+            if(data.rotate)
+                data.rotate= data.rotate;
+            if(data.callback){
+                data.callback= data.callback;
             }
             
-            times= times.zoom||2;
-        }
+            data.times= data.zoom||2;
+        //}
         
         if(sentTarget){
-            left= target[0].offsetLeft + target[0].offsetWidth/2;
-            top= target[0].offsetTop + target[0].offsetHeight/2;
+            data.left= target[0].offsetLeft + target[0].offsetWidth/2;
+            data.top= target[0].offsetTop + target[0].offsetHeight/2;
         }
         
-        times= ((times||1));
-        if(times <= 0) times= 0.1;
-        if(times > _conf.zoomMax) times= _conf.zoomMax;
+        data.times= ((data.times||1));
+        if(data.times <= 0) data.times= 0.1;
+        if(data.times > _conf.zoomMax) data.times= _conf.zoomMax;
         
         l= target[0].offsetLeft;
         t= target[0].offsetTop;
@@ -2814,20 +2824,20 @@ window.PPW= (function($, _d, console){
         hCenter= l/2 + w/2;
         vCenter= t/2 + h/2;
         
-        if(left < 0) left= 0;
-        if(top < 0) top= 0;
+        if(data.left < 0) data.left= 0;
+        if(data.top < 0) data.top= 0;
         
-        left= (left == undefined || left === false)? hCenter: parseInt(left, 10);
-        top = (top == undefined || top === false)? vCenter: parseInt(top, 10);
+        data.left= (data.left == undefined || data.left === false)? hCenter: parseInt(data.left, 10);
+        data.top = (data.top == undefined || data.top === false)? vCenter: parseInt(data.top, 10);
         
-        hLimit= l+w - (l*times)/2;
-        vLimit= t+h - (t*times)/2;
+        hLimit= l+w - (l*data.times)/2;
+        vLimit= t+h - (t*data.times)/2;
             
-        if(left >= hLimit){
-            left= hLimit;
+        if(data.left >= hLimit){
+            data.left= hLimit;
         }
-        if(top >= vLimit){
-            top= vLimit;
+        if(data.top >= vLimit){
+            data.top= vLimit;
         }
         
         if(!curTransform || curTransform == 'none'){
@@ -2844,25 +2854,25 @@ window.PPW= (function($, _d, console){
         if(!mx)
             mx= matrix;
         
-        mx[0]= mx[3]= times;
+        mx[0]= mx[3]= data.times;
         
-        if(rotate != undefined){
+        if(data.rotate != undefined){
             mx[1]= mx[2] = 0;
             curTransform= curTransform.replace(/rotate\(([0-9\,\.\- ]+)\)/g, '');
-            curTransform+= " rotate("+rotate+"deg)";
-            _conf.currentRotate= rotate;
+            curTransform+= " rotate("+data.rotate+"deg)";
+            _conf.currentRotate= data.rotate;
         }
         
         curTransform+= " matrix(" + mx.join(', ')+") ";
-        container.css(vendor+'transform-origin', left+'px '+top+'px');
+        container.css(vendor+'transform-origin', data.left+'px '+data.top+'px');
         container.css(vendor+'transform', curTransform);
-        _conf.currentZoom= times;
+        _conf.currentZoom= data.times;
         return PPW;
     };
     
     var _zoomBy= function(by, left, top, rotate){
         _conf.currentZoom+= by;
-        _viewport(_conf.currentZoom, left, top, rotate);
+        _viewport({zoom: _conf.currentZoom, left: left, top: top, rotate: rotate});
     }
     
     /**
