@@ -1,0 +1,12 @@
+{
+    "name": "trans-parallax-1",
+    "dependencies": {
+        "css": [
+            "styles/default-parallax.css",
+            "styles/animations-parallax.css"
+        ],
+        "js": [
+            "scripts/default-parallax.js"
+        ]
+    }
+}

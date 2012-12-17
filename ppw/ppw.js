@@ -1086,12 +1086,12 @@ window.PPW= (function($, _d, console){
             
             if(_conf.presentationStarted && !_isEditableTargetContent(evt.target)){
                 
-                if(_conf.currentZoom !== 1){
+                /*if(_conf.currentZoom !== 1){
                     _resetViewport();
-                }else{
+                }else{*/
                     if(!_conf.inThumbsMode)
                         _goNextSlide();
-                }
+                //}
                 
                 evt.stopPropagation();
                 evt.preventDefault();
@@ -1326,6 +1326,11 @@ window.PPW= (function($, _d, console){
             _b.appendChild(container);
         }
         
+        if(!l){
+            console.error("[PPW] Error: no slides found!");
+            $('#ppw-slides-loader-bar').html("<div style='color: red;text-align:center;'><br/>No slides found!!</div>");
+            return false;
+        }
         
         for(; i<l; i++){
             el= $('section#'+slides[i].id);
@@ -1850,7 +1855,8 @@ window.PPW= (function($, _d, console){
         PPW.animate(box, 'fadeOutUpBig', {
                 duration: '1s',
                 onstart: function(){
-                    fn();
+                    if(fn && typeof fn == 'function')
+                        fn();
                     _d.getElementById('ppw-message-content').innerHTML= '';
                 }
         });
@@ -2418,11 +2424,11 @@ window.PPW= (function($, _d, console){
         
         if(slide.actionIdx < slide.actions.length){
             // still has actions to execute.
-            try{
-                fn= slide.actions[slide.actionIdx].does();
-            }catch(e){
-                console.error("[PPW][Slide action error] There was an error trying to execute an action of the current slide:", slide, e);
-            };
+            //try{
+                setTimeout(slide.actions[slide.actionIdx].does, 1);
+            //}catch(e){
+                //console.error("[PPW][Slide action error] There was an error trying to execute an action of the current slide:", slide, e);
+            //};
             slide.actionIdx++;
             
             /*if(slide.onSlideDoes){
@@ -2944,8 +2950,18 @@ window.PPW= (function($, _d, console){
         return _conf.presentationStarted;
     };
     
+    /**
+     * Returns properties from the given settings.
+     **/
     var _get= function(key){
         return _settings[key]||false;
+    };
+    
+    /**
+     * Sets properties on settings.
+     */
+    var _set= function(key, value){
+        _settings[key]= value;
     };
     
     /**************************************************
@@ -3015,7 +3031,8 @@ window.PPW= (function($, _d, console){
         getStartedAt                    : _getStartedAt,
         getNextSlide                    : _getNextValidSlide,
         getPrevSlide                    : _getPrevValidSlide,
-        get                             : _get
+        get                             : _get,
+        set                             : _set
     };
     
 })(jQuery, document, console);
