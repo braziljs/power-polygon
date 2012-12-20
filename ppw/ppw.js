@@ -44,6 +44,7 @@ window.PPW= (function($, _d, console){
             testingResolution: false,
             currentZoom: 1,
             currentRotate: 0,
+            locked: false,
             zoomMax: 40,
             
             // MODES
@@ -842,7 +843,10 @@ window.PPW= (function($, _d, console){
               ){
                 return true;
               }
-                
+            
+            if(_conf.locked)
+                return false;
+            
             switch(evt.keyCode){
                 case 37: // left
                 case 40: // down
@@ -947,7 +951,8 @@ window.PPW= (function($, _d, console){
                 evt.stopPropagation();
                 return false;
             }
-            
+            if(_conf.locked)
+                return false;
             switch(evt.keyCode){
                 /*case 112: // P
                     if(evt.altKey || evt.ctrlKey){
@@ -965,6 +970,9 @@ window.PPW= (function($, _d, console){
         $d.bind('keyup', function(evt){
             
             var s= false;
+            
+            if(_conf.locked)
+                return false;
             
             // Manages the gotoslide box and also function keys
             switch(evt.keyCode){
@@ -1076,13 +1084,16 @@ window.PPW= (function($, _d, console){
         }, false);
         
         _w.addEventListener('hashchange', function(){
-                _goToSlide(_getCurrentSlideFromURL());
+            _goToSlide(_getCurrentSlideFromURL());
         }, false);
         
         /**
          * Mouse events.
          */
         $d.bind('click', function(evt){
+            
+            if(_conf.locked)
+                return false;
             
             if(_conf.presentationStarted && !_isEditableTargetContent(evt.target)){
                 
@@ -1104,6 +1115,9 @@ window.PPW= (function($, _d, console){
         if(_settings.zoomOnScroll){
             mouseWheelFn= function(event){
 
+                if(_conf.locked)
+                    return false;
+            
                 var container= $('.ppw-active-slide-element-container').eq(0)[0],
                     centerH= container.offsetWidth/2,
                     centerV= container.offsetHeight/2,
@@ -2916,6 +2930,20 @@ window.PPW= (function($, _d, console){
         
         return PPW;
     };
+
+    /**
+     * Locks the user controls.
+     */
+    var _lock= function(){
+        _conf.locked= true;
+    };
+
+    /**
+     * Unlocks the user controls.
+     */
+    var _unlock= function(){
+        _conf.locked= false;
+    };
     
     /**************************************************
      *                GETTERS/SETTERS                 *
@@ -3031,6 +3059,9 @@ window.PPW= (function($, _d, console){
         getStartedAt                    : _getStartedAt,
         getNextSlide                    : _getNextValidSlide,
         getPrevSlide                    : _getPrevValidSlide,
+        lock                            : _lock,
+        unlock                          : _unlock,
+        isLocked                        : function(){return _conf.locked;},
         get                             : _get,
         set                             : _set
     };
