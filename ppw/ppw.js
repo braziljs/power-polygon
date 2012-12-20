@@ -41,6 +41,11 @@ window.PPW= (function($, _d, console){
             slidesLoaded: false,
             themeLoaded: false,
             fontSize: 100,
+            testingResolution: false,
+            currentZoom: 1,
+            currentRotate: 0,
+            locked: false,
+            zoomMax: 40,
             
             // MODES
             inThumbsMode: false,
@@ -121,26 +126,29 @@ window.PPW= (function($, _d, console){
                 containerID: 'ppw-slides-container'
             },
             cons: {
-                CLASS_SLIDE             : 'ppw-slide-element',
-                CLASS_ACTIVE_SLIDE      : 'ppw-active-slide-element',
-                CLASS_PREVIOUS_SLIDE    : 'ppw-previous-slide-element',
-                CLASS_NEXT_SLIDE        : 'ppw-next-slide-element',
-                CLASS_FULLSCREEN        : 'ppw-fullscreen',
-                FOCUSABLE_ELEMENT       : 'ppw-focusable',
-                CLICKABLE_ELEMENT       : 'ppw-clickable',
+                CLASS_SLIDE               : 'ppw-slide-element',
+                CLASS_ACTIVE_SLIDE        : 'ppw-active-slide-element',
+                CLASS_ACTIVE_SLIDE_CONT   : 'ppw-active-slide-element-container',
+                CLASS_PREVIOUS_SLIDE      : 'ppw-previous-slide-element',
+                CLASS_PREVIOUS_SLIDE_CONT : 'ppw-previous-slide-element-container',
+                CLASS_NEXT_SLIDE          : 'ppw-next-slide-element',
+                CLASS_NEXT_SLIDE_CONT     : 'ppw-next-slide-element-container',
+                CLASS_FULLSCREEN          : 'ppw-fullscreen',
+                FOCUSABLE_ELEMENT         : 'ppw-focusable',
+                CLICKABLE_ELEMENT         : 'ppw-clickable',
                 /**
                  * used for the fsPattern settings.
                  * %id    = slide identifier
                  * %num   = slide number
                  */
                 fs: {
-                    SLIDE_ID_DIR         : 'slides/%id/index.html',
-                    SLIDE_ID_DIR_ID      : 'slides/%id/%id.html', // default
-                    SLIDE_ID_FILES       : 'slides/%id.html',
-                    SLIDE_ID_MIXED       : '%id.html',
-                    SLIDE_NUM_DIR        : 'slides/%num/index.html',
-                    SLIDE_NUM_FILES      : 'slides/%num.html',
-                    SLIDE_NUM_MIXED      : '%num.html'
+                    SLIDE_ID_DIR          : 'slides/%id/index.html',
+                    SLIDE_ID_DIR_ID       : 'slides/%id/%id.html', // default
+                    SLIDE_ID_FILES        : 'slides/%id.html',
+                    SLIDE_ID_MIXED        : '%id.html',
+                    SLIDE_NUM_DIR         : 'slides/%num/index.html',
+                    SLIDE_NUM_FILES       : 'slides/%num.html',
+                    SLIDE_NUM_MIXED       : '%num.html'
                 }
             },
             currentSlide: 0,
@@ -148,6 +156,7 @@ window.PPW= (function($, _d, console){
         },
         
         // user defined settings
+        
         _settings= {
             hashSeparator: '#', // the separator to be used on the address bar
             PPWSrc: "../../ppw/", // wondering the talk is in /talks/talkname for example
@@ -156,6 +165,7 @@ window.PPW= (function($, _d, console){
             useSplashScreen: true, // should ppw open the splash screen first?
             slidesContainer: _d.createElement('div'),
             theme: _conf.defaults.theme,
+            transition: _conf.defaults.transition,
             fsPattern: _conf.cons.fs.SLIDE_ID_DIR_ID,
             alertAt: _conf.defaults.alertAt,
             duration: _conf.defaults.duration,
@@ -163,6 +173,8 @@ window.PPW= (function($, _d, console){
             showOfflineAlerts: true,
             slidesCache: true,
             profile: 'none',
+            fixTransformsOnSlideChange: true,
+            zoomOnScroll: true,
             slidesPerPage: 1 // not working properly because no browser support 100%it by now
         },
         // a local reference to the $(document)
@@ -191,6 +203,7 @@ window.PPW= (function($, _d, console){
         onslidesloaded          : [],
         onslideloaded           : [],
         ongoto                  : [],
+        onresize                : [],
         onslidechange           : [],
         onfullscreen            : [],
         onshowcamera            : [],
@@ -202,6 +215,7 @@ window.PPW= (function($, _d, console){
         onthemeloaded           : [],
         onsplashscreen          : [],
         onshowthumbs            : [],
+        onbeforeshowthumbs      : [],
         onhidethumbs            : [],
         F10_PRESSED             : [],
         F9_PRESSED              : [],
@@ -321,8 +335,8 @@ window.PPW= (function($, _d, console){
                 title: _d.title,
                 authors: [],
                 PPWSrc: "../../ppw/",
-                transition: 'trans-slider',
-                theme: 'thm-default'
+                transition: _conf.defaults.transition,
+                theme: _conf.defaults.theme
             },
             i= 0,
             l= 0,
@@ -349,6 +363,16 @@ window.PPW= (function($, _d, console){
         
         return o;
     };
+    
+    /**
+     * Verifies whether the presentation is in printable version or not.
+     * 
+     * The presentation is in printable version if it is running on another
+     * windows, with the ppw-printing-version=true variable set on its url.
+     */
+    var _isInPrintableVersion= function(){
+        return _l.href.indexOf('ppw-printing-version=true')>=0;
+    }
     
     /**
      * Method called by the user to define the presentation settings.
@@ -383,10 +407,10 @@ window.PPW= (function($, _d, console){
             _init(_autoGenerateConfig(conf));
             return;
         }
-        console.log(conf)
+        
         $.extend(_settings, conf);
         
-        if(_settings.shortcutsEnable){
+        if(_settings.shortcutsEnable && !_isInPrintableVersion()){
             _enableFuncKeys();
         }
         _triggerEvent('onload', conf);
@@ -398,10 +422,12 @@ window.PPW= (function($, _d, console){
      * This method is used internaly only, before the splash screen.
      */
     var _setLoadingBarStatus= function(){
+        
         _conf.curLoaded++;
         var perc= _conf.curLoaded * 100 / _conf.loadSteps;
         
         $('#ppw-loadingbar').css({width: perc+'%'});
+        
         if(perc >= 100){
             _triggerEvent('onthemeloaded', _settings.themeSettings);
             if(!_settings.useSplashScreen)
@@ -411,6 +437,17 @@ window.PPW= (function($, _d, console){
     };
     
     /**
+     * Returns the value of the given param in the URL.
+     * @return Mixed Empty array, or 
+     */
+    var _querystring= function(key) {
+        var re=new RegExp('(?:\\?|&)'+key+'=(.*?)(?=&|$)','gi');
+        var r=[], m;
+        while ((m=re.exec(_l.search)) != null) r.push(m[1]);
+        return r.length? r[0]: false;
+    }
+    
+    /**
      * Loads the theme's files.
      * 
      * This method loads the theme' manifes.json file, and then, its
@@ -418,10 +455,15 @@ window.PPW= (function($, _d, console){
      */
     var _loadTheme= function(){
         
-        var theme= null;
+        var theme= null,
+            transition= _querystring('transition');
         
         if(typeof _settings.theme == 'string')
             _settings.theme= _settings.theme.replace(/ /g, '').split(',');
+        
+        if(transition){
+            _settings.transition= transition;
+        }
         
         if(_settings.transition)
             _settings.theme.push(_settings.transition);
@@ -535,13 +577,17 @@ window.PPW= (function($, _d, console){
          _tmp.lnk = _d.createElement('link');
          _tmp.lnk.type = 'image/x-icon';
          _tmp.lnk.rel = 'shortcut icon';
-         _tmp.lnk.href = _settings.PPWSrc+'/_images/power-polygon-logo.jpg';
+         _tmp.lnk.href = _settings.PPWSrc+'/_images/power-polygon-icon.png';
          _d.getElementsByTagName('head')[0].appendChild(_tmp.lnk);
          delete _tmp.lnk;
          
-         _loadTheme();
-         
-         _bindEvents();
+        _loadTheme();
+         if(!_isInPrintableVersion()){
+            _bindEvents();
+         }else{
+             _triggerEvent('onthemeloaded', _settings.themeSettings);
+             $('#ppw-lock-loading').hide();
+         }
     };
     
     /**
@@ -664,6 +710,10 @@ window.PPW= (function($, _d, console){
             if(!_settings.useSplashScreen)
                 _startPresentation();
             
+            if(_isInPrintableVersion()){
+                _preparePrintableVersion();
+            }
+            
             $('.ppw-slide-container').click(function(evt){
                 if(_conf.inThumbsMode){
                     _goToSlide($(this).data('ppw-slide-ref'));
@@ -682,6 +732,45 @@ window.PPW= (function($, _d, console){
     };
     
     /**
+     * Prepares the presentation to be printed.
+     */
+    var _preparePrintableVersion= function(){
+        var slides= _getValidSlides(),
+            notVisible= [],
+            tmp= null;
+        
+        $('#ppw-splash-screen').hide();
+        $('#ppw-toolbar-container').hide();
+        
+        if(_settings.languages && _settings.languages.length){
+            $(slides).each(function(){
+                tmp= $(this.el).find('*');
+                notVisible.push(tmp);
+                tmp.show();
+            });
+            _setLION(_conf.currentLang);
+        }
+        
+        $('#ppw-slides-container, .ppw-slide-container ').css({
+            'width': '100%',
+            'height': '100%',
+            'margin':'auto'
+        });
+        
+        $b.addClass('printing-'+(_settings.slidesPerPage||1));
+        
+        setTimeout(function(){
+            _w.print();
+            _w.close();
+        }, 1000);
+        return;
+        
+        $b.removeClass('printing-'+(_settings.slidesPerPage||1));
+        $('#ppw-toolbar-container').show();
+        $(notVisible).each(function(){ $(this).hide(); });
+    };
+    
+    /**
      * Shows the list of slides as thumbnails.
      */
     var _showThumbs= function(){
@@ -690,6 +779,10 @@ window.PPW= (function($, _d, console){
         
         if(!_conf.presentationStarted)
             return;
+        
+        _triggerEvent('onbeforeshowthumbs');
+        
+        //$(".ppw-slide-container:not(.ppw-slide-not-in-profile), .ppw-slide-container:not(.ppw-slide-not-in-profile) section").show();
         
         _conf.prevStyle= {
             margin: el.css('margin'),
@@ -731,7 +824,8 @@ window.PPW= (function($, _d, console){
      */
     var _bindEvents= function(){
         var t= null,
-            k= 0;
+            k= 0,
+            mouseWheelFn= null;
         
         /**
          * Keyboard events.
@@ -742,9 +836,17 @@ window.PPW= (function($, _d, console){
             
             // if the element is an input or has the ppw-focusable class
             // then no shortcut will be executed.
-            if(_isEditableTarget(evt.target) && evt.keyCode != 27/*esc*/)
+            if(_isEditableTarget(evt.target) &&
+               evt.keyCode != 27/*esc*/ &&
+               evt.keyCode != 32/*space*/ &&
+               evt.keyCode != 70/*F*/
+              ){
                 return true;
-                
+              }
+            
+            if(_conf.locked)
+                return false;
+            
             switch(evt.keyCode){
                 case 37: // left
                 case 40: // down
@@ -785,7 +887,7 @@ window.PPW= (function($, _d, console){
                     if(_settings.shortcutsEnable
                         && _conf.presentationStarted
                         && !_isEditableTarget(evt.target)){
-                        _showGoToComponent();
+                        _showGoToComponent(true);
                         evt.preventDefault();
                         evt.stopPropagation();
                         return false;
@@ -795,29 +897,34 @@ window.PPW= (function($, _d, console){
                 case 27: // esc
                     if(_d.getElementById('ppw-message-box').style.display != 'none'){
                         _closeMessage();
+                        _pauseCamera();
                         evt.preventDefault();
                         evt.stopPropagation();
+                        if(_conf.currentZoom != 1){
+                            _resetViewport();
+                        }
                         return false;
                     }
                     if(_conf.inThumbsMode){
                         _goToSlide(_conf.currentSlide);
-                        //_closeThumbnails();
                     }
                     break;
                     
                 case 70: // F
-                    _showSearchBox();
-                    evt.preventDefault();
-                    evt.stopPropagation();
-                    return false;
-                    break;
-                    
-                case 80: // P
-                    if(evt.altKey || evt.ctrlKey){
+                    if(evt.altKey){
+                        _showSearchBox();
                         evt.preventDefault();
                         evt.stopPropagation();
                         return false;
                     }
+                    break;
+                    
+                case 80: // P
+                    /*if(evt.altKey || evt.ctrlKey){
+                        evt.preventDefault();
+                        evt.stopPropagation();
+                        return false;
+                    }*/
                     break;
                 
                 default: {
@@ -844,15 +951,17 @@ window.PPW= (function($, _d, console){
                 evt.stopPropagation();
                 return false;
             }
-            
+            if(_conf.locked)
+                return false;
             switch(evt.keyCode){
-                case 112: // P
+                /*case 112: // P
                     if(evt.altKey || evt.ctrlKey){
                         evt.preventDefault();
                         evt.stopPropagation();
                         return false;
                     }
                     break;
+                */
             }
             
             return true;
@@ -861,6 +970,9 @@ window.PPW= (function($, _d, console){
         $d.bind('keyup', function(evt){
             
             var s= false;
+            
+            if(_conf.locked)
+                return false;
             
             // Manages the gotoslide box and also function keys
             switch(evt.keyCode){
@@ -882,12 +994,12 @@ window.PPW= (function($, _d, console){
                     break;
                 
                 case 80: // P
-                    if(evt.altKey || evt.ctrlKey){
+                    /*if(evt.altKey || evt.ctrlKey){
                         _print();
                         evt.preventDefault();
                         evt.stopPropagation();
                         return false;
-                    }
+                    }*/
                     break;
                 
                 case 117: // F6
@@ -936,7 +1048,7 @@ window.PPW= (function($, _d, console){
                     break;
             }
             
-            // for when the user holds a key
+            // when the user holds a key
             $d.bind('keypress', function(evt){
                 
                 if(!evt.altKey)
@@ -961,10 +1073,6 @@ window.PPW= (function($, _d, console){
                     break;
                 }
             });
-                        
-            
-            
-            
             return true;
         });
         
@@ -976,9 +1084,7 @@ window.PPW= (function($, _d, console){
         }, false);
         
         _w.addEventListener('hashchange', function(){
-            //alert(_h.state);
-            //if(_h.state)
-                _goToSlide(_getCurrentSlideFromURL());
+            _goToSlide(_getCurrentSlideFromURL());
         }, false);
         
         /**
@@ -986,15 +1092,59 @@ window.PPW= (function($, _d, console){
          */
         $d.bind('click', function(evt){
             
+            if(_conf.locked)
+                return false;
+            
             if(_conf.presentationStarted && !_isEditableTargetContent(evt.target)){
-                if(!_conf.inThumbsMode)
-                    _goNextSlide();
+                
+                /*if(_conf.currentZoom !== 1){
+                    _resetViewport();
+                }else{*/
+                    if(!_conf.inThumbsMode)
+                        _goNextSlide();
+                //}
+                
                 evt.stopPropagation();
                 evt.preventDefault();
                 return false;
             }
             return true;
         });
+        
+        // scrolling, for zoom
+        if(_settings.zoomOnScroll){
+            mouseWheelFn= function(event){
+
+                if(_conf.locked)
+                    return false;
+            
+                var container= $('.ppw-active-slide-element-container').eq(0)[0],
+                    centerH= container.offsetWidth/2,
+                    centerV= container.offsetHeight/2,
+                    evt= event.originalEvent,
+                    delta = evt.detail < 0 || evt.wheelDelta > 0 ? 1 : -1,
+                    zommAdd= delta>0? 0.1: -0.1,
+                    newZoom= _conf.currentZoom + zommAdd,
+                    posH= evt.offsetX, posV= evt.offsetY,
+                    finalH= posH,//(centerH + ((centerH - posH)*-1)) * newZoom,
+                    finalV= posV;
+
+// todo: Find a better way of applying a zoom referencing the mouse position
+//console.log({posH: posH, centerH: centerH, finalH: finalH, newZoom: newZoom});
+
+                if(_conf.presentationStarted && !_isEditableTargetContent(evt.target)){
+                    evt= evt.originalEvent;
+
+                    if(delta > 0){ // up
+                        _zoomBy(0.1, finalH, finalV);
+                    }else{ // down
+                        _zoomBy(-0.1, finalH, finalV);
+                    }
+                }
+            }
+            $d.bind('DOMMouseScroll', mouseWheelFn);
+            $d.bind('mousewheel', mouseWheelFn);
+        }
         
         /**
          * Online/Offline events
@@ -1042,6 +1192,10 @@ window.PPW= (function($, _d, console){
             
         }, false);
         
+        _w.addEventListener('resize', function(e){
+            _triggerEvent('onresize', {window: _w, event: e});
+        });
+        
         _w.onbeforeunload= function(){
             
             if(_conf.presentationTool)
@@ -1074,6 +1228,7 @@ window.PPW= (function($, _d, console){
                   ALT: Go to slide<br/>\
                   ALT+F: Search into slides<br/>\
                   ALT+Space: Show slides thumbnails<br/>\
+                  Scroll: Applies zoom in and out<br/>\
                   F6, F7, F8, F9, F10: Custom"
         _showMessage(msg);
     }
@@ -1119,6 +1274,9 @@ window.PPW= (function($, _d, console){
            t.hasAttribute('tabindex')){
            return true;
         }
+        if(tag == 'video' || tag == 'audio'){
+            return t.hasAttribute('controls');
+        }
         return false;
     }
     
@@ -1132,7 +1290,7 @@ window.PPW= (function($, _d, console){
      * if any of them is editable, it returns true.
      */
     var _isEditableTargetContent= function(target){
-        while(target.tagName.toLowerCase() != 'body'){
+        while(target.tagName && target.tagName.toLowerCase() != 'body'){
             if(_isEditableTarget(target)){
                 return true;
             }
@@ -1182,6 +1340,12 @@ window.PPW= (function($, _d, console){
             _b.appendChild(container);
         }
         
+        if(!l){
+            console.error("[PPW] Error: no slides found!");
+            $('#ppw-slides-loader-bar').html("<div style='color: red;text-align:center;'><br/>No slides found!!</div>");
+            return false;
+        }
+        
         for(; i<l; i++){
             el= $('section#'+slides[i].id);
             
@@ -1210,6 +1374,7 @@ window.PPW= (function($, _d, console){
                                                 tt= tt? tt.innerHTML: el.textContent.substring(0, _conf.defaults.slideTitleSize);
                                                 _settings.slides[i].title= tt;
                                                 _settings.slides[i].index= i+1;
+                                                _settings.slides[i].errors= 0;
                                                 
                                                 $(el).find("script").each(function(i, scr){
                                                     
@@ -1224,12 +1389,28 @@ window.PPW= (function($, _d, console){
                                                 _slidePreloaderNext(_settings.slides[i]);
                                             }
                                 })(slides[i], i),
-                        error: (function(slide){
+                        error: (function(slide, i){
                             return function(){
+                                
+                                var el= _d.getElementById(slide.id),
+                                    addr= _settings.fsPattern.replace(/\%id/g, slide.id);
+                                
+                                _settings.slides[i].el= el;
+                                _settings.slides[i].title= tt;
+                                _settings.slides[i].index= i+1;
+                                _settings.slides[i].errors= 1;
+                                
+                                $(el).addClass('ppw-slide-not-found')
+                                     .html("<h4 style='font-size: 22px;'>Failed loading slide <span class='ppw-slide-fail'>"+slide.id+"</span>!</h4>"+
+                                           "<div class='ppw-slide-fail-help' style='font-size:13px;'>Please verify the slide id.<br/>Power Polygon looks for the slide's content following these rules:<br/>"+
+                                           "<br/>* A section element on the page, with the given id:<br/>Eg.: &lt;section id='"+slide.id+"'>Your content&lt;/section><br/>"+
+                                           "<br/>* A file in the fsPattern location.<br/>Currently looking at: <span class='ppw-slide-fail'>"+addr+"</span><br/><br/>"+
+                                           "The content could not be found in any of these expected places!</div>");
+                                
                                 console.error("[PPW][Slide loading]: Slide not found!", slide);
                                 _slidePreloaderNext();
                             }
-                        })(slides[i])
+                        })(slides[i], i)
                     });
                 el= $('section#'+slides[i].id);
             }else{ // the slide content is already on the DOM
@@ -1289,6 +1470,7 @@ window.PPW= (function($, _d, console){
     var _showGoToComponent= function(useEnter){
         
         var el= null, fn;
+        
         if(useEnter){
             
             _showMessage("Go to slide:<br/><input style='margin: auto;' type='integer' id='ppw-go-to-slide' value='' />",
@@ -1306,7 +1488,7 @@ window.PPW= (function($, _d, console){
             }, false);
             el.focus();
         }else{
-            _showMessage("Go to slide:<br/><input style='margin: auto;' type='integer' id='ppw-go-to-slide' value='' />", false, true);
+            _showMessage("Go to slide:<br/><input style='margin: auto;' type='integer' id='ppw-go-to-slide' value='' />", false, false);
         }
     };
     
@@ -1365,30 +1547,8 @@ window.PPW= (function($, _d, console){
      */
     var _print= function(){
         
-        var slides= _getValidSlides(),
-            notVisible= [],
-            tmp= null;
-        
-        $('#ppw-splash-screen').hide();
-        $('#ppw-toolbar-container').hide();
-        
-        if(_settings.languages && _settings.languages.length){
-            $(slides).each(function(){
-                tmp= $(this.el).find(':not(:visible)');
-                notVisible.push(tmp);
-                tmp.show();
-                _setLION(_conf.currentLang);
-            });
-        }
-        
-        $('#ppw-slides-container, .ppw-slide-container ').css({'width': '100%', 'height': '100%', 'margin':'auto'});
-        
-        $b.addClass('printing-'+(_settings.slidesPerPage||1));
-        
-        _w.print();
-        $b.removeClass('printing-'+(_settings.slidesPerPage||1));
-        $('#ppw-toolbar-container').show();
-        $(notVisible).each(function(){ $(this).hide(); });
+        var printW= window.open(_l.origin + _l.pathname+'?ppw-printing-version=true');
+        return;
     };
     
     /**
@@ -1398,8 +1558,8 @@ window.PPW= (function($, _d, console){
      */
     var _showSearchBox= function(){
         var content= "Search into slides:<br/>\
-                      <input style='margin: auto;' type='text' id='ppw-search-slide' value='' />\
-                      <span id='ppw-search-prev' class='ppw-clickable' title='Find in previous slides(shift+enter)'>◄</span> <span id='ppw-search-next' title='Find in next slides(enter)' class='ppw-clickable'>►</span><br/><br/><span id='ppw-search-found' class='ppw-clickable'></span>",
+                      <div><input style='margin: auto;' type='search' id='ppw-search-slide' value='' />\
+                      <span id='ppw-search-prev' class='ppw-clickable' title='Find in previous slides(shift+enter)'>◄</span> <span id='ppw-search-next' title='Find in next slides(enter)' class='ppw-clickable'>►</span></div><div id='ppw-search-found' class='ppw-clickable'></div>",
             el= null;
         _showMessage(content);
         
@@ -1447,10 +1607,16 @@ window.PPW= (function($, _d, console){
         
         _preparePPW();
         
+        if(_isInPrintableVersion()){
+            $b.addClass('printing-1');
+            _preloadSlides();
+            return true;
+        }
+        
         // APPENDING THE CAMERA, TOOLBAR, SOCIAL BUTTONS AND MESSAGE-BOX TO THE DOCUMENT
         $b.append('<div id="fb-root"></div>');
         
-        $b.append('<div id="ppw-message-box"  class="ppw-clickable glass ppw-platform">\
+        $b.append('<div id="ppw-message-box"  class="ppw-clickable ppw-platform">\
                         <div id="ppw-message-content" class="ppw-clickable"></div>\
                         <div id="ppw-message-box-ok-button" class="ppw-clickable">\
                             <input type="button" id="ppw-message-box-button" value="Close" />\
@@ -1466,12 +1632,12 @@ window.PPW= (function($, _d, console){
         
         $b.append('<div id="ppw-toolbar-container" class="ppw-platform '+_conf.cons.CLICKABLE_ELEMENT+'">\
                     <div id="ppw-toolbar" class="ppw-platform '+_conf.cons.CLICKABLE_ELEMENT+'">\
-                        <img id="ppw-goto-icon" onclick="PPW.showGoToComponent(true);" title="Go to a specific slide" />\
-                        <img id="ppw-toolbox-icon" onclick="PPW.openPresentationTool();" title="Open Presentation Tool" />\
-                        <img id="ppw-search-icon" onclick="PPW.showSearchBox()" title="Search on slides"/>\
-                        <img id="ppw-fullscreen-icon" onclick="PPW.enterFullScreen()" title="Go Fullscreen"/>\
-                        <img id="ppw-camera-icon" onclick="PPW.startCamera();" title="Start the camera"/>\
-                        <img id="ppw-settings-icon" onclick="PPW.showConfiguration();" title="Settings"/>\
+                        <div class="img"><img id="ppw-goto-icon" onclick="PPW.showGoToComponent(false);" title="Go to a specific slide" /></div>\
+                        <div class="img"><img id="ppw-toolbox-icon" onclick="PPW.openPresentationTool();" title="Open Presentation Tool" /></div>\
+                        <div class="img"><img id="ppw-search-icon" onclick="PPW.showSearchBox()" title="Search on slides"/></div>\
+                        <div class="img"><img id="ppw-fullscreen-icon" onclick="PPW.enterFullScreen()" title="Go Fullscreen"/></div>\
+                        <div class="img"><img id="ppw-camera-icon" onclick="PPW.toggleCamera();" title="Start the camera"/></div>\
+                        <div class="img"><img id="ppw-settings-icon" onclick="PPW.showConfiguration();" title="Settings"/></div>\
                     </div>\
                     <div id="ppw-content-toolbar" class="ppw-platform">\
                         <span id="ppw-ct-text-small" title="Smaller fonts" onclick="PPW.smallerFonts();">A</span>\
@@ -1528,7 +1694,7 @@ window.PPW= (function($, _d, console){
                 $('#ppw-goFullScreen-trigger').click(_enterFullScreen);
                 $('#ppw-testResolution-trigger').click(_testResolution);
                 $('#ppw-testAudio-trigger').click(_testAudio);
-                $('#ppw-testCamera-trigger').click(_startCamera);
+                $('#ppw-testCamera-trigger').click(PPW.toggleCamera);
                 $('#ppw-testConnection-trigger').click(_testConnection);
                 $('#ppw-talk-title').html(_settings.title);
                 
@@ -1538,8 +1704,17 @@ window.PPW= (function($, _d, console){
                 $('#ppw-slides-loader-bar').stop().animate({
                     marginTop: '0px'
                 }, 500, _preloadSlides);
-                _triggerEvent('onsplashscreen', _d.getElementById('ppw-addons-container'));
                 
+                _conf.screenSize= _conf.screenSize||$("#ppw-resolution-test-element")[0];
+                
+                _addListener('onresize', function(obj){
+                    if(_conf.testingResolution){
+                        _updateScreenSizes();
+                    }
+                });
+                
+                _triggerEvent('onsplashscreen', _d.getElementById('ppw-addons-container'));
+               
             });
         }else{
             //_preloadSlides();
@@ -1560,12 +1735,20 @@ window.PPW= (function($, _d, console){
         });
     };
     
+    var _updateScreenSizes= function(){
+        _d.getElementById('ppw-resolution-sizes').innerHTML= _conf.screenSize.offsetWidth + ' X ' + _conf.screenSize.offsetHeight;
+    };
     /**
      * Set the font sizes 10% bigger.
      */
     var _biggerFonts= function(){
         _conf.fontSize+= 10;
+        
         _d.getElementById('ppw-slides-container').style.fontSize= _conf.fontSize+"%";
+        
+        if(_conf.testingResolution){
+            _d.getElementById('ppw-resolution-test-element').style.fontSize= _conf.fontSize+"%";
+        }
     };
     
     /**
@@ -1574,6 +1757,10 @@ window.PPW= (function($, _d, console){
     var _smallerFonts= function(){
         _conf.fontSize-= 10;
         _d.getElementById('ppw-slides-container').style.fontSize= _conf.fontSize+"%";
+        
+        if(_conf.testingResolution){
+            _d.getElementById('ppw-resolution-test-element').style.fontSize= _conf.fontSize+"%";
+        }
     };
     
     /**
@@ -1584,14 +1771,13 @@ window.PPW= (function($, _d, console){
      */
     var _testResolution= function(){
         var el= $('#ppw-resolution-test-element');
-        el.css({
-            width: _b.offsetWidth-6+'px', // chrome has a bug with clientWidth in fullscreen
-            height: _b.clientHeight-6+'px',
-            display: 'block'
-        });
-        _showMessage("This tool helps you to identify the borders of the screen in the projector, reajust it and the resolution, as well as, for example, resize the window if necessary.<br/>\
-This message should be in the center of the screen<br/><br/>Click ok when finished", function(){
+        el.show();
+        _updateScreenSizes();
+        _conf.testingResolution= true;
+        _showMessage("This tool helps you to identify the boundaries of the screen and adjust colors or font sizes as necessary.<br/>\
+<br/>Click in \"close\" when finished", function(){
             el.hide();
+            _conf.testingResolution= false;
         });
     };
     
@@ -1624,7 +1810,7 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
                       }
                       else{
                         status= false;
-                        alert("Your browser does not support Fullscreen from JavaScript!\nPlease, start your fullscreen with your keyboard!");
+                        alert("[PPW] Your browser does not support Fullscreen from JavaScript!\nPlease, start your fullscreen with your keyboard!");
                       }
             $b.addClass(_conf.cons.CLASS_FULLSCREEN);
             _triggerEvent('onfullscreen', status);
@@ -1640,10 +1826,12 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
             func= null;
         
         $('#ppw-message-content').html(msg);
-        box.show()
-           .css({
-               marginLeft: -(box[0].offsetWidth/2)+'px',
-               marginTop: -(box[0].offsetHeight/2)+'px'
+        PPW.animate(box, 'fadeInDownBig', {
+            duration: '1s'
+        });
+        box.css({
+               marginLeft: -(box[0].offsetWidth/2)+'px'
+               //, marginTop: -(box[0].offsetHeight/2)+'px'
            });
         
         if(hideButton)
@@ -1652,12 +1840,19 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
             $('#ppw-message-box-button').show();
         
         func= function(){
-            if(fn && typeof fn == 'function')
-                fn();
-            _closeMessage();
+            if(fn && typeof fn == 'function'){
+                try{
+                    fn();
+                }catch(e){
+                    console.error('Failed executing callback on closing message', e, fn);
+                }
+            }
+            
         }
         
-        $('#ppw-message-box-button').one('click', func);
+        box.data('closeCallback', func)
+        
+        $('#ppw-message-box-button').one('click', _closeMessage);
         setTimeout(function(){
             _d.getElementById('ppw-message-box-button').focus();
         }, 100);
@@ -1667,8 +1862,20 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
      * Closes the message box
      */
     var _closeMessage= function(){
-        _d.getElementById('ppw-message-box').style.display= 'none';
-        _d.getElementById('ppw-message-content').innerHTML= '';
+        
+        var box= $('#ppw-message-box'),
+            fn= box.data('closeCallback');
+        
+        PPW.animate(box, 'fadeOutUpBig', {
+                duration: '1s',
+                onstart: function(){
+                    if(fn && typeof fn == 'function')
+                        fn();
+                    _d.getElementById('ppw-message-content').innerHTML= '';
+                }
+        });
+        //_d.getElementById('ppw-message-box').style.display= 'none';
+        //_d.getElementById('ppw-message-content').innerHTML= '';
     }
     
     /**
@@ -1762,7 +1969,7 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
                     return false;
                 });
             }else{
-                alert("Could NOT start the video!");
+                alert("[PPW] Could NOT start the video!");
                 console.error("[PPW Error]: Could now open the camera! It looks like your browser does not support it!", data);
                 return false;
             }
@@ -1809,19 +2016,28 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
      */
     var _testAudio= function(){
         
-        var el= _d.getElementById('ppw-audioTestElement');
+        /*var el= _d.getElementById('ppw-audioTestElement');
         if(!el){
-            $b.append("<audio id='ppw-audioTestElement' autoplay='false' loop='loop' style='display: none;'>\
+            $b.append("<audio id='ppw-audioTestElement' autoplay='autoplay' loop='loop' controls='controls'>\
                                 <source src='"+_settings.PPWSrc+"/_audios/water.mp3'/>\
                                 <source src='"+_settings.PPWSrc+"/_audios/water.ogg'/>\
                                </audio>");
             el= _d.getElementById('ppw-audioTestElement');
-        }
-        el.play();
-        _showMessage("Playing audio<br/><img src='"+_settings.PPWSrc+"/_images/loadingBar.gif' style='position: relative; left: 50%; margin-left: -100px;' width='200' />",
+        }*/
+        //el.play();
+        _showMessage("Playing audio<br/><div style='background: url("+_settings.PPWSrc+"/_images/animated-wave-sound.gif) 0px -37px no-repeat; position: relative; width: 220px; height: 30px; margin: auto; background-size: 248px 108px; border-left: solid 1px #fcc; border-right: solid 1px #fcc;' onclick='console.log(document.getElementById(\"ppw-audioTestElement\").pause())' /><div id='ppw-audioPlaceHolder'>",
                      function(){
-                        _d.getElementById('ppw-audioTestElement').pause();
+                         
+                         var el= _d.getElementById('ppw-audioTestElement'),
+                            audio= new Audio(el);
+                         //el.volume= 0;
+                         el.pause();
+                         audio.pause();
                      });
+        $('#ppw-audioPlaceHolder').append("<audio id='ppw-audioTestElement' autoplay='autoplay' loop='loop' >\
+                                <source src='"+_settings.PPWSrc+"/_audios/water.mp3'/>\
+                                <source src='"+_settings.PPWSrc+"/_audios/water.ogg'/>\
+                               </audio>");
     };
     
     /**
@@ -2222,11 +2438,11 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         
         if(slide.actionIdx < slide.actions.length){
             // still has actions to execute.
-            try{
-                fn= slide.actions[slide.actionIdx].does();
-            }catch(e){
-                console.error("[PPW][Slide action error] There was an error trying to execute an action of the current slide:", slide, e);
-            };
+            //try{
+                setTimeout(slide.actions[slide.actionIdx].does, 1);
+            //}catch(e){
+                //console.error("[PPW][Slide action error] There was an error trying to execute an action of the current slide:", slide, e);
+            //};
             slide.actionIdx++;
             
             /*if(slide.onSlideDoes){
@@ -2265,6 +2481,10 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         
         if(!_conf.presentationStarted)
             return false;
+        
+        if(_settings.fixTransformsOnSlideChange){
+            _resetViewport();
+        }
         
         // let' clean the previos timeout, if any
         if(previousSlide._timer){
@@ -2416,32 +2636,43 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         // setting the active slide class
         $(_d.querySelector("."+_conf.cons.CLASS_ACTIVE_SLIDE))
             .removeClass(_conf.cons.CLASS_ACTIVE_SLIDE);
+        $(_d.querySelector("."+_conf.cons.CLASS_ACTIVE_SLIDE_CONT))
+            .removeClass(_conf.cons.CLASS_ACTIVE_SLIDE_CONT);
         $('#'+_settings.slides[idx].id).addClass(_conf.cons.CLASS_ACTIVE_SLIDE);
+        $('#'+_settings.slides[idx].id).parent().addClass(_conf.cons.CLASS_ACTIVE_SLIDE_CONT);
         
         // setting the previous slide class
         $(_d.querySelector("."+_conf.cons.CLASS_PREVIOUS_SLIDE))
             .removeClass(_conf.cons.CLASS_PREVIOUS_SLIDE);
+        $(_d.querySelector("."+_conf.cons.CLASS_PREVIOUS_SLIDE_CONT))
+            .removeClass(_conf.cons.CLASS_PREVIOUS_SLIDE_CONT);
             
         id= idx;
         do{
             id--;
         }while(_settings.slides[id] && !_isValidProfile(_settings.slides[id]));
         
-        if(_settings.slides[id])
+        if(_settings.slides[id]){
             $('#'+_settings.slides[id].id).addClass(_conf.cons.CLASS_PREVIOUS_SLIDE);
+            $('#'+_settings.slides[id].id).parent().addClass(_conf.cons.CLASS_PREVIOUS_SLIDE_CONT);
+        }
         
         
         // setting the next slide class
         $(_d.querySelector("."+_conf.cons.CLASS_NEXT_SLIDE))
             .removeClass(_conf.cons.CLASS_NEXT_SLIDE);
+        $(_d.querySelector("."+_conf.cons.CLASS_NEXT_SLIDE_CONT))
+            .removeClass(_conf.cons.CLASS_NEXT_SLIDE_CONT);
         
         id= idx;
         do{
             id++;
         }while(_settings.slides[id] && !_isValidProfile(_settings.slides[id]));
         
-        if(_settings.slides[id])
+        if(_settings.slides[id]){
             $('#'+_settings.slides[id].id).addClass(_conf.cons.CLASS_NEXT_SLIDE);
+            $('#'+_settings.slides[id].id).parent().addClass(_conf.cons.CLASS_NEXT_SLIDE_CONT);
+        }
     };
     
     var _removeAnimateCSSClasses= function(el){
@@ -2540,11 +2771,187 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         }
     };
     
+    var _resetViewport= function(){
+        if(_conf.currentZoom){
+            _viewport({zoom: 1});
+            _conf.currentZoom= 1;
+        }
+    }
+    
+    /**
+     * Viewports(zoom and rotate) to a coordinate or element.
+     * 
+     * This method goes to a specific coordinate and amplifies it the given
+     * times.
+     * 
+     * The object can combine properties to apply both rotation effect and zoom.
+     * 
+     * @param Object An object that may contain: zoom, target, left, top, rotate
+     * @return PPW.
+     **/
+    var _viewport= function(data){
+        
+        var vendor= $.browser.webkit? '-webkit-':
+                        $.browser.mozilla? '-moz-':
+                            '',
+            curTransform= $b.css(vendor+'transform'),
+            matrix= [1, 0, 0, 1, 0, 0],
+            mx= null,
+            target= $b,
+            callback= false,
+            useObjectConfig= false,
+            sentTarget= false,
+            container= $('.ppw-active-slide-element-container').eq(0),
+            l, t, w, h, hCenter, vCenter, hLimit, vLimit;
+        
+        if(!_conf.presentationStarted)
+            return false;
+        
+        //if(typeof times == 'object' && (times.zoom || times.target)){
+            
+            useObjectConfig= true;
+            
+            if(data.left || data.left === 0)
+                data.left= data.left;
+            if(data.top || data.top === 0)
+                data.top= data.top;
+            if(data.target){
+                data.target= (typeof data.target == 'string')? $(data.target).eq(0): data.target;
+                sentTarget= true;
+            }
+            if(data.rotate)
+                data.rotate= data.rotate;
+            if(data.callback){
+                data.callback= data.callback;
+            }
+            
+            data.times= data.zoom||2;
+        //}
+        
+        if(sentTarget){
+            data.left= target[0].offsetLeft + target[0].offsetWidth/2;
+            data.top= target[0].offsetTop + target[0].offsetHeight/2;
+        }
+        
+        data.times= ((data.times||1));
+        if(data.times <= 0) data.times= 0.1;
+        if(data.times > _conf.zoomMax) data.times= _conf.zoomMax;
+        
+        l= target[0].offsetLeft;
+        t= target[0].offsetTop;
+        w= target[0].offsetWidth;
+        h= target[0].offsetHeight;
+        hCenter= l/2 + w/2;
+        vCenter= t/2 + h/2;
+        
+        if(data.left < 0) data.left= 0;
+        if(data.top < 0) data.top= 0;
+        
+        data.left= (data.left == undefined || data.left === false)? hCenter: parseInt(data.left, 10);
+        data.top = (data.top == undefined || data.top === false)? vCenter: parseInt(data.top, 10);
+        
+        hLimit= l+w - (l*data.times)/2;
+        vLimit= t+h - (t*data.times)/2;
+            
+        if(data.left >= hLimit){
+            data.left= hLimit;
+        }
+        if(data.top >= vLimit){
+            data.top= vLimit;
+        }
+        
+        if(!curTransform || curTransform == 'none'){
+            curTransform= '';
+        }else{
+            if(mx= curTransform.match(/matrix\(([0-9\,\.\- ]+)\)/)){
+                if(mx[1]){
+                    curTransform= curTransform.replace(/matrix\(([0-9\,\.\- ]+)\)/g, '');
+                    mx= mx[1].replace(/ /g, '').split(',');
+                }
+            }
+            curTransform= curTransform.replace(/scale\(([0-9\,\.\- ]+)\)/, '');
+        }
+        if(!mx)
+            mx= matrix;
+        
+        mx[0]= mx[3]= data.times;
+        
+        if(data.rotate != undefined){
+            mx[1]= mx[2] = 0;
+            curTransform= curTransform.replace(/rotate\(([0-9\,\.\- ]+)\)/g, '');
+            curTransform+= " rotate("+data.rotate+"deg)";
+            _conf.currentRotate= data.rotate;
+        }
+        
+        curTransform+= " matrix(" + mx.join(', ')+") ";
+        container.css(vendor+'transform-origin', data.left+'px '+data.top+'px');
+        container.css(vendor+'transform', curTransform);
+        _conf.currentZoom= data.times;
+        return PPW;
+    };
+    
+    var _zoomBy= function(by, left, top, rotate){
+        _conf.currentZoom+= by;
+        _viewport({zoom: _conf.currentZoom, left: left, top: top, rotate: rotate});
+    }
+    
+    /**
+     * Rotate the canvas.
+     * 
+     * Notice that, this rotate method will probably reset any applied zoom.
+     * If you want to both zoom and rotate, use the viewport method with its fourth
+     * parameter.
+     * 
+     * @param Real Degrees to rotate.
+     * @return PPW.
+     **/
+    var _rotate= function(deg){
+        
+        var vendor= $.browser.webkit? '-webkit-':
+                        $.browser.mozilla? '-moz-':
+                            '',
+            curTransform= $b.css(vendor+'transform'),
+            to= $b.css(vendor+'transform-origin');
+        
+        if(!_conf.presentationStarted)
+            return false;
+        
+        if(!to || to.replace(/0px| /g, '') == ''){
+            $b.css(vendor+'transform-origin', '50% 50%');
+        }
+        
+        if(curTransform && curTransform != 'none' && curTransform.indexOf('rotate') > -1){
+            curTransform= curTransform.replace(/rotate\(.+\)/i, 'rotate('+deg+')');
+        }else{
+            curTransform+= ' rotate('+deg+'deg)';
+        }
+        
+        $b.css(vendor+'transform', curTransform);
+        
+        return PPW;
+    };
+
+    /**
+     * Locks the user controls.
+     */
+    var _lock= function(){
+        _conf.locked= true;
+    };
+
+    /**
+     * Unlocks the user controls.
+     */
+    var _unlock= function(){
+        _conf.locked= false;
+    };
+    
     /**************************************************
      *                GETTERS/SETTERS                 *
      **************************************************/
     /**
      * Returns the list os slide objects.
+     * 
+     * @return Array The array list of all the Slide objects.
      */
     var _getSlides= function(){
         return _settings.slides;
@@ -2571,8 +2978,18 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         return _conf.presentationStarted;
     };
     
+    /**
+     * Returns properties from the given settings.
+     **/
     var _get= function(key){
         return _settings[key]||false;
+    };
+    
+    /**
+     * Sets properties on settings.
+     */
+    var _set= function(key, value){
+        _settings[key]= value;
     };
     
     /**************************************************
@@ -2580,8 +2997,12 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
      **************************************************/
     var _constructor= function(){
         _createSplashScreen();
-        _conf.currentSlide= _getCurrentSlideFromURL();
-        _goToSlide(_conf.currentSlide);
+        if(!_isInPrintableVersion()){
+            _conf.currentSlide= _getCurrentSlideFromURL();
+            _goToSlide(_conf.currentSlide);
+        }else{
+            _goToSlide(0);
+        }
     };
     
     //$(_d).ready(_constructor);
@@ -2628,6 +3049,8 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         onSlideExit                     : _onSlideExit,
         onSlideUndo                     : _onSlideUndo,
         onSlideDoes                     : _onSlideDoes,
+        viewport                        : _viewport,
+        rotate                          : _rotate,
         // API GETTERS/SETTERS METHODS
         getSlides                       : _getSlides,
         getValidSlides                  : _getValidSlides,
@@ -2636,7 +3059,11 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
         getStartedAt                    : _getStartedAt,
         getNextSlide                    : _getNextValidSlide,
         getPrevSlide                    : _getPrevValidSlide,
-        get                             : _get
+        lock                            : _lock,
+        unlock                          : _unlock,
+        isLocked                        : function(){return _conf.locked;},
+        get                             : _get,
+        set                             : _set
     };
     
 })(jQuery, document, console);
@@ -2668,5 +3095,4 @@ This message should be in the center of the screen<br/><br/>Click ok when finish
                 });
                 
         };
-        //
 })();

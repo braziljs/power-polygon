@@ -1,0 +1,96 @@
+body{
+    -webkit-backface-visibility: visible;
+    -webkit-perspective: 800px;
+    -moz-backface-visibility: visible;
+    -moz-perspective: 800px;
+    backface-visibility: visible;
+    perspective: 800px;
+
+    background: rgb(206,220,231); /* Old browsers */
+    background: -moz-radial-gradient(center, ellipse cover, rgba(206,220,231,1) 0%, rgba(89,106,114,1) 100%); /* FF3.6+ */
+    background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,rgba(206,220,231,1)), color-stop(100%,rgba(89,106,114,1))); /* Chrome,Safari4+ */
+    background: -webkit-radial-gradient(center, ellipse cover, rgba(206,220,231,1) 0%,rgba(89,106,114,1) 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-radial-gradient(center, ellipse cover, rgba(206,220,231,1) 0%,rgba(89,106,114,1) 100%); /* Opera 12+ */
+    background: -ms-radial-gradient(center, ellipse cover, rgba(206,220,231,1) 0%,rgba(89,106,114,1) 100%); /* IE10+ */
+    background: radial-gradient(ellipse at center, rgba(206,220,231,1) 0%,rgba(89,106,114,1) 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#cedce7', endColorstr='#596a72',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+}
+
+.ppw-slide-element{
+    /*display: none;*/
+}
+/**/
+
+#ppw-slides-container{
+    position: relative;
+    margin: auto;
+    left: 0px;
+    top: 0px;
+    width: 1024px;
+    height: 768px;
+    
+    -webkit-transform-style: preserve-3d;
+    -moz-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+}
+
+.ppw-slide-container{
+    position: absolute;
+    width: 800px;
+    height: 600px;
+    
+}
+
+.ppw-slide-element{
+    -webkit-perspective-origin: 50% 50%;
+    -webkit-transform-style: preserve-3d;
+    -webkit-transition: all .3s linear;
+    -moz-perspective-origin: 50% 50%;
+    -moz-transform-style: preserve-3d;
+    -moz-transition: all .3s linear;
+    perspective-origin: 50% 50%;
+    transform-style: preserve-3d;
+    transition: all .3s linear;
+}
+
+.ppw-active-slide-element{
+    -webkit-transform: rotate(0deg) translateX(112px) translateY(40px) !IMPORTANT;
+    -moz-transform: rotate(0deg) translateX(112px) translateY(40px) !IMPORTANT;
+    transform: rotate(0deg) translateX(112px) translateY(40px) !IMPORTANT;
+    display: block;
+    opacity: 1 !IMPORTANT;
+}
+
+.ppw-slide-element{
+    box-shadow: 0px 0px 160px 0px white, 0px 0px 30px black;
+    
+    opacity: 0;
+    -webkit-transform: rotateY(90deg) translateX(250px) translateY(-400px) translateZ(450px) scale(.8);
+    -moz-transform: rotateY(90deg) translateX(250px) translateY(-400px) translateZ(450px) scale(.8);
+    transform: rotateY(90deg) translateX(250px) translateY(-400px) translateZ(450px) scale(.8);
+}
+
+.ppw-previous-slide-element{
+    /*-webkit-transform: rotateY(-94deg) translateZ(194px) translateX(-200px) scale(.9);*/
+    -webkit-transform: rotateY(-90deg) translateX(250px) translateY(400px) translateZ(0px) scale(.8);
+    -moz-transform: rotateY(-90deg) translateX(250px) translateY(400px) translateZ(0px) scale(.8);
+    transform: rotateY(-90deg) translateX(250px) translateY(400px) translateZ(0px) scale(.8);
+}
+.ppw-slide-container section{
+}
+
+
+
+
+/* FIXING a bug GOOGLE CHROME has related to z-index and 3D transform in css */
+.ppw-slide-container{
+    display: none;
+}
+.ppw-previous-slide-element-container, .ppw-next-slide-element-container{
+    display: block;
+    z-index: -999;
+}
+.ppw-active-slide-element-container{
+    display: block !IMPORTANT;
+    z-index: 999;
+}

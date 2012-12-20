@@ -1,10 +1,9 @@
 .ppw-slide-element{
-    display: none;
 }
 /**/
 .ppw-slide-container{
-    display: block;
-    position:absolute;
+    display: none;
+    position: absolute;
     height: auto;
     bottom: 0;
     top: 0;

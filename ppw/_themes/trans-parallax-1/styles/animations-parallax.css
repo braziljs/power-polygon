@@ -1,0 +1,24 @@
+@-webkit-keyframes mv-right{
+    0% {
+        -webkit-transform: translateX(7%);
+    }
+    100% {
+        -webkit-transform: translateX(-7%);
+    }
+}
+@-webkit-keyframes mv-left{
+    0% {
+        -webkit-transform: translateX(-7%);
+    }
+    100% {
+        -webkit-transform: translateX(7%);
+    }
+}
+@-webkit-keyframes mv-closer{
+    0% {
+        -webkit-transform: scale(1);
+    }
+    100% {
+        -webkit-transform: scale(1.6);
+    }
+}

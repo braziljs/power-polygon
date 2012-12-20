@@ -1,6 +1,5 @@
 {
-    "name": "thm-default",
-    "type": "theme",
+    "name": "trans-3d-5",
     "dependencies": {
         "css": [
             "styles/default.css"
