@@ -1,0 +1,94 @@
+/*------------------------- Layout styles ------------------------*/
+
+
+/*------------------------- Header ------------------------*/
+header{
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    z-index: 7;
+    width: 100%;
+    height: 46px;
+}
+header li{
+    float: left;
+    margin-right: 20px;
+}
+header .nav-container{
+    height: 100%;
+    padding: 12px;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-bottom: solid 1px #E34430;
+    box-shadow: 0px 0px 12px #a0a0a0 !IMPORTANT;
+}
+#registered-area{
+    float: right;
+}
+
+/*------------------------- Content ------------------------*/
+section {
+    height: 100%;
+    background-color: #F7FCFF;
+    background-image: url(../images/header-background.jpg);
+    background-position: center;
+    border-bottom: solid 4px red !IMPORTANT;
+    /*background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2Y3ZmNmZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjI2JSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmZmZmZmYiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+    background-image: -moz-linear-gradient(top, #F7FCFF 0%, white 26%, white 100%);
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #F7FCFF), color-stop(26%, white), color-stop(100%, white));
+    background-image: -webkit-linear-gradient(top, #F7FCFF 0%, white 26%, white 100%);
+    background-image: -o-linear-gradient(top, #F7FCFF 0%, white 26%, white 100%);
+    background-image: -ms-linear-gradient(top, #F7FCFF 0%, white 26%, white 100%);
+    background-image: linear-gradient(top, #F7FCFF 0%, white 26%, white 100%);*/
+    background-attachment: fixed;
+    margin-top: 46px !IMPORTANT;
+    position: relative;
+    z-index: 1;
+    display: block;
+}
+
+/*------------------------- Footer ------------------------*/
+.footer {
+	background:url(../images/bg-footer.png) repeat-x left top;
+	padding:38px 0 0;
+}
+.footer div.connect {
+	margin:0 auto 29px;
+	overflow:hidden;
+	width:167px;
+}
+.footer div.connect a {
+	display:block;
+	float:left;
+	height:48px;
+	text-indent:-99999px;
+	width:47px;
+}
+.footer div.connect a#twitter {
+	background:url(../images/icons.png) no-repeat 0 -200px;
+}
+.footer div.connect a#twitter:hover {
+	background:url(../images/icons.png) no-repeat 0 -250px;
+}
+.footer div.connect a#facebook {
+	background:url(../images/icons.png) no-repeat 0 0;
+	margin:0 0 0 13px;
+}
+.footer div.connect a#facebook:hover {
+	background:url(../images/icons.png) no-repeat 0 -50px;
+}
+.footer div.connect a#googleplus {
+	background:url(../images/icons.png) no-repeat 0 -100px;
+	margin:0 0 0 13px;
+}
+.footer div.connect a#googleplus:hover {
+	background:url(../images/icons.png) no-repeat 0 -150px;
+}
+.footer p {
+	clear:both;
+	color:#717171;
+	font-size:14px;
+	margin:0;
+	padding:0 0 110px;
+	text-align:center;
+	text-shadow:0 1px 0 #cfcfcf;
+}

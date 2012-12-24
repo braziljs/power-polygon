@@ -1,0 +1,18 @@
+@media screen and (max-width: 361px){
+    header li{
+        margin-right: 12px;
+    }
+    #registered-area{
+        width: 40px;
+        float: right;
+    }
+    #registered-area li{
+        margin: 0px;
+        text-indent: -9999px;
+        background: url(../images/signin.png) no-repeat;
+        background-size: 100%;
+        width: 24px;
+        height: 24px;
+        float: right;
+    }
+}
