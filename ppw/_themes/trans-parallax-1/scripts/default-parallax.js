@@ -12,7 +12,6 @@ PPW.addListener('onstart', function(data){
     
     $('.parallax-set').each(function(){
         //$(this).find('.far');
-        //console.log(this);
     });
     
 });
@@ -25,7 +24,7 @@ PPW.addListener('onslidechange', function(data){
     
     if(data.current != data.previous){
         $(currentSlide.el.parentNode).fadeIn(function(){
-            console.log($(currentSlide.el).find('.parallax-set').find('.far, .close, .medium'))
+            //console.log($(currentSlide.el).find('.parallax-set').find('.far, .close, .medium'))
             
             
             $(data.previous.el.parentNode).fadeOut();

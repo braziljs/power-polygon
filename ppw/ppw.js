@@ -33,6 +33,8 @@ window.PPW= (function($, _d, console){
             loadSteps: 6,
             curLoaded: 0,
             showingCamera: false,
+            showingMessage: false,
+            messagesQueue: [],
             preloadedSlidesCounter: 0,
             cameraLoaded: false,
             presentationTool: null,
@@ -844,8 +846,10 @@ window.PPW= (function($, _d, console){
                 return true;
               }
             
-            if(_conf.locked)
+            if(_isLocked(evt)){
+                console.warn("[PPW] User interaction(keydown) ignored because Power Polygon has been locked");
                 return false;
+            }
             
             switch(evt.keyCode){
                 case 37: // left
@@ -951,8 +955,10 @@ window.PPW= (function($, _d, console){
                 evt.stopPropagation();
                 return false;
             }
-            if(_conf.locked)
+            if(_isLocked(evt)){
+                console.warn("[PPW] User interaction(keypress) ignored because Power Polygon has been locked");
                 return false;
+            }
             switch(evt.keyCode){
                 /*case 112: // P
                     if(evt.altKey || evt.ctrlKey){
@@ -971,8 +977,10 @@ window.PPW= (function($, _d, console){
             
             var s= false;
             
-            if(_conf.locked)
+            if(_isLocked(evt)){
+                console.warn("[PPW] User interaction(keyup) ignored because Power Polygon has been locked");
                 return false;
+            }
             
             // Manages the gotoslide box and also function keys
             switch(evt.keyCode){
@@ -1054,6 +1062,11 @@ window.PPW= (function($, _d, console){
                 if(!evt.altKey)
                     return;
                 
+                if(_isLocked(evt)){
+                    console.warn("[PPW] User interaction(keypress) ignored because Power Polygon has been locked");
+                    return false;
+                }
+                
                 switch(evt.keyCode){
                     case 188: // ,(<)
                     case 65: // a
@@ -1084,6 +1097,10 @@ window.PPW= (function($, _d, console){
         }, false);
         
         _w.addEventListener('hashchange', function(){
+/*            
+            if(_isLocked(evt))
+                return false;
+*/                
             _goToSlide(_getCurrentSlideFromURL());
         }, false);
         
@@ -1092,8 +1109,10 @@ window.PPW= (function($, _d, console){
          */
         $d.bind('click', function(evt){
             
-            if(_conf.locked)
+            if(_isLocked(evt)){
+                console.warn("[PPW] User interaction(click) ignored because Power Polygon has been locked");
                 return false;
+            }
             
             if(_conf.presentationStarted && !_isEditableTargetContent(evt.target)){
                 
@@ -1115,8 +1134,10 @@ window.PPW= (function($, _d, console){
         if(_settings.zoomOnScroll){
             mouseWheelFn= function(event){
 
-                if(_conf.locked)
+                if(_isLocked(evt)){
+                    console.warn("[PPW] User interaction(zoom) ignored because Power Polygon has been locked");
                     return false;
+                }
             
                 var container= $('.ppw-active-slide-element-container').eq(0)[0],
                     centerH= container.offsetWidth/2,
@@ -1200,6 +1221,7 @@ window.PPW= (function($, _d, console){
             
             if(_conf.presentationTool)
                 _conf.presentationTool.close();
+            
             return null;
         };
         
@@ -1818,26 +1840,67 @@ window.PPW= (function($, _d, console){
     }
     
     /**
-     * Show a message in a floating box in the center of the screen.
+     * Shows the next queued message.
+     * 
+     * @return Boolean True if there was a queued message, false otherwise.
      */
-    var _showMessage= function(msg, fn, hideButton){
+    var _showNextMessage= function(){
+        var q= _conf.messagesQueue,
+            m= null;
+        if(q.length){
+            m= q.shift();
+            _showMessage(m.msg, m.fn, m.hideButton, m.type);
+            return true;
+        }else{
+            return false;
+        }
+    };
+    
+    /**
+     * Show a message in a floating box in the center of the screen.
+     * 
+     * @param String The message to be shown.
+     * @param Function A callback to be executed once the message is closed.
+     * @param Boolean (default false) Hides the 'close' button.
+     * @param String The message type. Can be: false/undefined, warning/warn or error.
+     * @return Boolean True if showed the message, false if it was queued.
+     */
+    var _showMessage= function(msg, fn, hideButton, type){
         
         var box= $('#ppw-message-box'),
             func= null;
         
+        if(_conf.showingMessage){
+            _conf.messagesQueue.push({msg: msg, fn: fn, hideButton: hideButton, type: type});
+            return false;
+        }
+        
+        PPW.unlock();
+        
         $('#ppw-message-content').html(msg);
+        
+        if(hideButton){
+            $('#ppw-message-box-button').hide();
+        }else{
+            PPW.lock($('#ppw-message-box-button').show()[0]);
+        }
+        
         PPW.animate(box, 'fadeInDownBig', {
             duration: '1s'
         });
         box.css({
-               marginLeft: -(box[0].offsetWidth/2)+'px'
-               //, marginTop: -(box[0].offsetHeight/2)+'px'
-           });
+            marginLeft: -(box[0].offsetWidth/2)+'px'
+        });
         
-        if(hideButton)
-            $('#ppw-message-box-button').hide();
-        else
-            $('#ppw-message-box-button').show();
+        if(!type){
+            box.removeClass('warning').removeClass('error');
+        }else{
+            if(type == 'warning' || type == 'error'){
+                box.addClass(type);
+            }
+        }
+        
+        _conf.showingMessage= true;
         
         func= function(){
             if(fn && typeof fn == 'function'){
@@ -1847,7 +1910,6 @@ window.PPW= (function($, _d, console){
                     console.error('Failed executing callback on closing message', e, fn);
                 }
             }
-            
         }
         
         box.data('closeCallback', func)
@@ -1856,6 +1918,30 @@ window.PPW= (function($, _d, console){
         setTimeout(function(){
             _d.getElementById('ppw-message-box-button').focus();
         }, 100);
+        
+        return true;
+    };
+    
+    /**
+     * Shows a message of type warning.
+     * 
+     * @param String The message to be shown.
+     * @param Function A callback to be executed once the message is closed.
+     * @param Boolean (default false) Hides the 'close' button.
+     */
+    var _showWarning= function(msg, fn, hideButton){
+        _showMessage(msg, fn, hideButton, 'warning');
+    };
+    
+    /**
+     * Shows a message of type error.
+     * 
+     * @param String The message to be shown.
+     * @param Function A callback to be executed once the message is closed.
+     * @param Boolean (default false) Hides the 'close' button.
+     */
+    var _showError= function(msg, fn, hideButton){
+        _showMessage(msg, fn, hideButton, 'error');
     };
     
     /**
@@ -1869,14 +1955,24 @@ window.PPW= (function($, _d, console){
         PPW.animate(box, 'fadeOutUpBig', {
                 duration: '1s',
                 onstart: function(){
+                    
+                },
+                onend: function(){
+                    
+                    _conf.showingMessage= false;
+                    
+                    if(!_showNextMessage()){
+                        //_d.getElementById('ppw-message-content').innerHTML= '';
+                        PPW.unlock();
+                        _b.focus();
+                    }
+                    
                     if(fn && typeof fn == 'function')
                         fn();
-                    _d.getElementById('ppw-message-content').innerHTML= '';
+                    
                 }
         });
-        //_d.getElementById('ppw-message-box').style.display= 'none';
-        //_d.getElementById('ppw-message-content').innerHTML= '';
-    }
+    };
     
     /**
      * Initializes and shows the camera.
@@ -2545,7 +2641,8 @@ window.PPW= (function($, _d, console){
             _closeThumbnails();
         }
         
-        _setHistoryStateTo(idx);
+        if(_settings.friendlyURL !== false)
+            _setHistoryStateTo(idx);
         
         _setSlideClasses(idx);
         
@@ -2933,16 +3030,41 @@ window.PPW= (function($, _d, console){
 
     /**
      * Locks the user controls.
+     * 
+     * If an HTML element is given, only this element allows the user interacion
+     * such as click or keyboard events.
+     * 
+     * @param HTMLElement
      */
-    var _lock= function(){
-        _conf.locked= true;
+    var _lock= function(allowedElement){
+        _conf.locked= allowedElement||true;
+        console.log("[PPW] Locked user interaction");
     };
+
+    /**
+     * Verifies if the platform is locked according to the refered event.
+     * 
+     * Power Polygon may be locked, but allowing events for one specified element,
+     * if that element is the target of the given event, it should be triggered.
+     */
+    var _isLocked= function(evt){
+        
+        if(!_conf.locked)
+            return false;
+        
+        if(_conf.locked !== true){
+            return evt.target != _conf.locked;
+        }else{
+            return true;
+        }
+    }
 
     /**
      * Unlocks the user controls.
      */
     var _unlock= function(){
         _conf.locked= false;
+        console.log("[PPW] Unlocked user interaction");
     };
     
     /**************************************************
@@ -3021,12 +3143,18 @@ window.PPW= (function($, _d, console){
         testResolution                  : _testResolution,
         openPresentationTool            : _openPresentationTool,
         goNextSlide                     : _goNextSlide,
+        goNext                          : _goNextSlide,
         goPreviousSlide                 : _goPreviousSlide,
+        goPrevious                      : _goPreviousSlide,
+        goPrev                          : _goPreviousSlide,
         testAudio                       : _testAudio,
         extend                          : _extend,
         startCamera                     : _startCamera,
         stopCamera                      : _pauseCamera,
         showMessage                     : _showMessage,
+        showWarning                     : _showWarning,
+        showWarn                        : _showWarning,
+        showError                       : _showError,
         toggleCamera                    :  function(){ if(_conf.showingCamera) _pauseCamera(); else _startCamera(); },
         addListener                     : _addListener,
         removeListener                  : _removeListener,
