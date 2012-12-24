@@ -835,7 +835,7 @@ window.PPW= (function($, _d, console){
         $d.bind('keydown', function(evt){
             var t= evt.target.tagName.toLowerCase(),
                 tmpEl= null;
-            
+            console.log(evt.keyCode);
             // if the element is an input or has the ppw-focusable class
             // then no shortcut will be executed.
             if(_isEditableTarget(evt.target) &&
@@ -932,9 +932,11 @@ window.PPW= (function($, _d, console){
                     break;
                 
                 default: {
+                        console.log("DEFAULT",evt.keyCode);
                     if(_settings.shortcutsEnable){
                         if(evt.altKey && _conf.presentationStarted){
                             k= evt.keyCode - 48;
+                            console.log("KKK", k);
                             if(k>=0 && k<10){
                                 _d.getElementById('ppw-go-to-slide').value+= k;
                                 evt.preventDefault();
@@ -1491,27 +1493,33 @@ window.PPW= (function($, _d, console){
      */
     var _showGoToComponent= function(useEnter){
         
-        var el= null, fn;
+        var el= null, fn,
+            msg= "Go to slide number <input style='margin: auto;' type='integer' id='ppw-go-to-slide' maxlength=3 value='' /><input type=button id=ppw-go-to-button value=Go>";
         
-        if(useEnter){
+        fn= function(){
+            var i= $('#ppw-go-to-slide').val();
             
-            _showMessage("Go to slide:<br/><input style='margin: auto;' type='integer' id='ppw-go-to-slide' value='' />",
-                         false, true);
+            if(i && i.replace(/ /g, '') != '' && !isNaN(i)){
+                _goToSlide(_getValidSlides()[parseInt(i, 10) -1]);
+                _closeMessage();
+            }
+        };
         
-            el= _d.querySelector('#ppw-go-to-slide');
-            el.addEventListener('keyup', function(evt){
-                if(evt.keyCode == 13){
-                    _goToSlide(_getValidSlides()[parseInt(this.value, 10) -1]);
-                    _closeMessage();
-                }
-                evt.preventDefault();
-                evt.stopPropagation();
-                return false;
-            }, false);
+        if(_conf.showingMessage)
+            return false;
+        
+        _showMessage(msg, fn, true, false, true);
+        
+        el= _d.querySelector('#ppw-go-to-slide');
+        _d.getElementById('ppw-go-to-button').addEventListener('click', _closeMessage);
+        
+        el.addEventListener('keyup', function(evt){
+            if(evt && evt.keyCode && evt.keyCode == 13)
+                fn();
+        }, false);
+        
+        if(!useEnter)
             el.focus();
-        }else{
-            _showMessage("Go to slide:<br/><input style='margin: auto;' type='integer' id='ppw-go-to-slide' value='' />", false, false);
-        }
     };
     
     /**
@@ -1583,7 +1591,12 @@ window.PPW= (function($, _d, console){
                       <div><input style='margin: auto;' type='search' id='ppw-search-slide' value='' />\
                       <span id='ppw-search-prev' class='ppw-clickable' title='Find in previous slides(shift+enter)'>◄</span> <span id='ppw-search-next' title='Find in next slides(enter)' class='ppw-clickable'>►</span></div><div id='ppw-search-found' class='ppw-clickable'></div>",
             el= null;
+        
+        if(_conf.showingMessage)
+            return false;
+        
         _showMessage(content);
+        _unlock();
         
         el= _d.getElementById('ppw-search-slide');
         setTimeout(function(){_d.getElementById('ppw-search-slide').focus();}, 100);
@@ -1865,7 +1878,7 @@ window.PPW= (function($, _d, console){
      * @param String The message type. Can be: false/undefined, warning/warn or error.
      * @return Boolean True if showed the message, false if it was queued.
      */
-    var _showMessage= function(msg, fn, hideButton, type){
+    var _showMessage= function(msg, fn, hideButton, type, notLocked){
         
         var box= $('#ppw-message-box'),
             func= null;
@@ -1878,11 +1891,12 @@ window.PPW= (function($, _d, console){
         PPW.unlock();
         
         $('#ppw-message-content').html(msg);
-        
+        console.log(msg, fn, hideButton, type, notLocked)
         if(hideButton){
             $('#ppw-message-box-button').hide();
         }else{
-            PPW.lock($('#ppw-message-box-button').show()[0]);
+            if(!notLocked)
+                PPW.lock($('#ppw-message-box-button').show()[0]);
         }
         
         PPW.animate(box, 'fadeInDownBig', {
