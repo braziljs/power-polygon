@@ -27,6 +27,8 @@ window.PPW= (function($, _d, console){
     var _self = this,
         _version= '2.0.0',
         _tmp= {},
+        // The list of addons that extended Power Polygon.
+        _extended= {},
         
         // internal configuration properties
         _conf= {
@@ -48,8 +50,6 @@ window.PPW= (function($, _d, console){
             currentRotate: 0,
             locked: false,
             zoomMax: 40,
-            
-            // MODES
             inThumbsMode: false,
             
             prevStyle: {
@@ -156,28 +156,104 @@ window.PPW= (function($, _d, console){
             currentSlide: 0,
             presentationStarted: false
         },
+        _templates= {
+            help: "<h3>Help</h3>\
+                  Website: <a href='http://powerpolygon.com' target='_blank'>powerpolygon.com</a><br/>\
+                  Forum/Discussion group: <a href='https://groups.google.com/forum/#!forum/powerpolygon' target='_blank'>forum/powerpolygon</a><br/>\
+                  Documentation: <a href='https://github.com/braziljs/power-polygon/wiki' target='_blank'>wiki</a><br/>\
+                  Fork me: <a href='https://github.com/braziljs/power-polygon' target='_blank'>Github</a><br/>\
+                  <br/><br/>\
+                  <b>Shortcuts</b><br/>\
+                  ALT: Go to slide<br/>\
+                  ALT+F: Search into slides<br/>\
+                  ALT+Space: Show slides thumbnails<br/>\
+                  Scroll: Applies zoom in and out<br/>\
+                  F6, F7, F8, F9, F10: Custom",
+        
+            loading: "<div id='ppw-lock-loading' style='position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; background-color: #f0f9f9; padding: 10px; font-family: Arial; z-index: 999999999;'>\
+                    Loading Contents<br/><div id='ppw-loadingbarParent'><div/><div id='ppw-loadingbar'><div/></div>",
+        
+            slideNotFound: "<h4 style='font-size: 22px;'>Failed loading slide <span class='ppw-slide-fail'>{{slideid}}</span>!</h4>"+
+            "<div class='ppw-slide-fail-help' style='font-size:13px;'>Please verify the slide id.<br/>Power Polygon looks for the slide's content following these rules:<br/>"+
+            "<br/>* A section element on the page, with the given id:<br/>Eg.: &lt;section id='{{slideid}}'>Your content&lt;/section><br/>"+
+            "<br/>* A file in the fsPattern location.<br/>Currently looking at: <span class='ppw-slide-fail'>{{addr}}</span><br/><br/>"+
+            "The content could not be found in any of these expected places!</div>",
+        
+            searchTool: "<div style='float: left;'>Search into slides:</div>\
+                         <div style='float: right;'><input type='search' id='ppw-search-slide' value='' placeholder='Search' />\
+                         <input type=button id='ppw-search-prev' class='ppw-clickable' title='Find in previous slides(shift+enter)' value='◄' /> <input type=button id='ppw-search-next' title='Find in next slides(enter)' class='ppw-clickable' value='►' /></div><div id='ppw-search-found' class='ppw-clickable'></div>",
+            
+            messages: '<div id="ppw-message-box"  class="ppw-clickable ppw-platform">\
+                        <div id="ppw-message-content" class="ppw-clickable"></div>\
+                        <div id="ppw-message-box-ok-button" class="ppw-clickable">\
+                            <input type="button" id="ppw-message-box-button" value="Close" />\
+                        </div>\
+                      </div>',
+        
+            camera: '<div id="ppw-camera-tool" class="ppw-clickable">\
+                        <video id="ppw-video-element" autoplay="autoplay" class="ppw-clickable"></video>\
+                        <div id="ppw-camera-hide-trigger" class="ppw-clickable">\
+                            <img height="10" class="ppw-clickable" src="">\
+                        </div>\
+                      </div>',
+        
+            toolBar: '<div id="ppw-toolbar-container" class="ppw-platform {{clickableClass}}">\
+                    <div id="ppw-toolbar" class="ppw-platform {{clickableClass}}">\
+                        <div class="img"><img id="ppw-goto-icon" onclick="PPW.showGoToComponent(false);" title="Go to a specific slide" /></div>\
+                        <div class="img"><img id="ppw-toolbox-icon" onclick="PPW.openPresentationTool();" title="Open Presentation Tool" /></div>\
+                        <div class="img"><img id="ppw-search-icon" onclick="PPW.showSearchBox()" title="Search on slides"/></div>\
+                        <div class="img"><img id="ppw-fullscreen-icon" onclick="PPW.enterFullScreen()" title="Go Fullscreen"/></div>\
+                        <div class="img"><img id="ppw-camera-icon" onclick="PPW.toggleCamera();" title="Start the camera"/></div>\
+                        <div class="img"><img id="ppw-settings-icon" onclick="PPW.showConfiguration();" title="Settings"/></div>\
+                    </div>\
+                    <div id="ppw-content-toolbar" class="ppw-platform">\
+                        <span id="ppw-ct-text-small" title="Smaller fonts" onclick="PPW.smallerFonts();">A</span>\
+                        <span id="ppw-ct-text-big" title="Bigger fonts" onclick="PPW.biggerFonts();">A</span>\
+                        <img id="ppw-ct-thumbs" onclick="PPW.showThumbs();" title="Show thumbnails"/>\
+                        <img id="ppw-ct-print" onclick="PPW.print();" title="Print or save as PDF"/>\
+                        <div id="ppw-presentation-social-buttons">\
+                            <div class="fb-like" data-href="{{likeSrc}}" data-send="false" data-width="450" data-show-faces="false"></div>\
+                            <span class="gp-button"><div class="g-plusone" data-size="medium" data-annotation="none" data-href="{{likeSrc}}"></div></span>\
+                        </div>\
+                    </div>\
+                   </div>'
+        },
         
         // user defined settings
-        
         _settings= {
             hashSeparator: '#', // the separator to be used on the address bar
             PPWSrc: "../../ppw/", // wondering the talk is in /talks/talkname for example
             shortcutsEnable: true, // enables or not, the shortcuts
-            friendlyURL: 'id', // may be false(also, 'num') or id(slide' id)
+            friendlyURL: 'id', // may be false(also, 'num') or id(slide's id)
             useSplashScreen: true, // should ppw open the splash screen first?
             slidesContainer: _d.createElement('div'),
             theme: _conf.defaults.theme,
             transition: _conf.defaults.transition,
+            // the pattern to find the external slides
             fsPattern: _conf.cons.fs.SLIDE_ID_DIR_ID,
             alertAt: _conf.defaults.alertAt,
             duration: _conf.defaults.duration,
+            // battery support only working on Firefox Nightly by now.
             showBatteryAlerts: true,
             showOfflineAlerts: true,
+            // allows slides to be cached
             slidesCache: true,
             profile: 'none',
-            fixTransformsOnSlideChange: true,
+            // removes any zooming or rotating effect on slide change.
+            fixTransformsOnSlideChange: true, 
+            // enables/disables the zoom effect when scrolling
             zoomOnScroll: true,
-            slidesPerPage: 1 // not working properly because no browser support 100%it by now
+            // not working properly because no browser support 100% of this by now
+            // should control how many slides are printed per page.
+            slidesPerPage: 1,
+            /* shows:
+             *   0/false: no messages
+             *   1: errors
+             *   2: errors and warnings
+             *   3: only logs
+             *   9: errors, warnings and logs
+             */
+            verbose: 9
         },
         // a local reference to the $(document)
         $d= $(_d),
@@ -235,6 +311,9 @@ window.PPW= (function($, _d, console){
      * Adds an event listener to PPW.
      * 
      * Used by addons or external scripts, as well as internal methods calls.
+     * 
+     * @param String The event identifier.
+     * @param Function The function to be triggered by the event.
      */
     var _addListener= function(evt, fn){
         if(_listeners[evt]){
@@ -243,14 +322,10 @@ window.PPW= (function($, _d, console){
     }
     
     /**
-     * verifies if the value is a number or not.
-     */
-    var isNum= function(val){
-        return !isNaN(val);
-    }
-    
-    /**
      * Removes a listener from the list.
+     * 
+     * @param String The event identifier.
+     * @param Function The function to be removed.
      */
     var _removeListener= function(evt, fn){
         var i= 0, curEvt= null;
@@ -264,6 +339,15 @@ window.PPW= (function($, _d, console){
             }while(i--);
         }
     };
+    
+    /**
+     * verifies if the value is a number or not.
+     * 
+     * @param Mixed The variable to be evaluated.
+     */
+    var isNum= function(val){
+        return !isNaN(val);
+    }
     
     /**
      * Triggers an event.
@@ -296,9 +380,13 @@ window.PPW= (function($, _d, console){
      * 
      * Used by addons to register themselves and then, to
      * be able to receive events and the presentation data.
+     * 
+     * @param 
      */
     var _extend= function(id, conf){
         var prop= null;
+        
+        _extended[id]= conf;
         
         for(prop in conf){
             if(_listeners[prop] && typeof conf[prop] == 'function'){
@@ -411,6 +499,36 @@ window.PPW= (function($, _d, console){
         }
         
         $.extend(_settings, conf);
+        
+       /** 0/false: no messages 
+        *   1: errors
+        *   2: errors and warnings
+        *   3: only logs
+        *   9: errors, warnings and logs
+        */
+        switch(_settings.verbose){
+            case 0:
+            case false: {
+                console.log= function(){};
+                console.warn= function(){};
+                console.error= function(){};
+                break;
+            }
+            case 1: {
+                console.log= function(){};
+                console.warn= function(){};
+                break;
+            }
+            case 2: {
+                console.log= function(){};
+                break;
+            }
+            case 3: {
+                console.warn= function(){};
+                console.error= function(){};
+                break;
+            }
+        }
         
         if(_settings.shortcutsEnable && !_isInPrintableVersion()){
             _enableFuncKeys();
@@ -528,6 +646,31 @@ window.PPW= (function($, _d, console){
     };
     
     /**
+     * Loads a css file to the head element of the page.
+     * 
+     * @param String CSS file source.
+     * @param Function/String The string to be executed or a function callback
+     */
+    var _loadStyle= function(src, fn){
+        $("<link/>", {
+            rel: "stylesheet",
+            type: "text/css",
+            href: src,
+            onload: fn
+         }).appendTo("head");
+    };
+    
+    /**
+     * Loads external script.
+     * 
+     * @param String Source address.
+     * @param Function Callback to be executed when the script is loaded.
+     */
+    var _loadScript= function(src, fn){
+        $.getScript(src, fn||function(){});
+    };
+    
+    /**
      * Prepares the page to load the required files.
      * 
      * This method adds the loading bar and then loads the required scrips and
@@ -535,46 +678,24 @@ window.PPW= (function($, _d, console){
      */
     var _preparePPW= function(){
         
-        $b.append("<div id='ppw-lock-loading' style='position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; background-color: #f0f9f9; padding: 10px; font-family: Arial; z-index: 999999999;'>\
-                    Loading Contents<br/><div id='ppw-loadingbarParent'><div/><div id='ppw-loadingbar'><div/></div>");
-        $('#ppw-loadingbarParent').css({
-            width: '260px',
-            height: '8px',
-            border: 'solid 1px black',
-            background: 'white',
-            orverflow: 'hidden'
-        });
-        $('#ppw-loadingbar').css({
-            width: '1px',
-            height: '100%',
-            background: '#f66'
-        });
-        
-        $("<link/>", {
-            rel: "stylesheet",
-            type: "text/css",
-            href: _settings.PPWSrc+"/_styles/ppw.css",
-            onload: "PPW.setLoadingBarStatus()"
-         }).appendTo("head");
-         
-         $("<link/>", {
-            rel: "stylesheet",
-            type: "text/css",
-            href: _settings.PPWSrc+"/_styles/animate.css",
-            onload: "PPW.setLoadingBarStatus()"
-         }).appendTo("head");
-        
-        $("<link/>", {
-            rel: "stylesheet",
-            type: "text/css",
-            href: _settings.PPWSrc+"/_styles/jquery-ui-1.8.23.custom.css",
-            onload: "PPW.setLoadingBarStatus()"
-         }).appendTo("head");
-         
-         $.getScript(_settings.PPWSrc+"/_scripts/jquery-ui-1.8.23.custom.min.js", function(){
-             PPW.setLoadingBarStatus();
+         $b.append(_templates.loading);
+         $('#ppw-loadingbarParent').css({
+             width: '260px',
+             height: '8px',
+             border: 'solid 1px black',
+             background: 'white',
+             orverflow: 'hidden'
          });
-         
+         $('#ppw-loadingbar').css({
+             width: '1px',
+             height: '100%',
+             background: '#f66'
+         });
+        
+         _loadStyle(_settings.PPWSrc+"/_styles/ppw.css", "PPW.setLoadingBarStatus()");
+         _loadStyle(_settings.PPWSrc+"/_styles/animate.css", "PPW.setLoadingBarStatus()");
+         _loadStyle(_settings.PPWSrc+"/_styles/jquery-ui-1.8.23.custom.css", "PPW.setLoadingBarStatus()");
+         _loadScript(_settings.PPWSrc+"/_scripts/jquery-ui-1.8.23.custom.min.js", PPW.setLoadingBarStatus);
          
          _tmp.lnk = _d.createElement('link');
          _tmp.lnk.type = 'image/x-icon';
@@ -582,14 +703,15 @@ window.PPW= (function($, _d, console){
          _tmp.lnk.href = _settings.PPWSrc+'/_images/power-polygon-icon.png';
          _d.getElementsByTagName('head')[0].appendChild(_tmp.lnk);
          delete _tmp.lnk;
-         
+
         _loadTheme();
-         if(!_isInPrintableVersion()){
+        
+        if(!_isInPrintableVersion()){
             _bindEvents();
-         }else{
-             _triggerEvent('onthemeloaded', _settings.themeSettings);
-             $('#ppw-lock-loading').hide();
-         }
+        }else{
+            _triggerEvent('onthemeloaded', _settings.themeSettings);
+            $('#ppw-lock-loading').hide();
+        }
     };
     
     /**
@@ -821,6 +943,41 @@ window.PPW= (function($, _d, console){
         $b.removeClass("ppw-showing-thumb");
         _conf.inThumbsMode= false;
     };
+    
+    /**
+     * Verifies if the current event is native and should aways be normally executed.
+     * 
+     * @param Event
+     * @return Boolean
+     */
+    var _isNativeShortcut= function(evt){
+        
+        var validKey= false;
+        switch(evt.keyCode){
+            case 82: // R
+            case 114: // r
+            case 76: // L
+            case 108: // l
+            case 73: // I
+            case 105: // i
+            case 84: // T
+            case 116: // t
+                validKey= true;
+            break;
+        }
+        
+        if(evt.keyCode == 9) // tab
+            return true;
+        
+        if(evt.keyCode == 8 && evt.shiftKey && (evt.metaKey || evt.ctrlKey)) // del/backspace
+            return true;
+        
+        if((evt.metaKey || evt.ctrlKey) && validKey)
+            return true;
+        
+        return false;
+    };
+    
     /**
      * Binds the keyboard events to the presentation.
      */
@@ -835,7 +992,10 @@ window.PPW= (function($, _d, console){
         $d.bind('keydown', function(evt){
             var t= evt.target.tagName.toLowerCase(),
                 tmpEl= null;
-            console.log(evt.keyCode);
+                
+            if(_isNativeShortcut(evt))
+                return true;
+            
             // if the element is an input or has the ppw-focusable class
             // then no shortcut will be executed.
             if(_isEditableTarget(evt.target) &&
@@ -952,6 +1112,10 @@ window.PPW= (function($, _d, console){
         });
         
         $d.bind('keypress', function(evt){
+            
+            if(_isNativeShortcut(evt))
+                return true;
+            
             if(evt.altKey){
                 evt.preventDefault();
                 evt.stopPropagation();
@@ -978,6 +1142,9 @@ window.PPW= (function($, _d, console){
         $d.bind('keyup', function(evt){
             
             var s= false;
+            
+            if(_isNativeShortcut(evt))
+                return true;
             
             if(_isLocked(evt)){
                 console.warn("[PPW] User interaction(keyup) ignored because Power Polygon has been locked");
@@ -1061,6 +1228,9 @@ window.PPW= (function($, _d, console){
             // when the user holds a key
             $d.bind('keypress', function(evt){
                 
+                if(_isNativeShortcut(evt))
+                    return true;
+            
                 if(!evt.altKey)
                     return;
                 
@@ -1242,23 +1412,13 @@ window.PPW= (function($, _d, console){
      * Shows the help pannell
      */
     var _showHelp= function(){
-        var msg= "<h3>Help</h3>\
-                  Website: <a href='http://powerpolygon.com' target='_blank'>powerpolygon.com</a><br/>\
-                  Forum/Discussion group: <a href='https://groups.google.com/forum/#!forum/powerpolygon' target='_blank'>forum/powerpolygon</a><br/>\
-                  Documentation: <a href='https://github.com/braziljs/PowerPolygon/wiki' target='_blank'>wiki</a><br/>\
-                  Fork me: <a href='https://github.com/braziljs/PowerPolygon' target='_blank'>Github</a><br/>\
-                  <br/><br/>\
-                  <b>Shortcuts</b><br/>\
-                  ALT: Go to slide<br/>\
-                  ALT+F: Search into slides<br/>\
-                  ALT+Space: Show slides thumbnails<br/>\
-                  Scroll: Applies zoom in and out<br/>\
-                  F6, F7, F8, F9, F10: Custom"
-        _showMessage(msg);
+        _showMessage(_templates.help);
     }
     
     /**
      * Show a notification in the bottom of the page.
+     * 
+     * @param String the message to be shown.
      */
     var _showNotification= function(msg){
         var el= $('#ppw-notification-element');
@@ -1285,6 +1445,8 @@ window.PPW= (function($, _d, console){
      * 
      * An editable element is a form element or any HTML element with the
      * editable  or clickacble classes, or with a tabindex set.
+     * 
+     * @param HTMLElement The target element.
      */
     var _isEditableTarget= function(target){
         var t= target,
@@ -1312,6 +1474,8 @@ window.PPW= (function($, _d, console){
      * 
      * This method verifies all the parent elements up to the body element,
      * if any of them is editable, it returns true.
+     * 
+     * @param HTMLElement The target element.
      */
     var _isEditableTargetContent= function(target){
         while(target.tagName && target.tagName.toLowerCase() != 'body'){
@@ -1425,11 +1589,7 @@ window.PPW= (function($, _d, console){
                                 _settings.slides[i].errors= 1;
                                 
                                 $(el).addClass('ppw-slide-not-found')
-                                     .html("<h4 style='font-size: 22px;'>Failed loading slide <span class='ppw-slide-fail'>"+slide.id+"</span>!</h4>"+
-                                           "<div class='ppw-slide-fail-help' style='font-size:13px;'>Please verify the slide id.<br/>Power Polygon looks for the slide's content following these rules:<br/>"+
-                                           "<br/>* A section element on the page, with the given id:<br/>Eg.: &lt;section id='"+slide.id+"'>Your content&lt;/section><br/>"+
-                                           "<br/>* A file in the fsPattern location.<br/>Currently looking at: <span class='ppw-slide-fail'>"+addr+"</span><br/><br/>"+
-                                           "The content could not be found in any of these expected places!</div>");
+                                     .html(_templates.slideNotFound.replace(/\{\{slideid\}\}/g, slide.id).replace('{{addr}}', addr, 'g'));
                                 
                                 console.error("[PPW][Slide loading]: Slide not found!", slide);
                                 _slidePreloaderNext();
@@ -1587,9 +1747,7 @@ window.PPW= (function($, _d, console){
      * This search goes to the slide where the searched term is found.
      */
     var _showSearchBox= function(){
-        var content= "Search into slides:<br/>\
-                      <div><input style='margin: auto;' type='search' id='ppw-search-slide' value='' />\
-                      <span id='ppw-search-prev' class='ppw-clickable' title='Find in previous slides(shift+enter)'>◄</span> <span id='ppw-search-next' title='Find in next slides(enter)' class='ppw-clickable'>►</span></div><div id='ppw-search-found' class='ppw-clickable'></div>",
+        var content= _templates.searchTool,
             el= null;
         
         if(_conf.showingMessage)
@@ -1615,7 +1773,7 @@ window.PPW= (function($, _d, console){
             var ret= _searchIntoSlides('prev', _d.getElementById('ppw-search-slide').value),
                 msg= 'Not found in previous slides!';
             if(ret !== false){
-                msg= "Found in slide "+ret;
+                msg= "Found in slide "+(ret+1);
             }
             _d.getElementById('ppw-search-found').innerHTML= msg;
         });
@@ -1623,7 +1781,7 @@ window.PPW= (function($, _d, console){
             var ret= _searchIntoSlides('next', _d.getElementById('ppw-search-slide').value),
                 msg= 'Not found in next slides!';
             if(ret !== false){
-                msg= "Found in slide "+ret;
+                msg= "Found in slide "+(ret+1);
             }
             _d.getElementById('ppw-search-found').innerHTML= msg;
         });
@@ -1651,40 +1809,13 @@ window.PPW= (function($, _d, console){
         // APPENDING THE CAMERA, TOOLBAR, SOCIAL BUTTONS AND MESSAGE-BOX TO THE DOCUMENT
         $b.append('<div id="fb-root"></div>');
         
-        $b.append('<div id="ppw-message-box"  class="ppw-clickable ppw-platform">\
-                        <div id="ppw-message-content" class="ppw-clickable"></div>\
-                        <div id="ppw-message-box-ok-button" class="ppw-clickable">\
-                            <input type="button" id="ppw-message-box-button" value="Close" />\
-                        </div>\
-                      </div>');
+        $b.append(_templates.messages);
         
-        $b.append('<div id="ppw-camera-tool" class="ppw-clickable">\
-                        <video id="ppw-video-element" autoplay="autoplay" class="ppw-clickable"></video>\
-                        <div id="ppw-camera-hide-trigger" class="ppw-clickable">\
-                            <img height="10" class="ppw-clickable" src="">\
-                        </div>\
-                      </div>');
+        $b.append(_templates.camera);
         
-        $b.append('<div id="ppw-toolbar-container" class="ppw-platform '+_conf.cons.CLICKABLE_ELEMENT+'">\
-                    <div id="ppw-toolbar" class="ppw-platform '+_conf.cons.CLICKABLE_ELEMENT+'">\
-                        <div class="img"><img id="ppw-goto-icon" onclick="PPW.showGoToComponent(false);" title="Go to a specific slide" /></div>\
-                        <div class="img"><img id="ppw-toolbox-icon" onclick="PPW.openPresentationTool();" title="Open Presentation Tool" /></div>\
-                        <div class="img"><img id="ppw-search-icon" onclick="PPW.showSearchBox()" title="Search on slides"/></div>\
-                        <div class="img"><img id="ppw-fullscreen-icon" onclick="PPW.enterFullScreen()" title="Go Fullscreen"/></div>\
-                        <div class="img"><img id="ppw-camera-icon" onclick="PPW.toggleCamera();" title="Start the camera"/></div>\
-                        <div class="img"><img id="ppw-settings-icon" onclick="PPW.showConfiguration();" title="Settings"/></div>\
-                    </div>\
-                    <div id="ppw-content-toolbar" class="ppw-platform">\
-                        <span id="ppw-ct-text-small" title="Smaller fonts" onclick="PPW.smallerFonts();">A</span>\
-                        <span id="ppw-ct-text-big" title="Bigger fonts" onclick="PPW.biggerFonts();">A</span>\
-                        <img id="ppw-ct-thumbs" onclick="PPW.showThumbs();" title="Show thumbnails"/>\
-                        <img id="ppw-ct-print" onclick="PPW.print();" title="Print or save as PDF"/>\
-                        <div id="ppw-presentation-social-buttons">\
-                            <div class="fb-like" data-href="'+_l+'" data-send="false" data-width="450" data-show-faces="false"></div>\
-                            <span class="gp-button"><div class="g-plusone" data-size="medium" data-annotation="none" data-href="'+_l+'"></div></span>\
-                        </div>\
-                    </div>\
-                   </div>');
+        $b.append(_templates.toolBar
+                            .replace(/\{\{clickableClass\}\}/g, _conf.cons.CLICKABLE_ELEMENT
+                            .replace(/\{\{likeSrc\}\}/g, _l)))
         
         // adding the svg blur effect, to be able to apply blur on firefox as well.
         $b.append('<svg id="ppw-svg-image-blur">\
@@ -1766,8 +1897,7 @@ window.PPW= (function($, _d, console){
         }(_d, 'script', 'facebook-jssdk'));
 
         // applying the g+ buttons
-        $.getScript('https://apis.google.com/js/plusone.js', function(){
-        });
+        _loadScript('https://apis.google.com/js/plusone.js');
     };
     
     var _updateScreenSizes= function(){
@@ -1806,11 +1936,11 @@ window.PPW= (function($, _d, console){
      */
     var _testResolution= function(){
         var el= $('#ppw-resolution-test-element');
+        _d.getElementById('ppw-splash-res-test-img-2').src= _d.getElementById('ppw-splash-res-test-img-1').src;
         el.show();
         _updateScreenSizes();
         _conf.testingResolution= true;
-        _showMessage("This tool helps you to identify the boundaries of the screen and adjust colors or font sizes as necessary.<br/>\
-<br/>Click in \"close\" when finished", function(){
+        _showMessage("Click in \"close\" when finished", function(){
             el.hide();
             _conf.testingResolution= false;
         });
@@ -3095,6 +3225,8 @@ window.PPW= (function($, _d, console){
     
     /**
      * Retrieves the current slide object.
+     * 
+     * @return SlideElement
      */
     var _getCurrentSlide= function(){
         return _settings.slides[_conf.currentSlide];
@@ -3102,6 +3234,8 @@ window.PPW= (function($, _d, console){
     
     /**
      * Returns the array with the "alert at" times.
+     * 
+     * @return Array
      */
     var _getAlertAtTimes= function(){
         return _settings.alertAt;
@@ -3109,6 +3243,8 @@ window.PPW= (function($, _d, console){
     
     /**
      * Returns the timestamp when the presentation started, or false.
+     * 
+     * @return Boolean Whether the presentation has started or not.
      */
     var _getStartedAt= function(){
         return _conf.presentationStarted;
@@ -3116,6 +3252,9 @@ window.PPW= (function($, _d, console){
     
     /**
      * Returns properties from the given settings.
+     * 
+     * @param The key to be retrieved.
+     * @return Mixed
      **/
     var _get= function(key){
         return _settings[key]||false;
@@ -3123,6 +3262,9 @@ window.PPW= (function($, _d, console){
     
     /**
      * Sets properties on settings.
+     * 
+     * @param String The key to be set.
+     * @param Mixed The value to be set.
      */
     var _set= function(key, value){
         _settings[key]= value;
@@ -3210,7 +3352,11 @@ window.PPW= (function($, _d, console){
     
 })(jQuery, document, console);
 
-
+/**
+ * We use jQuery to load multiple scripts as well.
+ * As jQuery does not support it by default, we will override the getScript method
+ * to support it.
+ */
 (function(){
         // enabling jquery to load multiple scripts
 	var getScript = $.getScript;
@@ -3219,12 +3365,11 @@ window.PPW= (function($, _d, console){
 
                 if(typeof resources == 'string')
                     resources= [resources];
-                var // reference declaration & localization
-                length = resources.length, 
-                handler = function() { counter++; },
-                deferreds = [],
-                counter = 0, 
-                idx = 0;
+                var length = resources.length, 
+                    handler = function() { counter++; },
+                    deferreds = [],
+                    counter = 0, 
+                    idx = 0;
 
                 for ( ; idx < length; idx++ ) {
                     deferreds.push(
