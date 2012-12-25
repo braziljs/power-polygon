@@ -60,23 +60,40 @@
                 
                 slides: [
                     {
-                        type: 'opexning',
+                        type: 'opening',
                         id: 'cover'
                     },
                     {
                         type: 'content',
-                        id: 'about',
-                        notes: [
-                            "A note here"
-                        ]
+                        id: 'about'
                     },
                     {
                         type: 'content',
-                        id: 'profile-example'
+                        id: 'presentationTool'
+                    },
+                    {
+                        type: 'section',
+                        id: 'section'
+                    },
+                    {
+                        id: 'profile-example-1'
+                    },
+                    {
+                        id: 'profile-example-2',
+                        profile: 'longer'
                     },
                     {
                         type: 'content',
-                        id: 'sh'
+                        id: 'sh',
+                        data: {
+                            info: "An object containing whatever we want",
+                            howToUse: "You can access it via $('#slideid').data('yourObjectKey')"
+                        }
+                    },
+                    {
+                        type: 'content',
+                        id: 'showCamera',
+                        className: 'red-test'
                     },
                     {
                         type: 'closing',

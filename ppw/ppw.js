@@ -13,12 +13,30 @@
 
 if(window.PPW)
     throw new Error("PowerPolygon framework already loaded!");
-if(!window.jQuery)
-    throw new Error("PowerPolygon requires jQuery");
+
+if(!window.jQuery){
+    console.warn("[PPW] Dependency required!");
+    alert("ERROR:\nMissing dependency:\n    - jQuery");
+    PPW= {
+        init: function(){},
+        extend: function(){},
+        addAction: function(){},
+        addListener: function(){},
+        animate: function(){},
+        onSlideEnter: function(){},
+        onSlideExit: function(){},
+        cons: { fs: {} }
+    };
+    
+    throw new Error("!\n[PPW] The only dependency Power Polygon has is jQuery, please insert a jQuery script to your page before including ppw.js!\n\n");
+}
 
 window.PPW= (function($, _d, console){
     
     "use strict";
+    
+    if(!$)
+        return { init: function(){} };
     
     /**************************************************
      *                PRIVATE VARIABLES               *
@@ -210,13 +228,22 @@ window.PPW= (function($, _d, console){
                         <span id="ppw-ct-text-small" title="Smaller fonts" onclick="PPW.smallerFonts();">A</span>\
                         <span id="ppw-ct-text-big" title="Bigger fonts" onclick="PPW.biggerFonts();">A</span>\
                         <img id="ppw-ct-thumbs" onclick="PPW.showThumbs();" title="Show thumbnails"/>\
-                        <img id="ppw-ct-print" onclick="PPW.print();" title="Print or save as PDF"/>\
+                        <img id="ppw-ct-print" onclick="PPW.print();" title="Print or save as PDF(alt+P)"/>\
                         <div id="ppw-presentation-social-buttons">\
                             <div class="fb-like" data-href="{{likeSrc}}" data-send="false" data-width="450" data-show-faces="false"></div>\
                             <span class="gp-button"><div class="g-plusone" data-size="medium" data-annotation="none" data-href="{{likeSrc}}"></div></span>\
                         </div>\
                     </div>\
-                   </div>'
+                   </div>',
+            
+            settings: "<form id='ppw-settings-form'>\
+                    <h3>Settings</h3><br/>\
+                    <label>Enable shortcuts: </label><input type='checkbox' id='ppw-shortcutsEnable' {{shortcuts}} /><br/>\
+                    <label>Duration: </label><input type='integer' id='ppw-talk-duration' value='{{duration}}' /><br/>\
+                    <label>Alert at: </label><input type='string' id='ppw-alert-at' value='{{alerts}}'placeholder='Comma separated minutes' /><br/>\
+                    <div id='ppw-profile-config'><label>Profile: </label><select id='ppw-profile-option'></select></div><br/>\
+                    <div id='ppw-languages-config'><label>Language: </label><select id='ppw-language-option'></select></div><br/>\
+              </form>"
         },
         
         // user defined settings
@@ -468,6 +495,10 @@ window.PPW= (function($, _d, console){
      * Method called by the user to define the presentation settings.
      */
     var _init= function(conf){
+        
+        if(!$){
+            return false;
+        }
         
         if(typeof conf != 'object'){
             
@@ -966,12 +997,15 @@ window.PPW= (function($, _d, console){
             break;
         }
         
-        if(evt.keyCode == 9) // tab
+        // tab/F5/F11
+        if(evt.keyCode == 9 || evt.keyCode == 116 || evt.keyCode == 122)
             return true;
         
-        if(evt.keyCode == 8 && evt.shiftKey && (evt.metaKey || evt.ctrlKey)) // del/backspace
+        // ctr/meta + shift + del/backspace
+        if(evt.keyCode == 8 && evt.shiftKey && (evt.metaKey || evt.ctrlKey))
             return true;
         
+        // ctrl/meta + R/L/T/I
         if((evt.metaKey || evt.ctrlKey) && validKey)
             return true;
         
@@ -1012,6 +1046,9 @@ window.PPW= (function($, _d, console){
             }
             
             switch(evt.keyCode){
+                case 112: // F1
+                    _showHelp();
+                    break
                 case 37: // left
                 case 40: // down
                 case  8: // delete/backspace
@@ -1084,19 +1121,20 @@ window.PPW= (function($, _d, console){
                     break;
                     
                 case 80: // P
-                    /*if(evt.altKey || evt.ctrlKey){
+                    if(evt.altKey || evt.ctrlKey || evt.meta){
+                        _print();
                         evt.preventDefault();
                         evt.stopPropagation();
                         return false;
-                    }*/
+                    }
                     break;
                 
                 default: {
-                        console.log("DEFAULT",evt.keyCode);
+                        
                     if(_settings.shortcutsEnable){
                         if(evt.altKey && _conf.presentationStarted){
                             k= evt.keyCode - 48;
-                            console.log("KKK", k);
+                            
                             if(k>=0 && k<10){
                                 _d.getElementById('ppw-go-to-slide').value+= k;
                                 evt.preventDefault();
@@ -1111,7 +1149,7 @@ window.PPW= (function($, _d, console){
             return true;
         });
         
-        $d.bind('keypress', function(evt){
+        /*$d.bind('keypress', function(evt){
             
             if(_isNativeShortcut(evt))
                 return true;
@@ -1133,11 +1171,11 @@ window.PPW= (function($, _d, console){
                         return false;
                     }
                     break;
-                */
+                * /
             }
             
             return true;
-        });
+        });*/
         
         $d.bind('keyup', function(evt){
             
@@ -1306,14 +1344,14 @@ window.PPW= (function($, _d, console){
         if(_settings.zoomOnScroll){
             mouseWheelFn= function(event){
 
-                if(_isLocked(evt)){
+                if(_isLocked(event)){
                     console.warn("[PPW] User interaction(zoom) ignored because Power Polygon has been locked");
                     return false;
                 }
             
                 var container= $('.ppw-active-slide-element-container').eq(0)[0],
-                    centerH= container.offsetWidth/2,
-                    centerV= container.offsetHeight/2,
+                    centerH= container? container.offsetWidth/2: 0,
+                    centerV= container? container.offsetHeight/2: 0,
                     evt= event.originalEvent,
                     delta = evt.detail < 0 || evt.wheelDelta > 0 ? 1 : -1,
                     zommAdd= delta>0? 0.1: -0.1,
@@ -1887,17 +1925,21 @@ window.PPW= (function($, _d, console){
             _setLoadingBarStatus();
             //_startPresentation();
         }
-        // applying Facebook Buttons
-        (function(d, s, id) {
-            var js, fjs = d.getElementsByTagName(s)[0];
-            if (d.getElementById(id)) return;
-            js = d.createElement(s); js.id = id;
-            js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=281929191903584";
-            fjs.parentNode.insertBefore(js, fjs);
-        }(_d, 'script', 'facebook-jssdk'));
-
-        // applying the g+ buttons
-        _loadScript('https://apis.google.com/js/plusone.js');
+        
+        if(_n.onLine){
+            
+            // applying Facebook Buttons
+            (function(d, s, id) {
+                var js, fjs = d.getElementsByTagName(s)[0];
+                if (d.getElementById(id)) return;
+                js = d.createElement(s); js.id = id;
+                js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=281929191903584";
+                fjs.parentNode.insertBefore(js, fjs);
+            }(_d, 'script', 'facebook-jssdk'));
+            
+            // applying the g+ buttons
+            _loadScript('https://apis.google.com/js/plusone.js');
+        }
     };
     
     var _updateScreenSizes= function(){
@@ -2021,7 +2063,7 @@ window.PPW= (function($, _d, console){
         PPW.unlock();
         
         $('#ppw-message-content').html(msg);
-        console.log(msg, fn, hideButton, type, notLocked)
+        
         if(hideButton){
             $('#ppw-message-box-button').hide();
         }else{
@@ -2030,8 +2072,10 @@ window.PPW= (function($, _d, console){
         }
         
         PPW.animate(box, 'fadeInDownBig', {
-            duration: '1s'
+            duration: '1s',
+            delay: '0s'
         });
+        
         box.css({
             marginLeft: -(box[0].offsetWidth/2)+'px'
         });
@@ -2089,7 +2133,7 @@ window.PPW= (function($, _d, console){
     };
     
     /**
-     * Closes the message box
+     * Closes the message box.
      */
     var _closeMessage= function(){
         
@@ -2106,14 +2150,12 @@ window.PPW= (function($, _d, console){
                     _conf.showingMessage= false;
                     
                     if(!_showNextMessage()){
-                        //_d.getElementById('ppw-message-content').innerHTML= '';
                         PPW.unlock();
                         _b.focus();
                     }
                     
                     if(fn && typeof fn == 'function')
                         fn();
-                    
                 }
         });
     };
@@ -2353,17 +2395,12 @@ window.PPW= (function($, _d, console){
                 _settings.alertAt= parsed;
             }
             
-        
-        msg= "<form id='ppw-settings-form'>\
-                    <h3>Settings</h3><br/>\
-                    <label>Enable shortcuts: </label><input type='checkbox' id='ppw-shortcutsEnable' "+(_settings.shortcutsEnable? 'checked=checked': '')+" /><br/>\
-                    <label>Duration: </label><input type='integer' id='ppw-talk-duration' value='"+_settings.duration+"' /><br/>\
-                    <label>Alert at: </label><input type='string' id='ppw-alert-at' value='"+_settings.alertAt+"'placeholder='Comma separated minutes' /><br/>\
-                    <div id='ppw-profile-config'><label>Profile: </label><select id='ppw-profile-option'></select></div><br/>\
-                    <div id='ppw-languages-config'><label>Language: </label><select id='ppw-language-option'></select></div><br/>\
-              </form>";
+        msg= _templates.settings
+                       .replace('{{shortcuts}}', _settings.shortcutsEnable? 'checked=checked': '')
+                       .replace('{{duration}}', _settings.duration)
+                       .replace('{{alerts}}', _settings.alertAt);
             
-        _showMessage(msg, fn);
+        _showMessage(msg, fn, false, false, true);
         
         if(_conf.profiles){
             list= Object.keys(_conf.profiles);
@@ -3048,26 +3085,23 @@ window.PPW= (function($, _d, console){
         if(!_conf.presentationStarted)
             return false;
         
-        //if(typeof times == 'object' && (times.zoom || times.target)){
-            
-            useObjectConfig= true;
-            
-            if(data.left || data.left === 0)
-                data.left= data.left;
-            if(data.top || data.top === 0)
-                data.top= data.top;
-            if(data.target){
-                data.target= (typeof data.target == 'string')? $(data.target).eq(0): data.target;
-                sentTarget= true;
-            }
-            if(data.rotate)
-                data.rotate= data.rotate;
-            if(data.callback){
-                data.callback= data.callback;
-            }
-            
-            data.times= data.zoom||2;
-        //}
+        useObjectConfig= true;
+
+        if(data.left || data.left === 0)
+            data.left= data.left;
+        if(data.top || data.top === 0)
+            data.top= data.top;
+        if(data.target){
+            data.target= (typeof data.target == 'string')? $(data.target).eq(0): data.target;
+            sentTarget= true;
+        }
+        if(data.rotate)
+            data.rotate= data.rotate;
+        if(data.callback){
+            data.callback= data.callback;
+        }
+
+        data.times= data.zoom||2;
         
         if(sentTarget){
             data.left= target[0].offsetLeft + target[0].offsetWidth/2;
@@ -3192,6 +3226,9 @@ window.PPW= (function($, _d, console){
      * if that element is the target of the given event, it should be triggered.
      */
     var _isLocked= function(evt){
+        
+        if(!evt)
+            return true;
         
         if(!_conf.locked)
             return false;
