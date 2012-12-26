@@ -19,12 +19,20 @@
             }
             
             body{
-                background-color: #c0c9c9;
+                background: url(../_images/splash-screen-bg.jpg);
             }
             
             #header{
-                background: black;
-                color: white;
+                position: relative;
+                z-index: 999;
+                border-radius: 7px;
+                
+                box-sizing: border-box;
+                -moz-box-sizing: border-box;
+                margin: 0 4px 0 4px;
+                
+                background: #eee;
+                color: #444;
                 font-size: 32px;
                 text-align: center;
                 padding-top: 4px;
@@ -185,7 +193,7 @@
         </style>
     </head>
     <body>
-        <div id="header"><span id="previous-slide-trigger">◄</span>PPW: <span id="ppw-slide-title">...</span><span id="next-slide-trigger">►</span></div>
+        <div id="header"><span id="previous-slide-trigger" title="Go to the previous slide">◄</span>PPW: <span id="ppw-slide-title">...</span><span id="next-slide-trigger" title="Go to the next slide">►</span></div>
         <div id="notes">
             <div class="title">
                 Notes

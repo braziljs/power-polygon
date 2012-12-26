@@ -1113,7 +1113,7 @@ window.PPW= (function($, _d, console){
                     
                 case 70: // F
                     if(evt.altKey){
-                        _showSearchBox();
+                        _showSearchBox(true);
                         evt.preventDefault();
                         evt.stopPropagation();
                         return false;
@@ -1317,7 +1317,7 @@ window.PPW= (function($, _d, console){
         /**
          * Mouse events.
          */
-        $d.bind('click', function(evt){
+        $d.bind('click', function(evt){ 
             
             if(_isLocked(evt)){
                 console.warn("[PPW] User interaction(click) ignored because Power Polygon has been locked");
@@ -1784,14 +1784,18 @@ window.PPW= (function($, _d, console){
      * 
      * This search goes to the slide where the searched term is found.
      */
-    var _showSearchBox= function(){
+    var _showSearchBox= function(force){
         var content= _templates.searchTool,
             el= null;
         
-        if(_conf.showingMessage)
+        if(_conf.showingMessage && !force)
             return false;
         
-        _showMessage(content);
+        if(_conf.showingMessage){
+            $('#ppw-message-content').html(content);
+        }else{
+            _showMessage(content);
+        }
         _unlock();
         
         el= _d.getElementById('ppw-search-slide');
