@@ -197,6 +197,8 @@ window.PPW= (function($, _d, console){
             "<br/>* A file in the fsPattern location.<br/>Currently looking at: <span class='ppw-slide-fail'>{{addr}}</span><br/><br/>"+
             "The content could not be found in any of these expected places!</div>",
         
+            arrows: "<div id='ppw-arrows-container' class='clickable'><div id='ppw-arrow-previous-slide' onclick='PPW.goPrev();'>◄</div><div id='ppw-arrow-next-slide' onclick='PPW.goNext();'>►</div></div>",
+        
             searchTool: "<div style='float: left;'>Search into slides:</div>\
                          <div style='float: right;'><input type='search' id='ppw-search-slide' value='' placeholder='Search' />\
                          <input type=button id='ppw-search-prev' class='ppw-clickable' title='Find in previous slides(shift+enter)' value='◄' /> <input type=button id='ppw-search-next' title='Find in next slides(enter)' class='ppw-clickable' value='►' /></div><div id='ppw-search-found' class='ppw-clickable'></div>",
@@ -263,6 +265,10 @@ window.PPW= (function($, _d, console){
             // battery support only working on Firefox Nightly by now.
             showBatteryAlerts: true,
             showOfflineAlerts: true,
+            // Enables the arrows to go previous and next slides.
+            useArrows: false,
+            // When using arrows, this means that ONLY the arrows will go next and previous.
+            useOnlyArrows: false,
             // allows slides to be cached
             slidesCache: true,
             profile: 'none',
@@ -493,6 +499,8 @@ window.PPW= (function($, _d, console){
     
     /**
      * Method called by the user to define the presentation settings.
+     * 
+     * @param Mixed The object with the settings information, or the address of the manifest.json file.
      */
     var _init= function(conf){
         
@@ -710,6 +718,11 @@ window.PPW= (function($, _d, console){
     var _preparePPW= function(){
         
          $b.append(_templates.loading);
+         
+         if(_settings.useArrows){
+             $b.append(_templates.arrows);
+         }
+         
          $('#ppw-loadingbarParent').css({
              width: '260px',
              height: '8px',
@@ -1307,10 +1320,6 @@ window.PPW= (function($, _d, console){
         }, false);
         
         _w.addEventListener('hashchange', function(){
-/*            
-            if(_isLocked(evt))
-                return false;
-*/                
             _goToSlide(_getCurrentSlideFromURL());
         }, false);
         
@@ -1326,12 +1335,16 @@ window.PPW= (function($, _d, console){
             
             if(_conf.presentationStarted && !_isEditableTargetContent(evt.target)){
                 
+                if(!_settings.useArrows || (_settings.useArrows && !_settings.useOnlyArrows)){
+                
                 /*if(_conf.currentZoom !== 1){
                     _resetViewport();
                 }else{*/
                     if(!_conf.inThumbsMode)
                         _goNextSlide();
                 //}
+                
+                }
                 
                 evt.stopPropagation();
                 evt.preventDefault();
@@ -1783,6 +1796,8 @@ window.PPW= (function($, _d, console){
      * Shows the searchbox.
      * 
      * This search goes to the slide where the searched term is found.
+     * 
+     * @param Boolean Force the search box to replace the current alert message.
      */
     var _showSearchBox= function(force){
         var content= _templates.searchTool,
