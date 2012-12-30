@@ -1,0 +1,120 @@
+.ppw-slide-element{
+    background: #f7f7f7; /* Old browsers */
+    background: -moz-linear-gradient(top, #f7f7f7 0%, #b7b7b7 80%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#f7f7f7), color-stop(80%,#b7b7b7)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, #f7f7f7 0%,#b7b7b7 80%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, #f7f7f7 0%,#b7b7b7 80%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, #f7f7f7 0%,#b7b7b7 80%); /* IE10+ */
+    background: linear-gradient(to bottom, #f7f7f7 0%,#b7b7b7 80%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f7f7f7', endColorstr='#b7b7b7',GradientType=0 ); /* IE6-9 */
+}
+.ppw-active-slide-element{
+    /*display: block;*/
+}
+
+.ppw-slide-element{
+    padding: 20px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    font-family: "Sans Serif", Tahoma, Arial;
+    white-space: normal;
+    font-size: 1.5em;
+    cursor: default;
+}
+
+/**/
+.ppw-previous-slide-element{
+ 
+}
+.ppw-next-slide-element{
+
+}
+
+body{
+    
+}
+
+
+/* SLIDE type section */
+.ppw-slide-type-section{
+    position: relative;
+    background: white;
+}
+.ppw-slide-type-section h2{
+    position: absolute;
+    top: 170px;
+    left: 340px;
+    font-size: 62px;
+    color: white;
+    opacity: 0;
+}
+
+.ppw-section-detail{
+    content: ' ';
+    display: block;
+    position: absolute;
+    height: 300px;
+    width: 100%;
+    top: 100px;
+    right: -100%;
+    background: #37ACC2;
+
+}
+.brzjs-logo{
+    position: absolute;
+    left: 100px;
+    top: 130px;
+    width: 230px;
+    height: 80px;
+    background: url(../imgs/logo-braziljs.png) no-repeat #37ACC2;
+    display: none;
+}
+
+/*
+.ppw-slide-type-section:after{
+    content: ' ';
+    display: block;
+    position: absolute;
+    height: 300px;
+    width: 100%;
+    top: 100px;
+    left: 0px;
+    background: url(../imgs/logo-braziljs.png) no-repeat 100px 130px #37ACC2;
+}
+
+.ppw-slide-type-section h1, .ppw-slide-type-section h2{
+    
+}
+*/
+
+
+/**/
+.ppw-slide-container{
+    
+}
+#ppw-slides-container{
+    
+}
+.ppw-slide-container section{
+    height: 100%;
+    width: 100%;
+}
+.ppw-slide-type-opening{
+    text-align: center;
+}
+
+.ppw-slide-type-opening h1{
+    margin-top: 15%;
+    font-size: 2.4em;
+}
+.ppw-slide-type-opening h2{
+    margin-top: -40px;
+    padding-left: 100px;
+    font-size: 1.4em;
+}
+
+
+h1, h2, h3, h4, h5, h6{
+    position: relative;
+    z-index: 999;
+}

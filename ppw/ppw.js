@@ -262,6 +262,8 @@ window.PPW= (function($, _d, console){
             fsPattern: _conf.cons.fs.SLIDE_ID_DIR_ID,
             alertAt: _conf.defaults.alertAt,
             duration: _conf.defaults.duration,
+            // enables the toolbar
+            useToolBar: true,
             // battery support only working on Firefox Nightly by now.
             showBatteryAlerts: true,
             showOfflineAlerts: true,
@@ -841,6 +843,7 @@ window.PPW= (function($, _d, console){
         }
         //$b.removeClass('.LANG-').addClass('.LANG-'+lang);
         _b.className= _b.className.replace(/LANG_[a-z]+( |$)/ig, '');
+        PPW.language= lang;
         $b.addClass('LANG_'+lang);
     }
     
@@ -1686,7 +1689,13 @@ window.PPW= (function($, _d, console){
             if(_settings.profile)
                 _conf.profiles[_settings.profile]= true;
             
+            // adding extra information and methods to each slide
             slides[i].actionIdx= 0;
+            slides[i].addAction= function(act){
+                _addAction(act, this);
+            };
+            
+            // adding the classes for the slides
             el.addClass(_conf.cons.CLASS_SLIDE + " ppw-slide-type-" + (slides[i].type||_conf.defaults.slideType));
             if(slides[i].className){
                 el.addClass(slides[i].className);
@@ -1870,9 +1879,11 @@ window.PPW= (function($, _d, console){
         
         $b.append(_templates.camera);
         
-        $b.append(_templates.toolBar
-                            .replace(/\{\{clickableClass\}\}/g, _conf.cons.CLICKABLE_ELEMENT
-                            .replace(/\{\{likeSrc\}\}/g, _l)))
+        if(_settings.useToolBar){
+            $b.append(_templates.toolBar
+                                .replace(/\{\{clickableClass\}\}/g, _conf.cons.CLICKABLE_ELEMENT
+                                .replace(/\{\{likeSrc\}\}/g, _l)));
+        }
         
         // adding the svg blur effect, to be able to apply blur on firefox as well.
         $b.append('<svg id="ppw-svg-image-blur">\
@@ -2469,7 +2480,8 @@ window.PPW= (function($, _d, console){
      */
     var _startPresentation= function(evt){
         
-        var el= _d.querySelector('.ppw-menu-start-icon');
+        var el= _d.querySelector('.ppw-menu-start-icon'),
+            first, act;
         
         if(!_conf.slidesLoaded)
             return;
@@ -2483,7 +2495,19 @@ window.PPW= (function($, _d, console){
         _goToSlide(_getCurrentSlideFromURL());
         if(el)
             el.blur();
+        
         _triggerEvent('onstart', _conf.currentSlide);
+        
+        // in case the first opened slide has a timming/auto action, it should be triggered
+        first= _getCurrentSlide();
+        if(first && first.actions.length && first.actions[0].timing){
+            act= first.actions[0];
+            if(act.timing == 'auto'){
+                act.does();
+            }else if(isNum(act.timing)){
+                setTimeout(act.does, act.timing)
+            }
+        }
         
         if(evt){
             evt.preventDefault();
@@ -2575,9 +2599,9 @@ window.PPW= (function($, _d, console){
     /**
      * Adds an action to each speficied slide.
      */
-    var _addAction= function(action){
+    var _addAction= function(action, slide){
         
-        var slideRef= PPW.slideIterator;
+        var slideRef= slide||PPW.slideIterator;
         if(!slideRef || !slideRef.actions)
             return false; // it probably is not loaded yet...will be called again when loaded
         
