@@ -38,7 +38,7 @@ body{
 /* SLIDE type section */
 .ppw-slide-type-section{
     position: relative;
-    background: white;
+    background: url(../imgs/sect-bg.jpg);
 }
 .ppw-slide-type-section h2{
     position: absolute;

@@ -341,7 +341,7 @@
     color: white;
     margin-top: -60px;
     cursor: pointer;
-    opacity: 0.2;
+    opacity: 0.4;
     
     -webkit-transition: all 500ms linear;
     -moz-transition: all 500ms linear;
@@ -364,7 +364,7 @@
     color: white;
     margin-top: -60px;
     cursor: pointer;
-    opacity: 0.2;
+    opacity: 0.4;
     
     -webkit-transition: all 500ms linear;
     -moz-transition: all 500ms linear;

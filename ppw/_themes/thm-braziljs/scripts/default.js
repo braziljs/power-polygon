@@ -1,4 +1,3 @@
-
 PPW.addListener('onstart', function(data){
     
     $(PPW.getSlides()).each(function(idx, slide){
@@ -48,10 +47,13 @@ PPW.addListener('onstart', function(data){
                     
                 }
             });
+            
             slide.addAction({
-                does: function(){ var el= $(PPW.getCurrentSlide().el).find('.ppw-section-detail'),
+                does: function(){
+                    
+                    var el= $(PPW.getCurrentSlide().el).find('.ppw-section-detail'),
                         h2= PPW.get('languages')? 'h2.LANG-'+PPW.language: 'h2',
-                        nx= PPW.getNextValidSlide();
+                        nx= PPW.getNextSlide();
                     
                     if(!nx)
                         return false;
@@ -64,8 +66,9 @@ PPW.addListener('onstart', function(data){
                             $(el).animate({
                                 right: '-100%'
                             }, function(){
-                                PPW.goNext();
                                 PPW.unlock();
+                                PPW.goNext();
+                                slide.actionIdx= 0;
                             });
                         }
                     });

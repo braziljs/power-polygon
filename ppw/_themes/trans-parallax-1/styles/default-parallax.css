@@ -34,6 +34,11 @@
     z-index: 1;
     width: 100%;
     height: 100%;
+    
+    
+    -webkit-perspective: 800px;
+    -moz-perspective: 800px;
+    perspective: 800px;
 }
 
 .parallax-set .far.mv-right, .parallax-set .far.mv-left{
@@ -95,4 +100,13 @@
 .parallax-set .close.mv-left.active{
     /*-webkit-transform: matrix();*/
     -webkit-animation: mv-left 50s ease-out 1 forwards;
+}
+
+.parallax-set .close.mv-spin-right.active{
+    -webkit-animation: mv-spin-right linear 14s 1;
+    -webkit-animation-fill-mode: forwards;
+}
+.parallax-set .close.mv-spin-left.active{
+    -webkit-animation: mv-spin-left linear 14s 1;
+    -webkit-animation-fill-mode: forwards;
 }

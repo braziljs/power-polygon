@@ -197,7 +197,7 @@ window.PPW= (function($, _d, console){
             "<br/>* A file in the fsPattern location.<br/>Currently looking at: <span class='ppw-slide-fail'>{{addr}}</span><br/><br/>"+
             "The content could not be found in any of these expected places!</div>",
         
-            arrows: "<div id='ppw-arrows-container' class='clickable'><div id='ppw-arrow-previous-slide' onclick='PPW.goPrev();'>◄</div><div id='ppw-arrow-next-slide' onclick='PPW.goNext();'>►</div></div>",
+            arrows: "<div id='ppw-arrows-container' class='ppw-clickable'><div id='ppw-arrow-previous-slide' onclick='if(!PPW.isLocked()) PPW.goPrev();'>◄</div><div id='ppw-arrow-next-slide' onclick='if(!PPW.isLocked()) PPW.goNext();'>►</div></div>",
         
             searchTool: "<div style='float: left;'>Search into slides:</div>\
                          <div style='float: right;'><input type='search' id='ppw-search-slide' value='' placeholder='Search' />\
@@ -3259,6 +3259,7 @@ window.PPW= (function($, _d, console){
      */
     var _lock= function(allowedElement){
         _conf.locked= allowedElement||true;
+        $('#ppw-arrows-container').fadeOut();
         console.log("[PPW] Locked user interaction");
     };
 
@@ -3288,6 +3289,7 @@ window.PPW= (function($, _d, console){
      */
     var _unlock= function(){
         _conf.locked= false;
+        $('#ppw-arrows-container').fadeIn();
         console.log("[PPW] Unlocked user interaction");
     };
     
@@ -3415,6 +3417,7 @@ window.PPW= (function($, _d, console){
         onSlideDoes                     : _onSlideDoes,
         viewport                        : _viewport,
         rotate                          : _rotate,
+        goToSlide                       : _goToSlide,
         // API GETTERS/SETTERS METHODS
         getSlides                       : _getSlides,
         getValidSlides                  : _getValidSlides,
