@@ -330,6 +330,9 @@ window.PPW= (function($, _d, console){
         onshowthumbs            : [],
         onbeforeshowthumbs      : [],
         onhidethumbs            : [],
+        onlock                  : [],
+        onunlock                : [],
+        onlangchange            : [],
         F10_PRESSED             : [],
         F9_PRESSED              : [],
         F8_PRESSED              : [],
@@ -845,6 +848,7 @@ window.PPW= (function($, _d, console){
         _b.className= _b.className.replace(/LANG_[a-z]+( |$)/ig, '');
         PPW.language= lang;
         $b.addClass('LANG_'+lang);
+        _triggerEvent('onlangchange');
     }
     
     /**
@@ -2897,6 +2901,18 @@ window.PPW= (function($, _d, console){
             }
         }
         
+        if(curSlide.first){
+            $('#ppw-arrow-previous-slide').hide();
+        }else{
+            $('#ppw-arrow-previous-slide').show();
+        }
+        
+        if(curSlide.last){
+            $('#ppw-arrow-next-slide').hide();
+        }else{
+            $('#ppw-arrow-next-slide').show();
+        }
+        
         // if the slide is of a different type
         if(previousSlide && previousSlide.type != curSlide.type)
             _triggerEvent('onslidetypechange', {
@@ -3048,7 +3064,10 @@ window.PPW= (function($, _d, console){
                         'animationDuration'      : settings.duration
                     });
                 }
-                if(settings.delay){
+                if(settings.delay || settings.delay === 0){
+                    if(isNum(settings.delay)){
+                        settings.delay= settings.delay+'ms';
+                    }
                     el.css({
                         'webkitAnimationDelay': settings.delay,
                         'mozAnimationDelay'   : settings.delay,
@@ -3261,6 +3280,7 @@ window.PPW= (function($, _d, console){
         _conf.locked= allowedElement||true;
         $('#ppw-arrows-container').fadeOut();
         console.log("[PPW] Locked user interaction");
+        _triggerEvent('onlock');
     };
 
     /**
@@ -3291,6 +3311,7 @@ window.PPW= (function($, _d, console){
         _conf.locked= false;
         $('#ppw-arrows-container').fadeIn();
         console.log("[PPW] Unlocked user interaction");
+        _triggerEvent('onunlock');
     };
     
     /**************************************************
@@ -3356,6 +3377,12 @@ window.PPW= (function($, _d, console){
      *                  CONSTRUCTOR                   *
      **************************************************/
     var _constructor= function(){
+        
+        // let's create some global useful variables
+        _w.auto= 'auto';
+        _w.click= 'click';
+        _w._p= PPW;
+        
         _createSplashScreen();
         if(!_isInPrintableVersion()){
             _conf.currentSlide= _getCurrentSlideFromURL();
