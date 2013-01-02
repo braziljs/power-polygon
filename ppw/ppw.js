@@ -2341,7 +2341,7 @@ window.PPW= (function($, _d, console){
             el= _d.getElementById('ppw-audioTestElement');
         }*/
         //el.play();
-        _showMessage("Playing audio<br/><div style='background: url("+_settings.PPWSrc+"/_images/animated-wave-sound.gif) 0px -37px no-repeat; position: relative; width: 220px; height: 30px; margin: auto; background-size: 248px 108px; border-left: solid 1px #fcc; border-right: solid 1px #fcc;' onclick='var audio = document.getElementById(\"ppw-audioTestElement\"); var t = \"Stopped\";  if(audio.paused) { audio.play(); t = \"Playing\" } else { audio.pause(); }; console.log(\"[PPW] Currently \" + t); '/><div id='ppw-audioPlaceHolder'>",
+        _showMessage("Playing audio<br/><div style='background: url("+_settings.PPWSrc+"/_images/animated-wave-sound.gif) 0px -37px no-repeat; position: relative; width: 220px; height: 30px; margin: auto; background-size: 248px 108px; border-left: solid 1px #fcc; border-right: solid 1px #fcc;' onclick='var audio = document.getElementById(\"ppw-audioTestElement\"); var t = \"Stopped\";  if(audio.paused) { audio.play(); t = \"Playing\" } else { audio.pause(); }; console.log(\"[PPW] Currently \" + t); '/><div id='ppw-audioPlaceHolder'></div>",
                      function(){
                          
                          var el= _d.getElementById('ppw-audioTestElement'),
