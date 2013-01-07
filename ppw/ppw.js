@@ -898,6 +898,14 @@ window.PPW= (function($, _d, console){
                 }
             });
         
+            $('a').each(function(){
+                if(this.href && this.href.substring(0, 1) != '#'){
+                    if(!this.getAttribute('target')){
+                        this.setAttribute('target', '_blank');
+                    }
+                }
+            })
+        
         }
         
         $('#ppw-slides-loader-bar-loading-container>div').stop().animate({
@@ -1663,11 +1671,7 @@ window.PPW= (function($, _d, console){
                 _settings.slides[i].title= tt;
                 _settings.slides[i].index= i+1;
                 
-                
-                
                 $(container).append("<div id='ppw-slide-container-"+slides[i].id+"' class='ppw-slide-container'></div>");
-                //_slidePreloaderNext(_settings.slides[i]); return;
-                
                 
                 $('#ppw-slide-container-'+slides[i].id).append(el[0]);
                 
