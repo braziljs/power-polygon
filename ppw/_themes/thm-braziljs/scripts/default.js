@@ -1,8 +1,12 @@
 PPW.addListener('onstart', function(data){
     
+    
+    $(document.body).append("<div id='ppw-brzjs-theme-lock-el-1'></div><div id='ppw-brzjs-theme-lock-el-2'></div>");
+    
+    
     $(PPW.getSlides()).each(function(idx, slide){
         
-        if(slide.type == 'section'){
+        if(slide.type == 'section' || slide.type == 'closing'){
             $(slide.el).append("<div class='ppw-section-detail'><div class='brzjs-logo'></div></div>");
             
             slide.addAction({
@@ -84,3 +88,11 @@ PPW.addListener('onslidechange', function(data){
         
     }
 });
+
+PPW.startAnimationSet= function(){
+    $('#ppw-brzjs-theme-lock-el-1, #ppw-brzjs-theme-lock-el-2').fadeIn('slow');
+};
+
+PPW.stopAnimationSet= function(){
+    $('#ppw-brzjs-theme-lock-el-1, #ppw-brzjs-theme-lock-el-2').fadeOut('slow');
+};

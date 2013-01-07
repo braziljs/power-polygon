@@ -2878,7 +2878,7 @@ window.PPW= (function($, _d, console){
         if(_settings.slides[_conf.currentSlide].onSlideEnter){
             _settings.slides[_conf.currentSlide].onSlideEnter();
         }
-        if(previousSlide.onSlideExit){
+        if(previousSlide.onSlideExit && previousSlide != curSlide){
             previousSlide.onSlideExit();
         }
         
@@ -3279,6 +3279,7 @@ window.PPW= (function($, _d, console){
     var _lock= function(allowedElement){
         _conf.locked= allowedElement||true;
         $('#ppw-arrows-container').fadeOut();
+        $('#ppw-toolbar-container').hide();
         console.log("[PPW] Locked user interaction");
         _triggerEvent('onlock');
     };
@@ -3310,6 +3311,7 @@ window.PPW= (function($, _d, console){
     var _unlock= function(){
         _conf.locked= false;
         $('#ppw-arrows-container').fadeIn();
+        $('#ppw-toolbar-container').show();
         console.log("[PPW] Unlocked user interaction");
         _triggerEvent('onunlock');
     };
