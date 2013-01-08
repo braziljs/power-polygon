@@ -577,6 +577,7 @@ window.PPW= (function($, _d, console){
         if(_settings.shortcutsEnable && !_isInPrintableVersion()){
             _enableFuncKeys();
         }
+        
         _triggerEvent('onload', conf);
     };
     
@@ -808,8 +809,85 @@ window.PPW= (function($, _d, console){
         }
     };
     
+    /**
+     * Gets the list of valid slides to the current profile.
+     * 
+     */
     var _getValidSlides= function(){
         return _conf.validSlides;
+    }
+    
+    /**
+     * Takes all the clonable elements and add them to slides, removing them
+     * from their original escope.
+     * 
+     * The HTML Element may also have two special classes: ppw-type-content or ppw-type-section
+     * Each class defines the clonable element to be cloned only into slides
+     * of that type.
+     */
+    var _applyClonableElements= function(){
+        
+        $('.ppw-clonable').each(function(){
+            
+            var _t= $(this),
+                clone= this,
+                containers= $('.ppw-slide-element'),
+                i= 0;
+            
+            clone.id= clone.id||'ppw-clone';
+            
+            // if slide type specified
+            if(_t.hasClass('ppw-type-section')){
+                containers= $('.ppw-slide-type-section');
+            }else if(_t.hasClass('ppw-type-content')){
+                containers= $('.ppw-slide-type-content');
+            }
+            
+            containers.each(function(){
+                i++;
+                clone= clone.cloneNode(true);
+                clone.id= clone.id + '-' + i;
+                $(this).append(clone);
+            });
+        }).remove();
+        
+    };
+    
+    /**
+     * Adds the headers and footers to the slides.
+     * 
+     * This method adds headers and footers to slides and sets their
+     * behaviours and data.
+     * 
+     * If the user has set the useGlobalFooter or useGlobalHeader on the
+     * init method, then the footer/header will be global, instead of inside
+     * all the slides.
+     */
+    var _applyHeaderFooter= function(){
+        var h= $('header'),
+            f= $('footer');
+            
+        if(h.length){
+            h.addClass('ppw-header-element');
+            if(!_settings.useGlobalHeader){
+                h[0].removeAttribute('id');
+                $('.ppw-slide-type-content').each(function(){
+                    $(this).append(h[0].cloneNode(true));
+                });
+            }
+        }
+        if(f.length){
+            h.addClass('ppw-footer-element');
+            if(!_settings.useGlobalFooter){
+                $('.ppw-slide-type-content').each(function(){
+                    $(this).append(f[0].cloneNode(true));
+                });
+            }
+        }
+        h.remove();
+        f.remove();
+        
+        // TODO: add behaviour and data to headers and footers
     }
     
     /**
@@ -879,7 +957,13 @@ window.PPW= (function($, _d, console){
             // when all the slides loaded
             _conf.slidesLoaded= true;
             _setPresentationProfile();
+            // set the current language to the loaded slide elements
             _setLION(_settings.defaultLanguage||_n.language);
+            // setting the clonable elements
+            _applyClonableElements();
+            // setting the header/footer elements
+            _applyHeaderFooter();
+            // triggering the event to all the listeners
             _triggerEvent('onslidesloaded', _settings.slides);
             
             if(!_settings.useSplashScreen)
@@ -1866,6 +1950,10 @@ window.PPW= (function($, _d, console){
      * Creates the spash screen.
      * 
      * This screen ofers access to useful tools before the presentation begins.
+     * This method is always called, but if the settings define that no splash
+     * screen should be used, it will not create the splash screen itself, although
+     * the other tools that can be accessed from outside the splash screen are
+     * going to be created.
      */
     var _createSplashScreen= function(){
         
@@ -1880,18 +1968,12 @@ window.PPW= (function($, _d, console){
             return true;
         }
         
-        // APPENDING THE CAMERA, TOOLBAR, SOCIAL BUTTONS AND MESSAGE-BOX TO THE DOCUMENT
+        // Adding the social buttons to the page.
         $b.append('<div id="fb-root"></div>');
-        
+        // adding the messages container
         $b.append(_templates.messages);
-        
+        // adding the camera container
         $b.append(_templates.camera);
-        
-        if(_settings.useToolBar){
-            $b.append(_templates.toolBar
-                                .replace(/\{\{clickableClass\}\}/g, _conf.cons.CLICKABLE_ELEMENT
-                                .replace(/\{\{likeSrc\}\}/g, _l)));
-        }
         
         // adding the svg blur effect, to be able to apply blur on firefox as well.
         $b.append('<svg id="ppw-svg-image-blur">\
@@ -1900,32 +1982,39 @@ window.PPW= (function($, _d, console){
                         </filter>\
                    </svg>');
         
-        $('#ppw-goto-icon').attr('src', _settings.PPWSrc+'/_images/goto.png')
-                           .addClass(_conf.cons.CLICKABLE_ELEMENT)
-        
-        $('#ppw-toolbox-icon').attr('src', _settings.PPWSrc+'/_images/toolbox.png')
-                              .addClass(_conf.cons.CLICKABLE_ELEMENT);
-                              
-        $('#ppw-search-icon').attr('src', _settings.PPWSrc+'/_images/search.png')
-                             .addClass(_conf.cons.CLICKABLE_ELEMENT);
-                             
-        $('#ppw-fullscreen-icon').attr('src', _settings.PPWSrc+'/_images/fullscreen.png')
-                                 .addClass(_conf.cons.CLICKABLE_ELEMENT);
-                                 
-        $('#ppw-camera-icon').attr('src', _settings.PPWSrc+'/_images/camera.png')
-                             .addClass(_conf.cons.CLICKABLE_ELEMENT);
-                                 
-        $('#ppw-settings-icon').attr('src', _settings.PPWSrc+'/_images/settings-icon.png')
-                               .addClass(_conf.cons.CLICKABLE_ELEMENT);
-                             
-        $('#ppw-ct-thumbs').attr('src', _settings.PPWSrc+'/_images/thumbs.png')
-                           .addClass(_conf.cons.CLICKABLE_ELEMENT);
-                             
-        $('#ppw-ct-print').attr('src', _settings.PPWSrc+'/_images/print.png')
-                           .addClass(_conf.cons.CLICKABLE_ELEMENT);
-                                 
-        //$('#ppw-ct-text-only').addClass(_conf.cons.CLICKABLE_ELEMENT);
+        // adding the toolbar
+        if(_settings.useToolBar){
+            $b.append(_templates.toolBar
+                                .replace(/\{\{clickableClass\}\}/g, _conf.cons.CLICKABLE_ELEMENT
+                                .replace(/\{\{likeSrc\}\}/g, _l)));
+                                
+            // setting images to the icons on the toolbar and their behaviour
+            $('#ppw-goto-icon').attr('src', _settings.PPWSrc+'/_images/goto.png')
+                               .addClass(_conf.cons.CLICKABLE_ELEMENT)
 
+            $('#ppw-toolbox-icon').attr('src', _settings.PPWSrc+'/_images/toolbox.png')
+                                  .addClass(_conf.cons.CLICKABLE_ELEMENT);
+
+            $('#ppw-search-icon').attr('src', _settings.PPWSrc+'/_images/search.png')
+                                 .addClass(_conf.cons.CLICKABLE_ELEMENT);
+
+            $('#ppw-fullscreen-icon').attr('src', _settings.PPWSrc+'/_images/fullscreen.png')
+                                     .addClass(_conf.cons.CLICKABLE_ELEMENT);
+
+            $('#ppw-camera-icon').attr('src', _settings.PPWSrc+'/_images/camera.png')
+                                 .addClass(_conf.cons.CLICKABLE_ELEMENT);
+
+            $('#ppw-settings-icon').attr('src', _settings.PPWSrc+'/_images/settings-icon.png')
+                                   .addClass(_conf.cons.CLICKABLE_ELEMENT);
+
+            $('#ppw-ct-thumbs').attr('src', _settings.PPWSrc+'/_images/thumbs.png')
+                               .addClass(_conf.cons.CLICKABLE_ELEMENT);
+
+            $('#ppw-ct-print').attr('src', _settings.PPWSrc+'/_images/print.png')
+                               .addClass(_conf.cons.CLICKABLE_ELEMENT);
+        }
+
+        // adding the splash screen if enabled
         if(_settings.useSplashScreen){
             
             $.get(_settings.PPWSrc+"_tools/splash-screen.html", {}, function(data){
@@ -1959,9 +2048,7 @@ window.PPW= (function($, _d, console){
                
             });
         }else{
-            //_preloadSlides();
             _setLoadingBarStatus();
-            //_startPresentation();
         }
         
         if(_n.onLine){
@@ -1978,6 +2065,7 @@ window.PPW= (function($, _d, console){
             // applying the g+ buttons
             _loadScript('https://apis.google.com/js/plusone.js');
         }
+        
     };
     
     var _updateScreenSizes= function(){
@@ -3387,9 +3475,11 @@ window.PPW= (function($, _d, console){
         // let's create some global useful variables
         _w.auto= 'auto';
         _w.click= 'click';
-        _w._p= PPW;
+        _w.global= 'global';
+        _w._p= _w.P= PPW;
         
         _createSplashScreen();
+        
         if(!_isInPrintableVersion()){
             _conf.currentSlide= _getCurrentSlideFromURL();
             _goToSlide(_conf.currentSlide);
@@ -3398,9 +3488,7 @@ window.PPW= (function($, _d, console){
         }
     };
     
-    //$(_d).ready(_constructor);
     _addListener('onload', _constructor)
-    
     
     /**************************************************
      *                 PUBLIC OBJECT                  *
