@@ -1086,7 +1086,10 @@ window.PPW= (function($, _d, console){
             });
         
             $('a').each(function(){
-                if(this.href && this.href.substring(0, 1) != '#'){
+                
+                var l= this.href? this.href.replace(_l.protocol+'//'+_l.host+_l.pathname, ''): '#';
+                
+                if(l.substring(0, 1) != '#' && l.substring(0, 11) != 'javascript:'){
                     if(!this.getAttribute('target')){
                         this.setAttribute('target', '_blank');
                     }
