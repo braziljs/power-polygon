@@ -103,3 +103,46 @@ h1, h2, h3, h4, h5, h6{
     position: relative;
     z-index: 999;
 }
+
+.ppw-header-element{
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    padding: 4px;
+    color: white;
+    
+    background: -moz-linear-gradient(top, rgba(0,0,0,0.29) 0%, rgba(36,38,24,0.64) 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(0,0,0,0.29)), color-stop(100%,rgba(36,38,24,0.64))); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, rgba(0,0,0,0.29) 0%,rgba(36,38,24,0.64) 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, rgba(0,0,0,0.29) 0%,rgba(36,38,24,0.64) 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, rgba(0,0,0,0.29) 0%,rgba(36,38,24,0.64) 100%); /* IE10+ */
+    background: linear-gradient(to bottom, rgba(0,0,0,0.29) 0%,rgba(36,38,24,0.64) 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4a000000', endColorstr='#a3242618',GradientType=0 ); /* IE6-9 */
+}
+.ppw-header-element.ppw-global{
+    
+}
+.ppw-footer-element{
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    width: 100%;
+    padding: 4px;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    
+    background: -moz-linear-gradient(top, rgba(36,38,24,0.64) 0%, rgba(0,0,0,0.29) 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(36,38,24,0.64)), color-stop(100%,rgba(0,0,0,0.29))); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, rgba(36,38,24,0.64) 0%,rgba(0,0,0,0.29) 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, rgba(36,38,24,0.64) 0%,rgba(0,0,0,0.29) 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, rgba(36,38,24,0.64) 0%,rgba(0,0,0,0.29) 100%); /* IE10+ */
+    background: linear-gradient(to bottom, rgba(36,38,24,0.64) 0%,rgba(0,0,0,0.29) 100%); /* W3C */
+}
+.ppw-footer-element.ppw-global{
+    
+}
+.ppw-header-element, .ppw-footer-element{
+    font-size: 16px;
+    z-index: 999988;
+}

@@ -19,11 +19,20 @@
     </head>
     <body>
         
-        <!-- use also: ppw-type-content or ppw-type-section to add the elements only to those slides -->
-        <div class="ppw-clonable">BLah blAH!</div>
+        <!-- 
+            Adding elements to all slides or to some types of slides
+            use also: ppw-type-content or ppw-type-section to add the elements only to those slides
+        -->
+        <div class="ppw-clonable">This element was cloned into all the slides!</div>
         
-        <header>This is the header!</header>
+        <!-- Headers and Footers -->
+        <header>This is  the header!</header>
         <footer>and this is the fooooooter :)</footer>
+        
+        <!-- variables -->
+        <div style="position: absolute; right: -1px; top: -1px; z-index: 999999;background-color: yellow; padding: 4px; border: solid 1px black;">
+            <var>slide.id</var> - <var>slide.idx</var> - <var>slide.number</var> - <var>talk.title</var> - <var>talk.length</var>
+        </div>
         
         <div id="redarrow"
             style="position: absolute;
@@ -204,6 +213,9 @@
                     sodialSearch: '#braziljs OR @felipenmoura'
 
                 },
+                
+                useGlobalHeader: true,
+                
                 // the expected duration in minutes in minutes (default 50)
                 duration: 60,
                 // When in minutes, the speaker should be alerted(default: 30, 40)

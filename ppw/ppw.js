@@ -864,31 +864,127 @@ window.PPW= (function($, _d, console){
      * all the slides.
      */
     var _applyHeaderFooter= function(){
+        
         var h= $('header'),
             f= $('footer');
             
         if(h.length){
             h.addClass('ppw-header-element');
-            if(!_settings.useGlobalHeader){
+            if(_settings.useGlobalHeader){
+                h.addClass('ppw-global');
+            }else{
                 h[0].removeAttribute('id');
                 $('.ppw-slide-type-content').each(function(){
                     $(this).append(h[0].cloneNode(true));
                 });
+                h.remove();
             }
         }
         if(f.length){
-            h.addClass('ppw-footer-element');
-            if(!_settings.useGlobalFooter){
+            f.addClass('ppw-footer-element');
+            if(_settings.useGlobalFooter){
+                f.addClass('ppw-global');
+            }else{
                 $('.ppw-slide-type-content').each(function(){
                     $(this).append(f[0].cloneNode(true));
                 });
+                f.remove();
             }
         }
-        h.remove();
-        f.remove();
-        
-        // TODO: add behaviour and data to headers and footers
     }
+    
+    /**
+     * Verifies if the given element is inside a slide or not.
+     * 
+     * @param HTMLElement The element to be verified.
+     * @return Mixed The slide section element or false.
+     */
+    var _elementInSlide= function(el){
+        while(!$(el).hasClass('ppw-slide-element') && el.tagName.toUpperCase() != 'HTML'){
+            el= el.parentNode;
+        }
+        if(el.tagName.toUpperCase() == 'SECTION')
+            return el;
+        else
+            return false;
+    }
+    
+    /**
+     * Replaces the var HTMLElements by the PPW variable corresponding to its innerHTML.
+     * 
+     * The variables will be added to the <var> elements as their contents.
+     * Global <var> elements(not inside any slide) will be updated automaticaly.
+     * 
+     * The available variables are:
+     * - slides.id
+     * - slides.idx
+     * - slides.number
+     * - talk.title
+     * - talk.length
+     * 
+     * If a selector is given, it means it is a global element which should be
+     * updated as the slides change.
+     * 
+     * @param String|Null The selector, if not given, 'var' will be used.
+     */
+    var _applyTalkVariables= function(selector){
+        
+        $(selector || 'var').each(function(){
+            console.log(this)
+            var controller= false, i= 0,
+                validSlides= _getValidSlides(),
+                slideEl= _elementInSlide(this),
+                variable= $(this).data('ppw-variable') || this.innerHTML,
+                slide= slideEl? $(slideEl.parentNode).data('ppwSlideRef'):
+                                _getCurrentSlide();
+            switch(variable){
+                case 'slide.id':
+                        this.innerHTML= slide.id;
+                    if(!slideEl){
+                        $(this).addClass('ppw-variable').data('ppw-variable', 'slide.id');
+                    }
+                    break;
+                case 'slide.idx':
+                    this.innerHTML= slide.index;
+                    if(!slideEl){
+                        $(this).addClass('ppw-variable').data('ppw-variable', 'slide.idx');
+                    }
+                    break;
+                case 'slide.number':
+                    
+                    $(validSlides).each(function(){
+                        
+                        i++;
+                        
+                        if((this.id === slide.id) >> controller){
+                            controller= true;
+                            return false;
+                        }
+                    });
+                    
+                    // if was one of the valid slides
+                    if(controller)
+                        this.innerHTML= i;
+                    
+                    if(!slideEl){
+                        $(this).addClass('ppw-variable').data('ppw-variable', 'slide.number');
+                    }
+                    break;
+                case 'talk.title':
+                    this.innerHTML= _settings.title;
+                    if(!slideEl){
+                        $(this).addClass('ppw-variable').data('ppw-variable', 'talk.title');
+                    }
+                    break;
+                case 'talk.length':
+                    this.innerHTML= validSlides.length;
+                    if(!slideEl){
+                        $(this).addClass('ppw-variable').data('ppw-variable', 'talk.length');
+                    }
+                    break;
+            }
+        });
+    };
     
     /**
      * Sets the language properties for the slides.
@@ -963,6 +1059,13 @@ window.PPW= (function($, _d, console){
             _applyClonableElements();
             // setting the header/footer elements
             _applyHeaderFooter();
+            //apply presentation variables
+            _applyTalkVariables();
+            // applying global variable values to variable elements not in slides
+            _addListener('onslidechange', function(){
+                _applyTalkVariables('.ppw-variable');
+            });
+            
             // triggering the event to all the listeners
             _triggerEvent('onslidesloaded', _settings.slides);
             
