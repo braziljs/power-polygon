@@ -3,11 +3,13 @@
  * 
  * This file contains the JavaScript library correspondent to the PowerPolygon
  * basic functionality.
+ * Read the full documentation at: http://github.com/braziljs/power-polygon
  * 
  * @dependencies jQuery
  * 
  * @author Felipe N. Moura <felipenmoura@gmail.com>
  * @namespace PPW
+ * @scope Global
  *
  */
 
@@ -1025,6 +1027,58 @@ window.PPW= (function($, _d, console){
         _triggerEvent('onlangchange');
     }
     
+    
+    
+    
+    
+    
+    var _imagesPreloadEnd= function(){
+        _w.setTimeout(function(){
+
+            $('#ppw-slides-loader-bar').animate({
+                marginTop: '-61px'
+            }, 500);
+
+        }, 1000);
+    };
+    
+    var _startPreLoadingImages= function(){
+        
+        var imagesToPreload= $('#ppw-slides-container img'),
+            imagesLength= imagesToPreload.length,
+            loadedImages= 0,
+            tmpImg= null,
+            loaderBar= $('#ppw-slides-loader-bar-loading-container>div'),
+            perc= 0,
+            onLoadFn= function(){
+                loadedImages++;
+                perc= loadedImages * 100 / imagesLength;
+                
+                loaderBar.stop().animate({width: perc+'%'}, 60, function(){
+                    
+                    if(perc == 100 && loadedImages == imagesLength){
+                        _imagesPreloadEnd();
+                        /*_w.setTimeout(function(){
+                            
+                            $('#ppw-slides-loader-bar').animate({
+                                marginTop: '-61px'
+                            }, 500);
+                            
+                        }, 1000);*/
+                    }
+                });
+            };
+        
+        imagesToPreload.each(function(){
+            tmpImg= new Image();
+            tmpImg.onload= onLoadFn;
+            tmpImg.src= this.src;
+        });
+        
+        if(!imagesLength)
+            _imagesPreloadEnd();
+    };
+    
     /**
      * Advances one step in the slides preload bar.
      */
@@ -1035,14 +1089,22 @@ window.PPW= (function($, _d, console){
         
         perc= _conf.preloadedSlidesCounter * 100 / l;
         
-        if(_conf.preloadedSlidesCounter == l){
-            fn= function(){
-                _w.setTimeout(function(){
-                    $('#ppw-slides-loader-bar').stop().animate({
-                        marginTop: '-61px'
-                    }, 500);
-                }, 1000);
-            };
+        if(_conf.preloadedSlidesCounter === l){
+            if(!_settings.preloadImages){
+                fn= function(){
+                    _w.setTimeout(function(){
+                        $('#ppw-slides-loader-bar').stop().animate({
+                            marginTop: '-61px'
+                        }, 500);
+                    }, 1000);
+                };
+            }else{
+                fn= function(){
+                    $('#ppw-preloader-label').html('Loading images...');
+                    $('#ppw-slides-loader-bar-loading-container>div').stop().css('width', '0%');
+                    _startPreLoadingImages();
+                }
+            }
         }
         
         // for each loaded slide
@@ -1154,8 +1216,6 @@ window.PPW= (function($, _d, console){
             return;
         
         _triggerEvent('onbeforeshowthumbs');
-        
-        //$(".ppw-slide-container:not(.ppw-slide-not-in-profile), .ppw-slide-container:not(.ppw-slide-not-in-profile) section").show();
         
         _conf.prevStyle= {
             margin: el.css('margin'),
@@ -1769,7 +1829,7 @@ window.PPW= (function($, _d, console){
      * tries to execute its JavaScript
      * 
      */
-    var _preloadSlides= function(){
+    var _preloadSlides= function(fn){
         var slides= _settings.slides,
             l= slides.length,
             i= 0,
