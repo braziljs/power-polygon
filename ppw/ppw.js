@@ -137,8 +137,11 @@ window.PPW= (function($, _d, console){
             currentRotate: 0,
             locked: false,
             zoomMax: 40,
+            currentSlide: 0,
+            presentationStarted: false,
             inThumbsMode: false,
             
+            // a default css format
             prevStyle: {
                 margin: '0px',
                 padding: '0px',
@@ -148,7 +151,10 @@ window.PPW= (function($, _d, console){
                 top: '0px',
                 left: '0px'
             },
+            
+            // all the animation
             animations: [
+                         // enphasys
                          "flash",
                          "shake",
                          "bounce",
@@ -158,10 +164,9 @@ window.PPW= (function($, _d, console){
                          "wiggle",
                          "pulse",
                          "flip",
+                         // entrance
                          "flipInX",
-                         "flipOutX",
                          "flipInY",
-                         "flipOutY",
                          "fadeIn",
                          "fadeInUp",
                          "fadeInDown",
@@ -171,6 +176,21 @@ window.PPW= (function($, _d, console){
                          "fadeInDownBig",
                          "fadeInLeftBig",
                          "fadeInRightBig",
+                         "bounceIn",
+                         "bounceInDown",
+                         "bounceInUp",
+                         "bounceInLeft",
+                         "bounceInRight",
+                         "rotateIn",
+                         "rotateInDownLeft",
+                         "rotateInDownRight",
+                         "rotateInUpLeft",
+                         "rotateInUpRight",
+                         "lightSpeedIn",
+                         "rollIn",
+                         // exiting
+                         "flipOutX",
+                         "flipOutY",
                          "fadeOut",
                          "fadeOutUp",
                          "fadeOutDown",
@@ -180,31 +200,21 @@ window.PPW= (function($, _d, console){
                          "fadeOutDownBig",
                          "fadeOutLeftBig",
                          "fadeOutRightBig",
-                         "bounceIn",
-                         "bounceInDown",
-                         "bounceInUp",
-                         "bounceInLeft",
-                         "bounceInRight",
                          "bounceOut",
                          "bounceOutDown",
                          "bounceOutUp",
                          "bounceOutLeft",
                          "bounceOutRight",
-                         "rotateIn",
-                         "rotateInDownLeft",
-                         "rotateInDownRight",
-                         "rotateInUpLeft",
-                         "rotateInUpRight",
                          "rotateOut",
                          "rotateOutDownLeft",
                          "rotateOutDownRight",
                          "rotateOutUpLeft",
                          "rotateOutUpRight",
-                         "lightSpeedIn",
                          "lightSpeedOut",
                          "hinge",
-                         "rollIn",
                          "rollOut"],
+
+            // default values to some properties and variables
             defaults: {
                 duration: 50,
                 alertAt: [30, 40],
@@ -214,6 +224,8 @@ window.PPW= (function($, _d, console){
                 slideTitleSize: 40,
                 containerID: 'ppw-slides-container'
             },
+            
+            // constant values and names for css classes and patterns
             cons: {
                 CLASS_SLIDE               : 'ppw-slide-element',
                 CLASS_ACTIVE_SLIDE        : 'ppw-active-slide-element',
@@ -225,8 +237,9 @@ window.PPW= (function($, _d, console){
                 CLASS_FULLSCREEN          : 'ppw-fullscreen',
                 FOCUSABLE_ELEMENT         : 'ppw-focusable',
                 CLICKABLE_ELEMENT         : 'ppw-clickable',
+                
                 /**
-                 * used for the fsPattern settings.
+                 * used for the fsPattern settings
                  * %id    = slide identifier
                  * %num   = slide number
                  */
@@ -239,11 +252,12 @@ window.PPW= (function($, _d, console){
                     SLIDE_NUM_FILES       : 'slides/%num.html',
                     SLIDE_NUM_MIXED       : '%num.html'
                 }
-            },
-            currentSlide: 0,
-            presentationStarted: false
+            }
         },
+        
+        // all the templates to created elements and tools
         _templates= {
+            // the help content
             help: "<h3>Help</h3>\
                   Website: <a href='http://powerpolygon.com' target='_blank'>powerpolygon.com</a><br/>\
                   Forum/Discussion group: <a href='https://groups.google.com/forum/#!forum/powerpolygon' target='_blank'>forum/powerpolygon</a><br/>\
@@ -257,21 +271,26 @@ window.PPW= (function($, _d, console){
                   Scroll: Applies zoom in and out<br/>\
                   F6, F7, F8, F9, F10: Custom",
         
+            // the loading element
             loading: "<div id='ppw-lock-loading' style='position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; background-color: #f0f9f9; padding: 10px; font-family: Arial; z-index: 999999999;'>\
-                    <span>Loading Power Polygon</span><br/><div id='ppw-loadingbarParent'><div/><div id='ppw-loadingbar'><div/></div>",
+                      <span>Loading Power Polygon</span><br/><div id='ppw-loadingbarParent'><div/><div id='ppw-loadingbar'><div/></div>",
+            
+            // content for the not found slides
+            slideNotFound:  "<h4 style='font-size: 22px;'>Failed loading slide <span class='ppw-slide-fail'>{{slideid}}</span>!</h4>\
+                            <div class='ppw-slide-fail-help' style='font-size:13px;'>Please verify the slide id.<br/>Power Polygon looks for the slide's content following these rules:<br/>\
+                            <br/>* A section element on the page, with the given id:<br/>Eg.: &lt;section id='{{slideid}}'>Your content&lt;/section><br/>\
+                            <br/>* A file in the fsPattern location.<br/>Currently looking at: <span class='ppw-slide-fail'>{{addr}}</span><br/><br/>\
+                            The content could not be found in any of these expected places!</div>",
         
-            slideNotFound: "<h4 style='font-size: 22px;'>Failed loading slide <span class='ppw-slide-fail'>{{slideid}}</span>!</h4>"+
-            "<div class='ppw-slide-fail-help' style='font-size:13px;'>Please verify the slide id.<br/>Power Polygon looks for the slide's content following these rules:<br/>"+
-            "<br/>* A section element on the page, with the given id:<br/>Eg.: &lt;section id='{{slideid}}'>Your content&lt;/section><br/>"+
-            "<br/>* A file in the fsPattern location.<br/>Currently looking at: <span class='ppw-slide-fail'>{{addr}}</span><br/><br/>"+
-            "The content could not be found in any of these expected places!</div>",
-        
+            // the arrows element to go forward and backward
             arrows: "<div id='ppw-arrows-container' class='ppw-clickable'><div id='ppw-arrow-previous-slide' onclick='if(!PPW.isLocked()) PPW.goPrev();'>◄</div><div id='ppw-arrow-next-slide' onclick='if(!PPW.isLocked()) PPW.goNext();'>►</div></div>",
         
+            // the search tool content
             searchTool: "<div style='float: left;'>Search into slides:</div>\
                          <div style='float: right;'><input type='search' id='ppw-search-slide' value='' placeholder='Search' />\
                          <input type=button id='ppw-search-prev' class='ppw-clickable' title='Find in previous slides(shift+enter)' value='◄' /> <input type=button id='ppw-search-next' title='Find in next slides(enter)' class='ppw-clickable' value='►' /></div><div id='ppw-search-found' class='ppw-clickable'></div>",
             
+            // the message box element itself
             messages: '<div id="ppw-message-box"  class="ppw-clickable ppw-platform">\
                         <div id="ppw-message-content" class="ppw-clickable"></div>\
                         <div id="ppw-message-box-ok-button" class="ppw-clickable">\
@@ -279,6 +298,7 @@ window.PPW= (function($, _d, console){
                         </div>\
                       </div>',
         
+            // camera/video placeholder element
             camera: '<div id="ppw-camera-tool" class="ppw-clickable">\
                         <video id="ppw-video-element" autoplay="autoplay" class="ppw-clickable"></video>\
                         <div id="ppw-camera-hide-trigger" class="ppw-clickable">\
@@ -286,6 +306,7 @@ window.PPW= (function($, _d, console){
                         </div>\
                       </div>',
         
+            // the top-left toolbar content
             toolBar: '<div id="ppw-toolbar-container" class="ppw-platform {{clickableClass}}">\
                     <div id="ppw-toolbar" class="ppw-platform {{clickableClass}}">\
                         <div class="img"><img id="ppw-goto-icon" onclick="PPW.showGoToComponent(false);" title="Go to a specific slide" /></div>\
@@ -307,6 +328,7 @@ window.PPW= (function($, _d, console){
                     </div>\
                    </div>',
             
+            // the settings form content
             settings: "<form id='ppw-settings-form'>\
                     <h3>Settings</h3><br/>\
                     <label>Enable shortcuts: </label><input type='checkbox' id='ppw-shortcutsEnable' {{shortcuts}} /><br/>\
@@ -317,24 +339,35 @@ window.PPW= (function($, _d, console){
               </form>"
         },
         
-        // user defined settings
+        // user defined settings...the following values come by default if the user did not set them
         _settings= {
-            hashSeparator: '#', // the separator to be used on the address bar
-            PPWSrc: "../../ppw/", // wondering the talk is in /talks/talkname for example
-            shortcutsEnable: true, // enables or not, the shortcuts
-            friendlyURL: 'id', // may be false(also, 'num') or id(slide's id)
-            useSplashScreen: true, // should ppw open the splash screen first?
+            // the separator to be used on the address bar
+            hashSeparator: '#',
+            // wondering the talk is in /talks/talkname for example
+            PPWSrc: "../../ppw/",
+            // enables or not, the shortcuts
+            shortcutsEnable: true,
+            // may be false(also, 'num') or id(slide's id)
+            friendlyURL: 'id',
+            // should ppw open the splash screen first?
+            useSplashScreen: true,
+            // the slides container to be appended to the body
             slidesContainer: _d.createElement('div'),
+            // the default theme
             theme: _conf.defaults.theme,
+            // the default transition
             transition: _conf.defaults.transition,
             // the pattern to find the external slides
             fsPattern: _conf.cons.fs.SLIDE_ID_DIR_ID,
+            // times in minutes to be alerted
             alertAt: _conf.defaults.alertAt,
+            // the duration of the talk
             duration: _conf.defaults.duration,
             // enables the toolbar
             useToolBar: true,
             // battery support only working on Firefox Nightly by now
             showBatteryAlerts: true,
+            // show the alerts of "offline browser" if supported
             showOfflineAlerts: true,
             // Enables the arrows to go previous and next slides
             useArrows: false,
@@ -344,6 +377,7 @@ window.PPW= (function($, _d, console){
             slidesCache: true,
             // preloads the images before starting the presentation
             preloadImages: false,
+            // talk's profile
             profile: 'none',
             // removes any zooming or rotating effect on slide change.
             fixTransformsOnSlideChange: true, 
@@ -373,10 +407,10 @@ window.PPW= (function($, _d, console){
         _h= history,
         _w= window;
     
-    
     /**
-     * Available listeners.
-     * Used by addons.
+     * Available event listeners.
+     * 
+     * These events are triggered by the _triggerEvent method.
      */
     var _listeners= {
         onstart                 : [],
@@ -495,7 +529,9 @@ window.PPW= (function($, _d, console){
      * Used by addons to register themselves and then, to
      * be able to receive events and the presentation data.
      * 
-     * @param 
+     * @param String The addon's identification
+     * @param Object The configuration for the addon
+     * 
      */
     var _extend= function(id, conf){
         var prop= null;
@@ -533,6 +569,8 @@ window.PPW= (function($, _d, console){
      * First section will be the openning slide.
      * Last section will be the closing slide.
      * All the other sections will be of type "content".
+     * 
+     * @param Object The given partial settings
      */
     var _autoGenerateConfig= function(conf){
         var o= {
