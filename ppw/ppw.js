@@ -5,6 +5,8 @@
  * basic functionality.
  * Read the full documentation at: http://github.com/braziljs/power-polygon
  * 
+ * Under MIT Licence.
+ * 
  * @dependencies jQuery
  * 
  * @author Felipe N. Moura <felipenmoura@gmail.com>
@@ -12,37 +14,102 @@
  * @scope Global
  *
  */
-
-if(window.PPW)
-    throw new Error("PowerPolygon framework already loaded!");
-
-if(!window.jQuery){
-    console.warn("[PPW] Dependency required!");
-    alert("ERROR:\nMissing dependency:\n    - jQuery");
-    PPW= {
-        init: function(){},
-        extend: function(){},
-        addAction: function(){},
-        addListener: function(){},
-        animate: function(){},
-        onSlideEnter: function(){},
-        onSlideExit: function(){},
-        cons: { fs: {} }
-    };
-    
-    throw new Error("!\n[PPW] The only dependency Power Polygon has is jQuery, please insert a jQuery script to your page before including ppw.js!\n\n");
-}
-
 window.PPW= (function($, _d, console){
     
     "use strict";
     
-    if(!$)
-        return { init: function(){} };
+    /**************************************************
+     *            VALIDATING AND SETING UP            *
+     **************************************************/
+     // This following instructions will validade the //
+     // current environment and configuration.        //
+     //                                               //
+     // This works quite proceduraly, just executing  //
+     // some validations.                             //
+     // before Power Polygon starts its job.          //
+     /*************************************************/
+
+    /**
+     * This work quite proceduraly, just executing some validations
+     * before Power Polygon starts its job.
+     *
+     * First of all, let's check if it has not been already loaded
+     */
+    if(window.PPW)
+       throw new Error("PowerPolygon framework already loaded!");
+
+    /**
+     * Now, let's verify if jQuery(the only dependency) is loaded
+     */
+    if(!$){
+       console.warn("[PPW] Dependency required!");
+       alert("ERROR:\nMissing dependency:\n    - jQuery");
+       window.PPW= {
+           init: function(){},
+           extend: function(){},
+           addAction: function(){},
+           addListener: function(){},
+           animate: function(){},
+           onSlideEnter: function(){},
+           onSlideExit: function(){},
+           cons: { fs: {} }
+       };
+
+       throw new Error("!\n[PPW] The only dependency Power Polygon has is jQuery! Please insert a jQuery script into your page before including ppw.js!\n\n");
+    }
+
+    /**
+     * Let's check for the console
+     */
+    if(!window.console){
+       // com'on, no console?1 what browser are you using?!
+       var fn= function(){return false};
+       window.console= {log:fn,warn:fn,error:fn};
+    }
+
+
+    /**
+     * We use jQuery to load multiple scripts...
+     * As jQuery does not support it by default, we will override the getScript method
+     * to support it, as follows.
+     */
+    (function($){
+
+           var getScript = $.getScript;
+
+           $.getScript = function( resources, callback ) {
+
+                   if(typeof resources == 'string')
+                       resources= [resources];
+                   var length = resources.length, 
+                       handler = function() { counter++; },
+                       deferreds = [],
+                       counter = 0, 
+                       idx = 0;
+
+                   for ( ; idx < length; idx++ ) {
+                       deferreds.push(
+                               getScript( resources[ idx ], handler )
+                       );
+                   }
+
+                   $.when.apply( null, deferreds ).then(function() {
+                       callback && callback();
+                   });
+
+           };
+    })($);
+    /* END VALIDATING AND SETTING UP */
     
     /**************************************************
      *                PRIVATE VARIABLES               *
      **************************************************/
+     // The following variables are used internaly.   //
+     // These variables can be exposed afterwards.    //
+     //                                               //
+     // Variables starting with _ shoulr represent    //
+     // these private variables                       //
+     /*************************************************/
     
     var _self = this,
         _version= '2.0.0',
@@ -348,6 +415,11 @@ window.PPW= (function($, _d, console){
     /**************************************************
      *                PRIVATE METHODS                 *
      **************************************************/
+     // Below, you will see the private methods.      //
+     // These methods can be exposed afterwards. They //
+     // are used internally, or, when exposed, by the //
+     // Power Polygon API                             //
+     /*************************************************/
     
     /**
      * Adds an event listener to PPW.
@@ -2771,6 +2843,12 @@ window.PPW= (function($, _d, console){
     /**************************************************
      *               PRESENTATION CORE                *
      **************************************************/
+     // Methods that are actually used to have the    //
+     // Power Polygon's core working.                 //
+     //                                               //
+     // These methods are private, but may be exposed //
+     // by the APY.                                   //
+     /*************************************************/
     
     /**
      * Starts the presentation itself.
@@ -2920,6 +2998,10 @@ window.PPW= (function($, _d, console){
     /**************************************************
      *                 SLIDE METHODS                  *
      **************************************************/
+     // Methods used by Slide contexts.               //
+     // This method is private, but can be exposed    //
+     // by the API, afterwards.                       //
+     /*************************************************/
     
     /**
      * Returns the index of the current slide based on the url.
@@ -3612,6 +3694,13 @@ window.PPW= (function($, _d, console){
     /**************************************************
      *                GETTERS/SETTERS                 *
      **************************************************/
+     // These methods allow you to exchange useful    //
+     // data with Power Polygon.                      //
+     //                                               //
+     // These methods set the settings properties,    //
+     // retrieve them, or get useful, already parsed  //
+     // and prepared data.                            //
+     /*************************************************/
     /**
      * Returns the list os slide objects.
      * 
@@ -3671,6 +3760,11 @@ window.PPW= (function($, _d, console){
     /**************************************************
      *                  CONSTRUCTOR                   *
      **************************************************/
+     // This is the constructor.                      //
+     // This method is the first method called by     //
+     // Power Polygon and should identify some        //
+     // variables and status.                         //
+     /*************************************************/
     var _constructor= function(){
         
         // let's create some global useful variables
@@ -3694,6 +3788,10 @@ window.PPW= (function($, _d, console){
     /**************************************************
      *                 PUBLIC OBJECT                  *
      **************************************************/
+     // All the properties returned in this object    //
+     // will be exposed by the API, becoming global   //
+     // variables and functions on the PPW namespace  //
+     /*************************************************/
     return {
         version                         : _version,
         init                            : _init,
@@ -3755,36 +3853,4 @@ window.PPW= (function($, _d, console){
         set                             : _set
     };
     
-})(jQuery, document, console);
-
-/**
- * We use jQuery to load multiple scripts as well.
- * As jQuery does not support it by default, we will override the getScript method
- * to support it.
- */
-(function(){
-        // enabling jquery to load multiple scripts
-	var getScript = $.getScript;
-
-        $.getScript = function( resources, callback ) {
-
-                if(typeof resources == 'string')
-                    resources= [resources];
-                var length = resources.length, 
-                    handler = function() { counter++; },
-                    deferreds = [],
-                    counter = 0, 
-                    idx = 0;
-
-                for ( ; idx < length; idx++ ) {
-                    deferreds.push(
-                            getScript( resources[ idx ], handler )
-                    );
-                }
-
-                $.when.apply( null, deferreds ).then(function() {
-                    callback && callback();
-                });
-                
-        };
-})();
+})(window.jQuery, document, window.console);
