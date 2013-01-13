@@ -191,7 +191,7 @@ window.PPW= (function($, _d, console){
                   F6, F7, F8, F9, F10: Custom",
         
             loading: "<div id='ppw-lock-loading' style='position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; background-color: #f0f9f9; padding: 10px; font-family: Arial; z-index: 999999999;'>\
-                    Loading Contents<br/><div id='ppw-loadingbarParent'><div/><div id='ppw-loadingbar'><div/></div>",
+                    <span>Loading Power Polygon</span><br/><div id='ppw-loadingbarParent'><div/><div id='ppw-loadingbar'><div/></div>",
         
             slideNotFound: "<h4 style='font-size: 22px;'>Failed loading slide <span class='ppw-slide-fail'>{{slideid}}</span>!</h4>"+
             "<div class='ppw-slide-fail-help' style='font-size:13px;'>Please verify the slide id.<br/>Power Polygon looks for the slide's content following these rules:<br/>"+
@@ -266,15 +266,17 @@ window.PPW= (function($, _d, console){
             duration: _conf.defaults.duration,
             // enables the toolbar
             useToolBar: true,
-            // battery support only working on Firefox Nightly by now.
+            // battery support only working on Firefox Nightly by now
             showBatteryAlerts: true,
             showOfflineAlerts: true,
-            // Enables the arrows to go previous and next slides.
+            // Enables the arrows to go previous and next slides
             useArrows: false,
-            // When using arrows, this means that ONLY the arrows will go next and previous.
+            // When using arrows, this means that ONLY the arrows will go next and previous
             useOnlyArrows: false,
             // allows slides to be cached
             slidesCache: true,
+            // preloads the images before starting the presentation
+            preloadImages: false,
             profile: 'none',
             // removes any zooming or rotating effect on slide change.
             fixTransformsOnSlideChange: true, 
@@ -596,10 +598,26 @@ window.PPW= (function($, _d, console){
         $('#ppw-loadingbar').css({width: perc+'%'});
         
         if(perc >= 100){
+            
             _triggerEvent('onthemeloaded', _settings.themeSettings);
-            if(!_settings.useSplashScreen)
-                _preloadSlides();
-            $('#ppw-lock-loading').fadeOut();
+            
+            if(_settings.preloadImages >> _settings.useSplashScreen){
+                
+                setTimeout(function(){
+                    $('#ppw-lock-loading').find('span').eq(0).html('Loading images...');
+                    
+                    _preloadSlides(function(){
+                        _startPreLoadingImages($('#ppw-loadingbar').stop()
+                                                                   .css('width', '1%'));
+                    });
+                    
+                }, 400);
+            }else{
+                if(_settings.useSplashScreen)
+                    $('#ppw-lock-loading').fadeOut();
+                else
+                    _preloadSlides(function(){$('#ppw-lock-loading').fadeOut();});
+            }
         }
     };
     
@@ -1035,20 +1053,24 @@ window.PPW= (function($, _d, console){
     var _imagesPreloadEnd= function(){
         _w.setTimeout(function(){
 
-            $('#ppw-slides-loader-bar').animate({
-                marginTop: '-61px'
-            }, 500);
+            if(_settings.useSplashScreen){
+                $('#ppw-slides-loader-bar').animate({
+                    marginTop: '-61px'
+                }, 500);
+            }else{
+                $('#ppw-lock-loading').fadeOut();
+            }
 
         }, 1000);
     };
     
-    var _startPreLoadingImages= function(){
+    var _startPreLoadingImages= function(loadBar){
         
         var imagesToPreload= $('#ppw-slides-container img'),
             imagesLength= imagesToPreload.length,
             loadedImages= 0,
             tmpImg= null,
-            loaderBar= $('#ppw-slides-loader-bar-loading-container>div'),
+            loaderBar= loadBar||$('#ppw-slides-loader-bar-loading-container>div'),
             perc= 0,
             onLoadFn= function(){
                 loadedImages++;
@@ -1075,8 +1097,9 @@ window.PPW= (function($, _d, console){
             tmpImg.src= this.src;
         });
         
-        if(!imagesLength)
+        if(!imagesLength){
             _imagesPreloadEnd();
+        }
     };
     
     /**
@@ -1842,6 +1865,10 @@ window.PPW= (function($, _d, console){
         if(!container.id){
             container.id= _conf.defaults.containerID;
             _b.appendChild(container);
+        }
+        
+        if(fn && typeof fn == 'function'){
+            _addListener('onslidesloaded', fn);
         }
         
         if(!l){
