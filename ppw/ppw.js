@@ -626,8 +626,10 @@ window.PPW= (function($, _d, console){
      * @return Mixed Empty array, or 
      */
     var _querystring= function(key) {
-        var re=new RegExp('(?:\\?|&)'+key+'=(.*?)(?=&|$)','gi');
-        var r=[], m;
+        
+        var re=new RegExp('(?:\\?|&)'+key+'=(.*?)(?=&|$)','gi'),
+            r=[], m;
+            
         while ((m=re.exec(_l.search)) != null) r.push(m[1]);
         return r.length? r[0]: false;
     }
@@ -1038,18 +1040,21 @@ window.PPW= (function($, _d, console){
                 }
             }while(i--);
         }
-        //$b.removeClass('.LANG-').addClass('.LANG-'+lang);
+        
         _b.className= _b.className.replace(/LANG_[a-z]+( |$)/ig, '');
         PPW.language= lang;
         $b.addClass('LANG_'+lang);
         _triggerEvent('onlangchange');
     }
     
-    
-    
-    
-    
-    
+    /**
+     * Triggered when the last image is loaded.
+     * 
+     * This method hides the first loading screen when the splash screen
+     * is disabled, or hide the loading tool in the splash screen when the
+     * images finished loading and the sattings have the property preloadImages
+     * equals to true.
+     */
     var _imagesPreloadEnd= function(){
         _w.setTimeout(function(){
 
@@ -1064,6 +1069,14 @@ window.PPW= (function($, _d, console){
         }, 1000);
     };
     
+    /**
+     * Starts and manipulates the image preloading proccess.
+     * 
+     * If the settings preloadImages is true, this method is called to load all
+     * the images on slides.
+     * 
+     * @param HTMLElement the loader element to received the percent(default is the splash screen's loader bar).
+     */
     var _startPreLoadingImages= function(loadBar){
         
         var imagesToPreload= $('#ppw-slides-container img'),
@@ -1080,13 +1093,6 @@ window.PPW= (function($, _d, console){
                     
                     if(perc == 100 && loadedImages == imagesLength){
                         _imagesPreloadEnd();
-                        /*_w.setTimeout(function(){
-                            
-                            $('#ppw-slides-loader-bar').animate({
-                                marginTop: '-61px'
-                            }, 500);
-                            
-                        }, 1000);*/
                     }
                 });
             };
@@ -1104,6 +1110,8 @@ window.PPW= (function($, _d, console){
     
     /**
      * Advances one step in the slides preload bar.
+     * 
+     * @param SlideObject The slided that has just loaded.
      */
     var _slidePreloaderNext= function(loadedSlide){
         var l= _settings.slides.length,
