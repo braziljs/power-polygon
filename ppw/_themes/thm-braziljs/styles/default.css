@@ -78,6 +78,10 @@ body{
     box-shadow: 0px 0px 40px black;
     -webkit-transform-origin: 0% 100%;
     -webkit-transform: rotate(-20deg);
+    -moz-transform-origin: 0% 100%;
+    -moz-transform: rotate(-20deg);
+    transform-origin: 0% 100%;
+    transform: rotate(-20deg);
 }
 
 .ppw-slide-type-closing{
