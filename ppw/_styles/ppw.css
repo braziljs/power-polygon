@@ -550,6 +550,9 @@
     text-align: center;
     padding-bottom: 2px;
     cursor: pointer !IMPORTANT;
+    position: absolute;
+    bottom: -7px;
+    width: 100%;
 }
 
 #ppw-camera-tool .ui-resizable-s{
