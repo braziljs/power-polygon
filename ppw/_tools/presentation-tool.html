@@ -3,13 +3,13 @@
     <head>
         <title></title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        
+
         <style type="text/css">
             *{
                 margin: 0px;
             }
-            
-            html, body { 
+
+            html, body {
                 height: 100%;
                 width: 100%;
                 overflow: hidden;
@@ -17,27 +17,27 @@
                 padding: 0px;
                 font-family: sans-serif, Arial, Tahoma;
             }
-            
+
             body{
                 background: url(../_images/splash-screen-bg.jpg);
             }
-            
+
             #header{
                 position: relative;
                 z-index: 999;
                 border-radius: 7px;
-                
+
                 box-sizing: border-box;
                 -moz-box-sizing: border-box;
                 margin: 0 4px 0 4px;
-                
+
                 background: #eee;
                 color: #444;
                 font-size: 32px;
                 text-align: center;
                 padding-top: 4px;
             }
-            
+
             #notes{
                 background-color: white;
                 margin: 4px;
@@ -64,17 +64,17 @@
             .notes-list li:nth-child(2n){
                 background-color: #f0f0f0;
             }
-            
+
             #right-panel{
                 width: 200px;
                 height: 100%;
                 box-shadow: 0px 0px 20px black;
                 float: right;
             }
-            
-            
-            
-            
+
+
+
+
             .slide-counter{
                 border: solid 1px white;
                 border-radius: 3px;
@@ -87,13 +87,13 @@
             .slide-counter span{
                 letter-spacing: 0px;
             }
-            
+
             .slide-counter span:nth-child(1){
                 font-weight: bold;
                 font-size: 60px;
                 /*margin-right: -14px;*/
             }
-            
+
             .slide-percent-container{
                 width: 170px;
                 height: 13px;
@@ -111,7 +111,7 @@
                 background-color: green;
                 border-radius: 0px 4px 4px 0px;
             }
-            
+
             .slide-next-title{
                 margin: 4px;
                 border: solid 1px white;
@@ -124,7 +124,7 @@
                 font-size: 24px;
                 color: black;
             }
-            
+
             #timer{
                 position: absolute;
                 bottom: -10px;
@@ -138,9 +138,9 @@
                 text-shadow: -1px 0px 2px black;
                 color: white;
             }
-            
-            
-            
+
+
+
             #timeAlertElement{
                 position: absolute;
                 left: 0px;
@@ -150,15 +150,15 @@
                 text-align: center;
                 font-weight: bold;
                 color: red;
-                
+
                 -webkit-text-stroke: 3px black;
                 -moz-text-stroke: 3px black;
                 text-stroke: 3px black;
-                
+
                 font-size: 600px;
                 display: none;
             }
-            
+
             #previous-slide-trigger, #next-slide-trigger{
                 cursor: pointer;
                 position: absolute;
@@ -169,7 +169,7 @@
             #next-slide-trigger{
                 right: 0px;
             }
-            
+
             #cameraContainer{
                 position: absolute;
                 right: -210px;
@@ -203,7 +203,7 @@
                 </ul>
             </div>
         </div>
-        
+
         <div id="right-panel">
             <div class="slide-counter">
                 <span id="slides-current-slide">
@@ -221,25 +221,25 @@
             <div class="slide-next-title">
                 <span>Next: </span><span id="next-slide-title">...</span>
             </div>
-            
+
             <div class="addons-container">
             </div>
-            
+
             <div id="timer">
                 <span>0</span>min
             </div>
         </div>
-        
+
         <div id="cameraContainer">
             <video id="ppw-video-element" width="200" height="160" autoplay="autoplay"></video>
             <img src="../_images/close.png" id="close-video" />
         </div>
-        
+
         <div id="timeAlertElement">30</div>
-        
-        
+
+
         <script>
-            
+
             window.PresentationTool= (function(_d){
                 var $= null,
                     ppw= null,
@@ -249,15 +249,15 @@
                     d= _d,
                     timer= 0,
                     clock;
-                
+
                 var _setCurrentSlide= function(){
-                    
+
                     var slide= curSlide= ppw.getCurrentSlide(),
                         str= "",
                         i= 0,
                         l= 0,
                         el= null;
-                    
+
                     d.getElementById('ppw-slide-title').innerHTML= slide.title || slide.id;
                     d.getElementById('slides-current-slide').innerHTML= ppw.getValidSlides().indexOf(slide)+1;
                     if(slides[slide.index]){
@@ -265,7 +265,7 @@
                     }else{
                         d.getElementById('next-slide-title').innerHTML= "Final";
                     }
-                    
+
                     el= d.getElementById('slide-notes-list');
                     if(slide.notes && slide.notes.length){
                         l= slide.notes.length;
@@ -276,41 +276,41 @@
                         str= "--";
                     }
                     el.innerHTML= str;
-                    
+
                     el= d.getElementById('slide-percent-bar');
-                    
+
                     el.style.width= (slide.index * 100 / ppw.getValidSlides().length)+'%';
                     d.getElementById('slides-length').innerHTML= ppw.getValidSlides().length;
                 };
-                
+
                 var _startTimer= function(){
                     clock= setInterval(function(){
                         timer++;
-                        
+
                         if(ppw.getAlertAtTimes().indexOf(timer) >= 0){
                             window.PresentationTool.alertTime(timer);
                         }
-                        
+
                         d.querySelector('#timer span').innerHTML= timer;
                     }, 60000);
                     d.querySelector('#timer span').innerHTML= timer;
                 };
-                
+
                 var _init= function(_$, _ppw, _slides){
-                    
+
                     var el= null, started= false, dt= new Date();
-                    
+
                     $= _$;
                     ppw= _ppw;
                     slides= _slides;
                     d.getElementById('slides-length').innerHTML= ppw.getValidSlides().length;
                     _setCurrentSlide();
-                    
+
                     el= d.getElementById('timer');
-                    
+
                     el.style.border= 'solid 1ps red';
                     el.addEventListener('click', function(){
-                        
+
                         var t= prompt("Set the current time to:");
                         if(!t)
                             return false;
@@ -321,7 +321,7 @@
                         d.querySelector('#timer span').innerHTML= timer;
 
                     }, false);
-                
+
                     started= ppw.getStartedAt();
                     if(!started){
                         ppw.addListener('onstart', _startTimer);
@@ -329,28 +329,78 @@
                         timer= Math.floor((dt.getTime() - started) / 60000);
                         _startTimer();
                     }
-                    
-                    
+
+
+                    //Event binding for the presentation tool
+
                     d.getElementById('previous-slide-trigger').addEventListener('click', function(){
                         ppw.goPreviousSlide();
                     }, false);
                     d.getElementById('next-slide-trigger').addEventListener('click', function(){
                         ppw.goNextSlide();
                     }, false);
-                
+                    d.getElementById('close-video').addEventListener('click', function(){
+
+                        var container= document.getElementById('cameraContainer')
+                        document.getElementById('ppw-video-element').pause();
+                        $(container).animate({
+                            right: '-210px'
+                        }, function(){});
+                    }, false);
+                    $(d).bind('keydown', function(evt){
+                        switch(evt.keyCode){
+                            case 37: // left
+                            case 40: // down
+                            case  8: // delete/backspace
+                                ppw.goPreviousSlide();
+                                evt.preventDefault();
+                                evt.stopPropagation();
+                                return false;
+                                break;
+
+                            case 38: // up
+                            case 39: // right
+                            case 13: // enter
+                            case 32: // space
+                                ppw.goNextSlide();
+                                evt.preventDefault();
+                                evt.stopPropagation();
+                                return false;
+                                break;
+
+                            case 67: // C
+                                ppw.toggleCamera();
+                                evt.preventDefault();
+                                evt.stopPropagation();
+                                return false;
+                                break;
+
+                            case 84: // T
+                                ppw.showThumbs();
+                                evt.preventDefault();
+                                evt.stopPropagation();
+                                return false;
+                                break;
+
+                            default:
+                                return true;
+                        }
+                    });
+
+
                     ppw.addListener('onslidechange', function(){
                         _setCurrentSlide();
                     });
-                    
+
                     ppw.addListener("onshowcamera", function(data){
-                        
+
                         var video= d.getElementById('ppw-video-element'),
                             container= d.getElementById('cameraContainer');
-                        
+
                         window.URL = window.URL || window.webkitURL;
                         navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia ||
                                            navigator.mozGetUserMedia || navigator.msGetUserMedia;
-                        
+
                         navigator.getUserMedia({audio: false, video: true}, function(stream) {
                             var streamData= stream;
                             try{
@@ -366,49 +416,39 @@
                             }, function(){});
                         });
                     });
-                    
-                    
-                    document.getElementById('close-video').addEventListener('click', function(){
-
-                        var container= document.getElementById('cameraContainer')
-                        document.getElementById('ppw-video-element').pause();
-                        $(container).animate({
-                            right: '-210px'
-                        }, function(){});
-                    }, false);
                 };
-                    
+
                 var verifyInstance= function(){
                     if(!$){
                         _init(o.jQuery, o.PPW, o.PPW.getSlides());
                     }
                 }
-                
+
                 return {
                     init: _init,
                     adjustScreen: function(){
                         verifyInstance();
-                        
+
                         var notesEl= d.getElementById('notes'),
                             bar= d.getElementById('right-panel'),
                             tt= d.getElementById('header');
-                        
+
                         notesEl.style.width= (d.body.clientWidth - bar.offsetWidth - 22) + 'px';
                         notesEl.style.height= (d.body.clientHeight - tt.offsetHeight - 22) + 'px';
-                        
+
                     },
                     triggerPresentationToolLoadEvent: function(){
                         ppw.triggerPresentationToolLoadEvent(window);
                     },
                     alertTime: function(t){
-                        
+
                         var el= null,
                             notesEl= d.getElementById('notes');
-                            
+
                         verifyInstance();
-                        
+
                         el= $(d.querySelector('#timeAlertElement'));
-                        
+
                         el.html(t)
                           .show()
                           .css({
@@ -435,15 +475,15 @@
                         });
                     }
                 }
-                
+
             })(document);
-            
+
             window.onresize= PresentationTool.adjustScreen;
             window.onload= function(){
                 PresentationTool.adjustScreen();
                 PresentationTool.triggerPresentationToolLoadEvent();
             }
-            
+
         </script>
     </body>
 </html>
