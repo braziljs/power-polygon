@@ -3702,6 +3702,8 @@ window.PPW= (function($, _d, console){
      * 
      * Power Polygon may be locked, but allowing events for one specified element,
      * if that element is the target of the given event, it should be triggered.
+     * 
+     * Link elements(with the tag A) will be accepted even when locked.
      */
     var _isLocked= function(evt){
         
@@ -3714,6 +3716,8 @@ window.PPW= (function($, _d, console){
         if(_conf.locked !== true){
             return evt.target != _conf.locked;
         }else{
+            if(evt.target.tagName.toUpperCase() == 'A')
+                return false;
             return true;
         }
     }
