@@ -3,32 +3,49 @@
     "PPWSrc": "../../ppw/",
     "languages": ["PT", "EN"],
     "defaultLanguage":  "EN",
-    "slides": [
+    slides: [
         {
-            "type": "opexning",
-            "id": "cover"
+            type: 'opening',
+            id: 'cover'
         },
         {
-            "type": "content",
-            "id": "about",
-            "notes": [
-                "A note here"
-            ]
+            type: 'content',
+            id: 'about'
         },
         {
-            "type": "content",
-            "id": "profile-example-1"
+            type: 'content',
+            id: 'presentationTool'
         },
         {
-            "type": "content",
-            "id": "sh"
+            type: 'section',
+            id: 'section'
         },
         {
-            "type": "closing",
-            "id": "closing",
-            "notes": [
+            id: 'profile-example-1'
+        },
+        {
+            id: 'profile-example-2',
+            profile: 'longer'
+        },
+        {
+            type: 'content',
+            id: 'sh',
+            data: {
+                info: "An object containing whatever we want",
+                howToUse: "You can access it via $('#slideid').data('yourObjectKey')"
+            }
+        },
+        {
+            type: 'content',
+            id: 'showCamera',
+            className: 'red-test'
+        },
+        {
+            type: 'closing',
+            id: 'closing',
+            notes: [
                 "The last slide, to thank and ask for questions"
             ]
         }
-    ]
+    ],
 }

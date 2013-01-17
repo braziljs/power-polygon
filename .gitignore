@@ -10,6 +10,11 @@
 .project
 nbproject
 nbproject/*
+
+##
+## Internal use
+##
 ./.settings/
 /talks/
 !/talks/README
+/_docs

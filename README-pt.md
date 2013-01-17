@@ -1,8 +1,12 @@
 # Power Polygon
 Power Polygon é uma ferramenta para criação de apresentações HTML5.  
-O Power Polygon possui vários temas e transições, todos baseados em HTML5, CSS3 e JavaScript.  
-Você pode criar um novo tema, ou customizar um tema existente.  
-Novas transições também podem ser facilmente criadas.  
+O Power Polygon possui vários temas e transições, todos baseados em HTML5, CSS3 e JavaScript.  <br/>
+Você pode criar um novo tema, ou customizar um tema existente.  <br/>
+Novas transições também podem ser facilmente criadas.<br/>
+Assista ao vídeo:<br/>
+<a href="http://www.youtube.com/watch?v=24k5_wBI9vI" target="_blank">
+![Video - Conheça Power Polygon](http://i4.ytimg.com/vi/oZIvKOCDvus/mqdefault.jpg)
+</a>
 
 ### Documentação
 Para obter informações detalhadas, acesse a wiki do Power Polygon:
