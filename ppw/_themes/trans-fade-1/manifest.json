@@ -1,0 +1,11 @@
+{
+    "name": "trans-fade-1",
+    "dependencies": {
+        "css": [
+            "styles/default.css"
+        ],
+        "js": [
+            "scripts/default.js"
+        ]
+    }
+}

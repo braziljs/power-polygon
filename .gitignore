@@ -17,4 +17,4 @@ nbproject/*
 ./.settings/
 /talks/
 !/talks/README
-/_docs
+#/_docs
