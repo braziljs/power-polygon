@@ -1257,7 +1257,7 @@ window.PPW= (function($, _d, console){
             _conf.slidesLoaded= true;
             _setPresentationProfile();
             // set the current language to the loaded slide elements
-            _setLION(_settings.defaultLanguage||_n.language);
+            _setLION(_querystring('lang')||_settings.defaultLanguage||_n.language);
             // setting the clonable elements
             _applyClonableElements();
             // setting the header/footer elements
