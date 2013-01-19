@@ -1,0 +1,135 @@
+#ppw-slides-container{
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.ppw-slide-element{
+    
+}
+.ppw-slide-element section{
+    margin: 0px;
+}
+/**/
+.ppw-slide-container{
+    /*display: none;*/
+    position: absolute;
+    height: auto;
+    bottom: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    overflow: hidden;
+    
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+
+.parallax-set{
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    
+    
+    -webkit-perspective: 800px;
+    -moz-perspective: 800px;
+    perspective: 800px;
+}
+
+.parallax-set .far.mv-right, .parallax-set .far.mv-left{
+    position: absolute;
+    left: -10%;
+    top: -10%;
+    width: 120%;
+    height: 120%;
+    z-index: 1;
+}
+.parallax-set .medium.mv-right, .parallax-set .medium.mv-left{
+    position: absolute;
+    left: -10%;
+    top: -10%;
+    width: 120%;
+    height: 120%;
+    z-index: 2;
+}
+.parallax-set .close.mv-right, .parallax-set .close.mv-left{
+    position: absolute;
+    left: -10%;
+    top: -10%;
+    width: 120%;
+    height: 120%;
+    z-index: 3;
+}
+.parallax-set .close.mv-closer{
+    position: relative;
+    z-index: 5;
+}
+
+
+
+
+
+.parallax-set .close.mv-closer.active{
+    -webkit-animation: mv-closer 140s ease-out 1 forwards;
+    -moz-animation: mv-closer 140s ease-out 1 forwards;
+    animation: mv-closer 140s ease-out 1 forwards;
+}
+.parallax-set .far.mv-right.active{
+    /*-webkit-transform: matrix();*/
+    -webkit-animation: mv-right 140s ease-out 1 forwards;
+    -moz-animation: mv-right 140s ease-out 1 forwards;
+    animation: mv-right 140s ease-out 1 forwards;
+}
+.parallax-set .far.mv-left.active{
+    /*-webkit-transform: matrix();*/
+    -webkit-animation: mv-left 140s ease-out 1 forwards;
+    -moz-animation: mv-left 140s ease-out 1 forwards;
+    animation: mv-left 140s ease-out 1 forwards;
+}
+.parallax-set .medium.mv-right.active{
+    /*-webkit-transform: matrix();*/
+    -webkit-animation: mv-right 80s ease-out 1 forwards;
+    -moz-animation: mv-right 80s ease-out 1 forwards;
+    animation: mv-right 80s ease-out 1 forwards;
+}
+.parallax-set .medium.mv-left.active{
+    /*-webkit-transform: matrix();*/
+    -webkit-animation: mv-left 80s ease-out 1 forwards;
+    -moz-animation: mv-left 80s ease-out 1 forwards;
+    animation: mv-left 80s ease-out 1 forwards;
+}
+.parallax-set .close.mv-right.active{
+    /*-webkit-transform: matrix();*/
+    -webkit-animation: mv-right 50s ease-out 1 forwards;
+    -moz-animation: mv-right 50s ease-out 1 forwards;
+    animation: mv-right 50s ease-out 1 forwards;
+}
+.parallax-set .close.mv-left.active{
+    /*-webkit-transform: matrix();*/
+    -webkit-animation: mv-left 50s ease-out 1 forwards;
+    -moz-animation: mv-left 50s ease-out 1 forwards;
+    animation: mv-left 50s ease-out 1 forwards;
+}
+
+.parallax-set .close.mv-spin-right.active{
+    -webkit-animation: mv-spin-right linear 14s 1;
+    -webkit-animation-fill-mode: forwards;
+    -moz-animation: mv-spin-right linear 14s 1;
+    -moz-animation-fill-mode: forwards;
+    animation: mv-spin-right linear 14s 1;
+    animation-fill-mode: forwards;
+}
+.parallax-set .close.mv-spin-left.active{
+    -webkit-animation: mv-spin-left linear 14s 1;
+    -webkit-animation-fill-mode: forwards;
+    -moz-animation: mv-spin-left linear 14s 1;
+    -moz-animation-fill-mode: forwards;
+    animation: mv-spin-left linear 14s 1;
+    animation-fill-mode: forwards;
+}
