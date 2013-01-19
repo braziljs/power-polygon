@@ -13,8 +13,8 @@
         <link rel="stylesheet" href="page/css/reset.css" type="text/css" />
         <link rel="stylesheet" href="page/css/presets.css" type="text/css" />
         
-        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-	<script>window.jQuery || document.write('<script src="/static/js/libs/jquery-1.7.1.min.js"><\/script>')</script>
+        <script src="ppw/_scripts/jquery-1.8.2.min.js"></script>
+        <script src="ppw/ppw.js"></script>
         
     </head>
     <body>
@@ -43,20 +43,49 @@
                 </nav>
             </div>
         </header>
-        <section class="body home">
-            <div>
-                <div class="section">
-                    blah
-                </div>
-            </div>
+        
+        <section id="home" class="body home">
+            Home here, baby
         </section>
-        <div class="footer">
+        
+        <section id="documentation" class="body docs">
+            Docs here, baby
+        </section>
+        
+        <section id="download" class="body downloads">
+            Downloads here, baby
+        </section>
+        
+        <section id="demos" class="body demos">
+            Demos here, baby
+        </section>
+        
+        <footer>
             <div class="connect">
                 <a href="http://freewebsitetemplates.com/go/twitter/" id="twitter">twitter</a> <a href="http://freewebsitetemplates.com/go/facebook/" id="facebook">facebook</a> <a href="http://freewebsitetemplates.com/go/googleplus/" id="googleplus">google+</a>
             </div>
             <p>
                 &#169; <script>document.write((new Date()).getFullYear());</script>. Conteúdo disponível sob a licença <a href="http://creativecommons.org/licenses/by/3.0/br/" target="_blank">Creative Commons</a>.
             </p>
-        </div>
+        </footer>
+        
+        <script>
+            PPW.init({
+                title: 'BrazilJS 2012 Report',
+                transition: 'trans-fade-2',
+                theme: ['thm-parallax-1'],
+                languages: ['EN', 'PT', 'ES'],
+                useArrows: false,
+                useSplashScreen: false,
+                preloadImages: false,
+                useToolBar: false,
+                zoomOnScroll: false,
+                shortcutsEnable: false,
+                PPWSrc: './ppw/'
+                //slides: []
+            });
+            PPW.lock();
+        </script>
+        
     </body>
 </html>
