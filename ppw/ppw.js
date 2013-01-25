@@ -1071,7 +1071,7 @@ window.PPW= (function($, _d, console){
                                 _getCurrentSlide();
             switch(variable){
                 case 'slide.id':
-                        this.innerHTML= slide.id;
+                    this.innerHTML= slide.id;
                     if(!slideEl){
                         $(this).addClass('ppw-variable').data('ppw-variable', 'slide.id');
                     }
@@ -1081,6 +1081,21 @@ window.PPW= (function($, _d, console){
                     if(!slideEl){
                         $(this).addClass('ppw-variable').data('ppw-variable', 'slide.idx');
                     }
+                    break;
+                case 'time.day':
+                    this.innerHTML= (new Date()).getDate();
+                    break;
+                case 'time.month':
+                    this.innerHTML= 1+(new Date()).getMonth();
+                    break;
+                case 'time.year':
+                    this.innerHTML= (new Date()).getFullYear();
+                    break;
+                case 'time.hour':
+                    this.innerHTML= (new Date()).getHours();
+                    break;
+                case 'time.minute':
+                    this.innerHTML= (new Date()).getMinutes();
                     break;
                 case 'slide.number':
                     
