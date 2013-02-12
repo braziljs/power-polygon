@@ -10,7 +10,8 @@
         "js": [
             
             "scripts/default.js",
-            "scripts/jquery.scrollpath.js"
+            "scripts/jquery.scrollpath.js",
+            "scripts/jquery.easing.js"
 
         ]
     }

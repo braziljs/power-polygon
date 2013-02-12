@@ -1,13 +1,11 @@
+body{
+    background-color: #1F516D;
+}
+
 .ppw-slide-element{
     background: #f7f7f7; /* Old browsers */
-    background: -moz-linear-gradient(top, #f7f7f7 0%, #b7b7b7 80%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#f7f7f7), color-stop(80%,#b7b7b7)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(top, #f7f7f7 0%,#b7b7b7 80%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(top, #f7f7f7 0%,#b7b7b7 80%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(top, #f7f7f7 0%,#b7b7b7 80%); /* IE10+ */
-    background: linear-gradient(to bottom, #f7f7f7 0%,#b7b7b7 80%); /* W3C */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f7f7f7', endColorstr='#b7b7b7',GradientType=0 ); /* IE6-9 */
 }
+
 .ppw-active-slide-element{
     /*display: block;*/
 }
@@ -22,24 +20,41 @@
     cursor: default;
 }
 
-#ppw-slides-container{}
-
-/**/
-.ppw-previous-slide-element{
- 
-}
-.ppw-next-slide-element{
-
-}
-
-body{
-    
+div.ppw-slide-container{
+    width: 700px;
+    height: 500px;
+    float: none;
 }
 
 
-.randal {
-   position:absolute !important;
-   top:-200px !important;
+div.randal {
+   position:absolute;
+   top:-170px;
+   left:-350px;
+}
+
+div.randal1 {
+   position:absolute;
+   top:900px;
+   left:-2750px;
+}
+
+div.randal2 {
+   position:absolute;
+   top: 2690px;
+   left: -1450px;
+}
+
+div.randal3 {
+   position:absolute;
+   top: 2690px;
+   left: 1350px;
+}
+
+div.randal4 {
+   position:absolute;
+    top: 900px;
+    left: 1963px;
 }
 
 .ppw-slide-type-section{
@@ -78,16 +93,7 @@ body{
 }
 
 /**/
-.ppw-slide-container{
-    
-}
-#ppw-slides-container{
-    
-}
-.ppw-slide-container section{
-    height: 100%;
-    width: 100%;
-}
+
 .ppw-slide-type-opening{
     text-align: center;
 }

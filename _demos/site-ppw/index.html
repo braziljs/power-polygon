@@ -12,21 +12,30 @@
     </head>
     <body>
             
-    
-      
+        
+
+        <div id="slide-container">
             <section>
                 <h1>jQuery Scroll Path</h1>
                 <span class="arrow">&darr;</span> A Quick Demo <span class="arrow">&darr;</span>
             </section>
             
-           <!-- <section>
+            <section>
                 <h1>It's a plugin for defining custom scroll paths.</h1>
             </section>
 
             <section>
                 <h1>It uses canvas flavored syntax to draw lines and arcs.</h1>
-            </section>-->
-       
+            </section>
+
+            <section>
+                <h1>Slide randal-3</h1>
+            </section>
+
+            <section>
+                <h1>Slide randal-4</h1>
+            </section>
+       </div>
         
         
 
@@ -37,12 +46,15 @@
             PPW.set('zoomOnScroll',false);
             PPW.set('shortcutsEnable',false);  
             
-            var Slides = ['randal','randal1','randal2'];
+            var Slides = ['randal','randal1','randal2','randal3','randal4'];           
+            var div = document.getElementById('slide-container');
+
             
             PPW.init({
                   theme : 'thm-powerpolygon',
                   useSplashScreen : false,
-                  themeSettings: Slides
+                  themeSettings: {'slides': Slides,'drawPath':true},
+                  slidesContainer: div
 
             });
             
