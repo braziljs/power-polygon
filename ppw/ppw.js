@@ -2377,7 +2377,7 @@ window.PPW= (function($, _d, console){
             _setLoadingBarStatus();
         }
         
-        if(_n.onLine){
+        if(_n.onLine && _settings.Facebook){
             
             // applying Facebook Buttons
             (function(d, s, id) {
@@ -2387,7 +2387,10 @@ window.PPW= (function($, _d, console){
                 js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=281929191903584";
                 fjs.parentNode.insertBefore(js, fjs);
             }(_d, 'script', 'facebook-jssdk'));
+	}
             
+        if(_n.onLine && _settings.Google){
+
             // applying the g+ buttons
             _loadScript('https://apis.google.com/js/plusone.js');
         }
@@ -3907,7 +3910,9 @@ window.PPW= (function($, _d, console){
         unlock                          : _unlock,
         isLocked                        : function(){return _conf.locked;},
         get                             : _get,
-        set                             : _set
+        set                             : _set,
+        Facebook                        : true,
+        Google                          : true,
     };
     
 })(window.jQuery, document, window.console);
