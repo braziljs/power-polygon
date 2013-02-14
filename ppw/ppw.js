@@ -393,7 +393,11 @@ window.PPW= (function($, _d, console){
              *   3: only logs
              *   9: errors, warnings and logs
              */
-            verbose: 9
+            verbose: 9,
+            // enables the Facebook Buttons
+            Facebook: true,
+            // enables the g+ buttons
+            Google: true,
         },
         // a local reference to the $(document)
         $d= $(_d),
