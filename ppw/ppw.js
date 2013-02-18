@@ -1524,6 +1524,24 @@ window.PPW= (function($, _d, console){
                     }
                     break;
                     
+                case 35: // end
+                    if(_conf.presentationStarted && !_isEditableTarget(evt.target)){
+                        _goToSlide('last');
+                        evt.preventDefault();
+                        evt.stopPropagation();
+                        return false;
+                    }
+                    break;
+                    
+                case 36: // home
+                    if(_conf.presentationStarted && !_isEditableTarget(evt.target)){
+                        _goToSlide(0);
+                        evt.preventDefault();
+                        evt.stopPropagation();
+                        return false;
+                    }
+                    break;
+                    
                 case 18: // alt
                     if(_settings.shortcutsEnable
                         && _conf.presentationStarted
