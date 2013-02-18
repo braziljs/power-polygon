@@ -472,6 +472,12 @@ window.PPW= (function($, _d, console){
             _listeners[evt].push(fn);
         }
     }
+
+    var _preventDefaultstopPropagation= function(evt){
+        evt.preventDefault();
+        evt.stopPropagation();
+        return false;
+    }
     
     /**
      * Removes a listener from the list.
@@ -1301,9 +1307,7 @@ window.PPW= (function($, _d, console){
             $('.ppw-slide-container').click(function(evt){
                 if(_conf.inThumbsMode){
                     _goToSlide($(this).data('ppw-slide-ref'));
-                    evt.preventDefault();
-                    evt.stopPropagation();
-                    return false;
+                    return _preventDefaultstopPropagation(evt);
                 }
             });
         
@@ -1487,17 +1491,17 @@ window.PPW= (function($, _d, console){
                 case 112: // F1
                     _showHelp();
                     break
+                case 34: // page down
                 case 37: // left
                 case 40: // down
                 case  8: // delete/backspace
                     if(_conf.presentationStarted && !_isEditableTarget(evt.target)){
                         _goPreviousSlide();
-                        evt.preventDefault();
-                        evt.stopPropagation();
-                        return false;
+                        return _preventDefaultstopPropagation(evt);
                     }
                     break;
                     
+                case 33: // page up
                 case 38: // up
                 case 39: // right
                 case 13: // enter
@@ -1506,19 +1510,29 @@ window.PPW= (function($, _d, console){
                     if(evt.keyCode == 32 /*space*/ && evt.altKey){
                         _closeMessage();
                         _showThumbs();
-                        evt.preventDefault();
-                        evt.stopPropagation();
-                        return false;
+                        return _preventDefaultstopPropagation(evt);
                     }
                     
                     if(_conf.presentationStarted && !_isEditableTarget(evt.target)){
                         _goNextSlide();
-                        evt.preventDefault();
-                        evt.stopPropagation();
-                        return false;
+                        return _preventDefaultstopPropagation(evt);
                     }
                     if(evt.keyCode == 13 && _isEditableTarget(evt.target)){
                         evt.target.click();
+                    }
+                    break;
+                    
+                case 35: // end
+                    if(_conf.presentationStarted && !_isEditableTarget(evt.target)){
+                        _goToSlide('last');
+                        return _preventDefaultstopPropagation(evt);
+                    }
+                    break;
+                    
+                case 36: // home
+                    if(_conf.presentationStarted && !_isEditableTarget(evt.target)){
+                        _goToSlide(0);
+                        return _preventDefaultstopPropagation(evt);
                     }
                     break;
                     
@@ -1527,9 +1541,7 @@ window.PPW= (function($, _d, console){
                         && _conf.presentationStarted
                         && !_isEditableTarget(evt.target)){
                         _showGoToComponent(true);
-                        evt.preventDefault();
-                        evt.stopPropagation();
-                        return false;
+                        return _preventDefaultstopPropagation(evt);
                     }
                     break;
                 
@@ -1537,8 +1549,7 @@ window.PPW= (function($, _d, console){
                     if(_d.getElementById('ppw-message-box').style.display != 'none'){
                         _closeMessage();
                         _pauseCamera();
-                        evt.preventDefault();
-                        evt.stopPropagation();
+                        _preventDefaultstopPropagation(evt);
                         if(_conf.currentZoom != 1){
                             _resetViewport();
                         }
@@ -1552,18 +1563,14 @@ window.PPW= (function($, _d, console){
                 case 70: // F
                     if(evt.altKey){
                         _showSearchBox(true);
-                        evt.preventDefault();
-                        evt.stopPropagation();
-                        return false;
+                        return _preventDefaultstopPropagation(evt);
                     }
                     break;
                     
                 case 80: // P
                     if(evt.altKey || evt.ctrlKey || evt.meta){
                         _print();
-                        evt.preventDefault();
-                        evt.stopPropagation();
-                        return false;
+                        return _preventDefaultstopPropagation(evt);
                     }
                     break;
                 
@@ -1575,9 +1582,7 @@ window.PPW= (function($, _d, console){
                             
                             if(k>=0 && k<10){
                                 _d.getElementById('ppw-go-to-slide').value+= k;
-                                evt.preventDefault();
-                                evt.stopPropagation();
-                                return false;
+                                return _preventDefaultstopPropagation(evt);
                             }
                         }
                     }
@@ -1593,9 +1598,7 @@ window.PPW= (function($, _d, console){
                 return true;
             
             if(evt.altKey){
-                evt.preventDefault();
-                evt.stopPropagation();
-                return false;
+                return _preventDefaultstopPropagation(evt);
             }
             if(_isLocked(evt)){
                 console.warn("[PPW] User interaction(keypress) ignored because Power Polygon has been locked");
@@ -1604,9 +1607,7 @@ window.PPW= (function($, _d, console){
             switch(evt.keyCode){
                 /*case 112: // P
                     if(evt.altKey || evt.ctrlKey){
-                        evt.preventDefault();
-                        evt.stopPropagation();
-                        return false;
+                        return _preventDefaultstopPropagation(evt);
                     }
                     break;
                 * /
@@ -1637,11 +1638,9 @@ window.PPW= (function($, _d, console){
                             if(s <= 0)
                                 s= 1;
                             _goToSlide(_getValidSlides()[s -1]);
-                            
+                            _closeMessage();
                         }
-                        _closeMessage();
-                        evt.preventDefault();
-                        evt.stopPropagation();
+                        _preventDefaultstopPropagation(evt);
                     }
                     return false;
                     break;
@@ -1649,54 +1648,42 @@ window.PPW= (function($, _d, console){
                 case 80: // P
                     /*if(evt.altKey || evt.ctrlKey){
                         _print();
-                        evt.preventDefault();
-                        evt.stopPropagation();
-                        return false;
+                        return _preventDefaultstopPropagation(evt);
                     }*/
                     break;
                 
                 case 117: // F6
                     s= _triggerEvent('F6_PRESSED');
                     if(!s){
-                        evt.preventDefault();
-                        evt.stopPropagation();
-                        return false;
+                        return _preventDefaultstopPropagation(evt);
                     }
                     break;
                     
                 case 118: // F7
                     s= _triggerEvent('F7_PRESSED');
                     if(!s){
-                        evt.preventDefault();
-                        evt.stopPropagation();
-                        return false;
+                        return _preventDefaultstopPropagation(evt);
                     }
                     break;
                     
                 case 119: // F8
                     s= _triggerEvent('F8_PRESSED');
                     if(!s){
-                        evt.preventDefault();
-                        evt.stopPropagation();
-                        return false;
+                        return _preventDefaultstopPropagation(evt);
                     }
                     break;
                     
                 case 120: // F9
                     s= _triggerEvent('F9_PRESSED');
                     if(!s){
-                        evt.preventDefault();
-                        evt.stopPropagation();
-                        return false;
+                        return _preventDefaultstopPropagation(evt);
                     }
                     break;
                     
                 case 121: // F10
                     s= _triggerEvent('F10_PRESSED');
                     if(!s){
-                        evt.preventDefault();
-                        evt.stopPropagation();
-                        return false;
+                        return _preventDefaultstopPropagation(evt);
                     }
                     break;
             }
@@ -1720,17 +1707,13 @@ window.PPW= (function($, _d, console){
                     case 65: // a
                     case 37: // left
                         //_showSlidesThumb();
-                        evt.preventDefault();
-                        evt.stopPropagation();
-                        return false;
+                        return _preventDefaultstopPropagation(evt);
                     break;
                     case 190: // .(>)
                     case 83: // s
                     case 39: // left
                         //_showSlidesThumb();
-                        evt.preventDefault();
-                        evt.stopPropagation();
-                        return false;
+                        return _preventDefaultstopPropagation(evt);
                     break;
                 }
             });
@@ -1771,9 +1754,7 @@ window.PPW= (function($, _d, console){
                 
                 }
                 
-                evt.stopPropagation();
-                evt.preventDefault();
-                return false;
+                return _preventDefaultstopPropagation(evt);
             }
             return true;
         });
@@ -1878,9 +1859,7 @@ window.PPW= (function($, _d, console){
             if(_isEditableTargetContent(evt.target))
                 return true;
             
-            evt.preventDefault();
-            evt.stopPropagation();
-            return false;
+            return _preventDefaultstopPropagation(evt);
         });*/
     };
     
