@@ -1487,6 +1487,7 @@ window.PPW= (function($, _d, console){
                 case 112: // F1
                     _showHelp();
                     break
+                case 34: // page down
                 case 37: // left
                 case 40: // down
                 case  8: // delete/backspace
@@ -1498,6 +1499,7 @@ window.PPW= (function($, _d, console){
                     }
                     break;
                     
+                case 33: // page up
                 case 38: // up
                 case 39: // right
                 case 13: // enter
