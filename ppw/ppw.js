@@ -2370,7 +2370,7 @@ window.PPW= (function($, _d, console){
                 js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=281929191903584";
                 fjs.parentNode.insertBefore(js, fjs);
             }(_d, 'script', 'facebook-jssdk'));
-	}
+        }
             
         if(_n.onLine && _settings.Google){
 
