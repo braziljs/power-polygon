@@ -220,6 +220,7 @@ window.PPW= (function($, _d, console){
                 alertAt: [30, 40],
                 theme: 'thm-default',
                 transition: 'trans-slider',
+                directionalIconsStyle: 'chevron',
                 slideType: 'content',
                 slideTitleSize: 40,
                 containerID: 'ppw-slides-container'
@@ -283,12 +284,12 @@ window.PPW= (function($, _d, console){
                             The content could not be found in any of these expected places!</div>",
         
             // the arrows element to go forward and backward
-            arrows: "<div id='ppw-arrows-container' class='ppw-clickable'><div id='ppw-arrow-previous-slide' onclick='if(!PPW.isLocked()) PPW.goPrev();'>◄</div><div id='ppw-arrow-next-slide' onclick='if(!PPW.isLocked()) PPW.goNext();'>►</div></div>",
+            arrows: "<div id='ppw-arrows-container' class='ppw-clickable'><div id='ppw-arrow-previous-slide' onclick='if(!PPW.isLocked()) PPW.goPrev();'><i class='icon-{{directionaliconsstyle}}-left'></i></div><div id='ppw-arrow-next-slide' onclick='if(!PPW.isLocked()) PPW.goNext();'><i class='icon-{{directionaliconsstyle}}-right'></i></div></div>",
         
             // the search tool content
-            searchTool: "<div style='float: left;'>Search into slides:</div>\
+            searchTool: "<div id='ppw-search-container'><div style='float: left;'>Search into slides:</div>\
                          <div style='float: right;'><input type='search' id='ppw-search-slide' value='' placeholder='Search' />\
-                         <input type=button id='ppw-search-prev' class='ppw-clickable' title='Find in previous slides(shift+enter)' value='◄' /> <input type=button id='ppw-search-next' title='Find in next slides(enter)' class='ppw-clickable' value='►' /></div><div id='ppw-search-found' class='ppw-clickable'></div>",
+                         <div id='ppw-search-arrow-container' class='ppw-clickable'><div id='ppw-search-prev' class='ppw-clickable' title='Find in previous slides(shift+enter)'><i class='icon-{{directionaliconsstyle}}-left'></i></div><div id='ppw-search-next' class='ppw-clickable' title='Find in next slides(enter)'><i class='icon-{{directionaliconsstyle}}-right'></i></div></div></div><div id='ppw-search-found' class='ppw-clickable'></div></div>",
             
             // the message box element itself
             messages: '<div id="ppw-message-box"  class="ppw-clickable ppw-platform">\
@@ -307,20 +308,20 @@ window.PPW= (function($, _d, console){
                       </div>',
         
             // the top-left toolbar content
-            toolBar: '<div id="ppw-toolbar-container" class="ppw-platform {{clickableClass}}">\
-                    <div id="ppw-toolbar" class="ppw-platform {{clickableClass}}">\
-                        <div class="img"><img id="ppw-goto-icon" onclick="PPW.showGoToComponent(false);" title="Go to a specific slide" /></div>\
-                        <div class="img"><img id="ppw-toolbox-icon" onclick="PPW.openPresentationTool();" title="Open Presentation Tool" /></div>\
-                        <div class="img"><img id="ppw-search-icon" onclick="PPW.showSearchBox()" title="Search on slides"/></div>\
-                        <div class="img"><img id="ppw-fullscreen-icon" onclick="PPW.enterFullScreen()" title="Go Fullscreen"/></div>\
-                        <div class="img"><img id="ppw-camera-icon" onclick="PPW.toggleCamera();" title="Start the camera"/></div>\
-                        <div class="img"><img id="ppw-settings-icon" onclick="PPW.showConfiguration();" title="Settings"/></div>\
+            toolBar: '<div id="ppw-toolbar-container" class="ppw-platform ppw-clickable">\
+                    <div id="ppw-toolbar" class="ppw-platform ppw-clickable">\
+                        <i class="icon-exchange icon-2x" id="ppw-goto-icon" onclick="PPW.showGoToComponent(false);" title="Go to a specific slide"></i>\
+                        <i class="icon-briefcase icon-2x" id="ppw-toolbox-icon" onclick="PPW.openPresentationTool();" title="Open Presentation Tool"></i>\
+                        <i class="icon-search icon-2x" id="ppw-search-icon" onclick="PPW.showSearchBox()" title="Search on slides"></i>\
+                        <i class="icon-fullscreen icon-2x" id="ppw-fullscreen-icon" onclick="PPW.enterFullScreen()" title="Go Fullscreen"></i>\
+                        <i class="icon-camer icon-2x" id="ppw-camera-icon" onclick="PPW.toggleCamera();" title="Start the camera"></i>\
+                        <i class="icon-cogs icon-2x" id="ppw-settings-icon" onclick="PPW.showConfiguration();" title="Settings"></i>\
                     </div>\
                     <div id="ppw-content-toolbar" class="ppw-platform">\
                         <span id="ppw-ct-text-small" title="Smaller fonts" onclick="PPW.smallerFonts();">A</span>\
                         <span id="ppw-ct-text-big" title="Bigger fonts" onclick="PPW.biggerFonts();">A</span>\
-                        <img id="ppw-ct-thumbs" onclick="PPW.showThumbs();" title="Show thumbnails"/>\
-                        <img id="ppw-ct-print" onclick="PPW.print();" title="Print or save as PDF(alt+P)"/>\
+                        <i class="icon-th icon-2x" id="ppw-ct-thumbs" onclick="PPW.showThumbs();" title="Show thumbnails"></i>\
+                        <i class="icon-print icon-2x" id="ppw-ct-print" onclick="PPW.print();" title="Print or save as PDF(alt+P)"></i>\
                         <div id="ppw-presentation-social-buttons">\
                             <div class="fb-like" data-href="{{likeSrc}}" data-send="false" data-width="450" data-show-faces="false"></div>\
                             <span class="gp-button"><div class="g-plusone" data-size="medium" data-annotation="none" data-href="{{likeSrc}}"></div></span>\
@@ -357,6 +358,8 @@ window.PPW= (function($, _d, console){
             theme: _conf.defaults.theme,
             // the default transition
             transition: _conf.defaults.transition,
+            // the default directionalIconsStyle
+            directionalIconsStyle: _conf.defaults.directionalIconsStyle,
             // the pattern to find the external slides
             fsPattern: _conf.cons.fs.SLIDE_ID_DIR_ID,
             // times in minutes to be alerted
@@ -588,6 +591,7 @@ window.PPW= (function($, _d, console){
                 authors: [],
                 PPWSrc: "../../ppw/",
                 transition: _conf.defaults.transition,
+                directionalIconsStyle: _conf.defaults.directionalIconsStyle,
                 theme: _conf.defaults.theme
             },
             i= 0,
@@ -755,81 +759,13 @@ window.PPW= (function($, _d, console){
     }
     
     /**
-     * Loads the theme's files.
+     * Loads external script.
      * 
-     * This method loads the theme' manifes.json file, and then, its
-     * dependencies.
+     * @param String Source address.
+     * @param Function Callback to be executed when the script is loaded.
      */
-    var _loadTheme= function(){
-        
-        var theme= null,
-            transition= _querystring('transition');
-        
-        if(typeof _settings.theme == 'string')
-            _settings.theme= _settings.theme.replace(/ /g, '').split(',');
-        
-        if(transition){
-            _settings.transition= transition;
-        }
-        
-        if(_settings.transition)
-            _settings.theme.push(_settings.transition);
-        
-        _conf.loadSteps+= _settings.theme.length-1;
-        
-        $(_settings.theme).each(function(){
-            var theme= this.toString();
-            $.getJSON(_settings.PPWSrc+'/_themes/'+theme+'/manifest.json', function(data, status){
-
-                var dependencies= false,
-                    i= 0,
-                    l= 0,
-                    url= '';
-
-                console.log("[PPW] Loading theme: "+ theme);
-
-                if(status == 'success'){
-
-                    _conf.themeData= data;
-                    dependencies= _conf.themeData.dependencies||[];
-
-                    if(dependencies.css){
-                        _conf.loadSteps+= dependencies.css.length;
-                        l= dependencies.css.length;
-
-                        for(i= 0; i<l; i++){
-                            url= _settings.PPWSrc+'/_themes/'+
-                                 theme+'/'+dependencies.css[i];
-
-                            $("head").append($("<link rel='stylesheet' href='"+
-                                                url+"' type='text/css' media='screen' />")
-                                            .bind('load',
-                                                  function(){
-                                                      _setLoadingBarStatus();
-                                                  }));
-                        }
-                    }
-
-                    if(dependencies.js){
-
-                        _conf.loadSteps+= dependencies.js.length;
-                        l= dependencies.js.length;
-
-                        for(i= 0; i<l; i++){
-                            $.getScript(_settings.PPWSrc+'/_themes/'+
-                                        theme+'/'+dependencies.js[i],
-                                        function(data, status, xhr){
-                                            _setLoadingBarStatus();
-                                        });
-                        }
-                    }
-
-                }else{
-                    console.error("[PPW][Theme data] Could not load manifest.json! Theme: " + theme);
-                }
-                _setLoadingBarStatus();
-            });
-        });
+    var _loadScript= function(src, fn){
+        $.getScript(src, fn||function(){});
     };
     
     /**
@@ -848,13 +784,79 @@ window.PPW= (function($, _d, console){
     };
     
     /**
-     * Loads external script.
+     * Loads the theme's files.
      * 
-     * @param String Source address.
-     * @param Function Callback to be executed when the script is loaded.
+     * This method loads the theme' manifes.json file, and then, its
+     * dependencies.
      */
-    var _loadScript= function(src, fn){
-        $.getScript(src, fn||function(){});
+    var _loadTheme= function(){
+        
+        var theme= null,
+            transition= _querystring('transition'),
+            directionalIconsStyle= _querystring('directionalIconsStyle');
+        
+        if(typeof _settings.theme == 'string')
+            _settings.theme= _settings.theme.replace(/ /g, '').split(',');
+        
+        if(transition){
+            _settings.transition= transition;
+        }
+        
+        if(_settings.transition)
+            _settings.theme.push(_settings.transition);
+        
+        if(directionalIconsStyle){
+            _settings.directionalIconsStyle= directionalIconsStyle;
+        }
+        
+        _conf.loadSteps+= _settings.theme.length-1;
+        
+        $(_settings.theme).each(function(){
+            var theme= this.toString();
+            var themeSrc= _settings.PPWSrc+'_themes/'+theme;
+            $.getJSON(themeSrc+'/manifest.json', function(data, status){
+
+                var dependencies= false,
+                    i= 0,
+                    l= 0,
+                    url= '';
+
+                console.log("[PPW] Loading theme: "+ theme);
+
+                if(status == 'success'){
+
+                    _conf.themeData= data;
+                    dependencies= _conf.themeData.dependencies||[];
+
+                    if(dependencies.css){
+                        _conf.loadSteps+= dependencies.css.length;
+                        l= dependencies.css.length;
+
+                        for(i= 0; i<l; i++){
+                            url= themeSrc+'/'+dependencies.css[i];
+                            _loadStyle(url, "PPW.setLoadingBarStatus()");
+                        }
+                    }
+
+                    if(dependencies.js){
+
+                        _conf.loadSteps+= dependencies.js.length;
+                        l= dependencies.js.length;
+
+                        for(i= 0; i<l; i++){
+                            _loadScript(themeSrc+'/'+dependencies.js[i],
+                                        function(data, status, xhr){
+                                            _setLoadingBarStatus();
+                                        });
+                        }
+                    }
+
+                }else{
+                    console.error("[PPW][Theme data] Could not load manifest.json! Theme: " + theme);
+                }
+                _setLoadingBarStatus();
+            });
+        });
     };
     
     /**
@@ -868,7 +870,7 @@ window.PPW= (function($, _d, console){
          $b.append(_templates.loading);
          
          if(_settings.useArrows){
-             $b.append(_templates.arrows);
+             $b.append(_templates.arrows.replace(/\{\{directionaliconsstyle\}\}/g, _settings.directionalIconsStyle));
          }
          
          $('#ppw-loadingbarParent').css({
@@ -884,15 +886,17 @@ window.PPW= (function($, _d, console){
              background: '#f66'
          });
         
-         _loadStyle(_settings.PPWSrc+"/_styles/ppw.css", "PPW.setLoadingBarStatus()");
-         _loadStyle(_settings.PPWSrc+"/_styles/animate.css", "PPW.setLoadingBarStatus()");
-         _loadStyle(_settings.PPWSrc+"/_styles/jquery-ui-1.8.23.custom.css", "PPW.setLoadingBarStatus()");
-         _loadScript(_settings.PPWSrc+"/_scripts/jquery-ui-1.8.23.custom.min.js", PPW.setLoadingBarStatus);
+         _loadStyle(_settings.PPWSrc+"_styles/ppw.css", "PPW.setLoadingBarStatus()");
+         _loadStyle(_settings.PPWSrc+"_styles/font-awesome.min.css", "PPW.setLoadingBarStatus()");
+         _loadStyle(_settings.PPWSrc+"_styles/animate.css", "PPW.setLoadingBarStatus()");
+         _loadStyle(_settings.PPWSrc+"_styles/jquery-ui-1.8.23.custom.css", "PPW.setLoadingBarStatus()");
+         _loadScript(_settings.PPWSrc+"_scripts/jquery-ui-1.8.23.custom.min.js", PPW.setLoadingBarStatus);
+
          
          _tmp.lnk = _d.createElement('link');
          _tmp.lnk.type = 'image/x-icon';
          _tmp.lnk.rel = 'shortcut icon';
-         _tmp.lnk.href = _settings.PPWSrc+'/_images/power-polygon-icon.png';
+         _tmp.lnk.href = _settings.PPWSrc+'_images/power-polygon-icon.png';
          _d.getElementsByTagName('head')[0].appendChild(_tmp.lnk);
          delete _tmp.lnk;
 
@@ -1813,7 +1817,7 @@ window.PPW= (function($, _d, console){
             if(_n.battery){
                 _n.battery.addEventListener('chargingchange', function(data){
                     if(!_n.battery.charging){ // was charging and is not anymore
-                        _showNotification("<img src='"+_settings.PPWSrc+"/_images/electricity.png' width='20' alt='Your battery stoped charging!' />");
+                        _showNotification("<img src='"+_settings.PPWSrc+"_images/electricity.png' width='20' alt='Your battery stopped charging!' />");
                     }else{
                         _closeNotification();
                     }
@@ -1824,7 +1828,7 @@ window.PPW= (function($, _d, console){
                     setTimeout(function(){
                         if(!_n.battery.charging){
                             if(_n.battery.dischargingTime < _settings.duration){
-                                _showNotification("<img src='"+_settings.PPWSrc+"/_images/electricity.png' width='20' title='You have "+ (_n.battery.dischargingTime / 60)+" minutes of battery!' />");
+                                _showNotification("<img src='"+_settings.PPWSrc+"_images/electricity.png' width='20' title='You have "+ (_n.battery.dischargingTime / 60)+" minutes of battery!' />");
                             }
                         }
                     }, 1000);
@@ -2210,7 +2214,7 @@ window.PPW= (function($, _d, console){
      * @param Boolean Force the search box to replace the current alert message.
      */
     var _showSearchBox= function(force){
-        var content= _templates.searchTool,
+        var content= _templates.searchTool.replace(/\{\{directionaliconsstyle\}\}/g, _settings.directionalIconsStyle),
             el= null;
         
         if(_conf.showingMessage && !force)
@@ -2256,7 +2260,7 @@ window.PPW= (function($, _d, console){
     };
     
     /**
-     * Creates the spash screen.
+     * Creates the splash screen.
      * 
      * This screen ofers access to useful tools before the presentation begins.
      * This method is always called, but if the settings define that no splash
@@ -2293,34 +2297,7 @@ window.PPW= (function($, _d, console){
         
         // adding the toolbar
         if(_settings.useToolBar){
-            $b.append(_templates.toolBar
-                                .replace(/\{\{clickableClass\}\}/g, _conf.cons.CLICKABLE_ELEMENT
-                                .replace(/\{\{likeSrc\}\}/g, _l)));
-                                
-            // setting images to the icons on the toolbar and their behaviour
-            $('#ppw-goto-icon').attr('src', _settings.PPWSrc+'/_images/goto.png')
-                               .addClass(_conf.cons.CLICKABLE_ELEMENT)
-
-            $('#ppw-toolbox-icon').attr('src', _settings.PPWSrc+'/_images/toolbox.png')
-                                  .addClass(_conf.cons.CLICKABLE_ELEMENT);
-
-            $('#ppw-search-icon').attr('src', _settings.PPWSrc+'/_images/search.png')
-                                 .addClass(_conf.cons.CLICKABLE_ELEMENT);
-
-            $('#ppw-fullscreen-icon').attr('src', _settings.PPWSrc+'/_images/fullscreen.png')
-                                     .addClass(_conf.cons.CLICKABLE_ELEMENT);
-
-            $('#ppw-camera-icon').attr('src', _settings.PPWSrc+'/_images/camera.png')
-                                 .addClass(_conf.cons.CLICKABLE_ELEMENT);
-
-            $('#ppw-settings-icon').attr('src', _settings.PPWSrc+'/_images/settings-icon.png')
-                                   .addClass(_conf.cons.CLICKABLE_ELEMENT);
-
-            $('#ppw-ct-thumbs').attr('src', _settings.PPWSrc+'/_images/thumbs.png')
-                               .addClass(_conf.cons.CLICKABLE_ELEMENT);
-
-            $('#ppw-ct-print').attr('src', _settings.PPWSrc+'/_images/print.png')
-                               .addClass(_conf.cons.CLICKABLE_ELEMENT);
+            $b.append(_templates.toolBar.replace(/\{\{likeSrc\}\}/g, _l));
         }
 
         // adding the splash screen if enabled
@@ -2739,13 +2716,13 @@ window.PPW= (function($, _d, console){
         /*var el= _d.getElementById('ppw-audioTestElement');
         if(!el){
             $b.append("<audio id='ppw-audioTestElement' autoplay='autoplay' loop='loop' controls='controls'>\
-                                <source src='"+_settings.PPWSrc+"/_audios/water.mp3'/>\
-                                <source src='"+_settings.PPWSrc+"/_audios/water.ogg'/>\
+                                <source src='"+_settings.PPWSrc+"_audios/water.mp3'/>\
+                                <source src='"+_settings.PPWSrc+"_audios/water.ogg'/>\
                                </audio>");
             el= _d.getElementById('ppw-audioTestElement');
         }*/
         //el.play();
-        _showMessage("Playing audio<br/><div style='background: url("+_settings.PPWSrc+"/_images/animated-wave-sound.gif) 0px -37px no-repeat; position: relative; width: 220px; height: 30px; margin: auto; background-size: 248px 108px; border-left: solid 1px #fcc; border-right: solid 1px #fcc;' onclick='var audio = document.getElementById(\"ppw-audioTestElement\"); var t = \"Stopped\";  if(audio.paused) { audio.play(); t = \"Playing\" } else { audio.pause(); }; console.log(\"[PPW] Currently \" + t); '/><div id='ppw-audioPlaceHolder'></div>",
+        _showMessage("Playing audio<br/><div style='background: url("+_settings.PPWSrc+"_images/animated-wave-sound.gif) 0px -37px no-repeat; position: relative; width: 220px; height: 30px; margin: auto; background-size: 248px 108px; border-left: solid 1px #fcc; border-right: solid 1px #fcc;' onclick='var audio = document.getElementById(\"ppw-audioTestElement\"); var t = \"Stopped\";  if(audio.paused) { audio.play(); t = \"Playing\" } else { audio.pause(); }; console.log(\"[PPW] Currently \" + t); '/><div id='ppw-audioPlaceHolder'></div>",
                      function(){
                          
                          var el= _d.getElementById('ppw-audioTestElement'),
@@ -2755,8 +2732,8 @@ window.PPW= (function($, _d, console){
                          audio.pause();
                      });
         $('#ppw-audioPlaceHolder').html("<audio id='ppw-audioTestElement' autoplay='autoplay' loop='loop' >\
-                                <source src='"+_settings.PPWSrc+"/_audios/water.mp3'/>\
-                                <source src='"+_settings.PPWSrc+"/_audios/water.ogg'/>\
+                                <source src='"+_settings.PPWSrc+"_audios/water.mp3'/>\
+                                <source src='"+_settings.PPWSrc+"_audios/water.ogg'/>\
                                </audio>");
     };
     
@@ -2768,7 +2745,7 @@ window.PPW= (function($, _d, console){
      * Also, the time remaning/lapsed and the shortcut keys.
      */
     var _openPresentationTool= function(){
-        var toolSrc= _settings.PPWSrc+'/_tools/presentation-tool.html',
+        var toolSrc= _settings.PPWSrc+'_tools/presentation-tool.html',
             toolName= 'ppw-Presentation-tool',
             toolProps= "width=780,height=520,left=40,top=10";
         
