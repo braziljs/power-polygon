@@ -393,7 +393,10 @@ window.PPW= (function($, _d, console){
              *   3: only logs
              *   9: errors, warnings and logs
              */
-            verbose: 9
+            verbose: 9,
+            // social buttons
+            Google: true,
+            Facebook: true
         },
         // a local reference to the $(document)
         $d= $(_d),
@@ -3912,7 +3915,7 @@ window.PPW= (function($, _d, console){
         get                             : _get,
         set                             : _set,
         Facebook                        : true,
-        Google                          : true,
+        Google                          : true
     };
     
 })(window.jQuery, document, window.console);

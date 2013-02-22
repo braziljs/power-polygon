@@ -17,6 +17,10 @@ pre.no-numbers .ppw-sh-source-container{
     background-color: white;
 }
 
+.sh_sourceCode{
+    text-align: left !IMPORTANT;
+}
+
 .ppw-sh-line:nth-child(1){
     border-top: solid 1px rgba(100, 100, 100, 0.1);
 }
