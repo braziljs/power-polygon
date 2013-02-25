@@ -400,7 +400,7 @@ window.PPW= (function($, _d, console){
             // enables the Facebook Buttons
             Facebook: true,
             // enables the g+ buttons
-            Google: true,
+            Google: true
         },
         // a local reference to the $(document)
         $d= $(_d),
@@ -3872,7 +3872,7 @@ window.PPW= (function($, _d, console){
         get                             : _get,
         set                             : _set,
         Facebook                        : true,
-        Google                          : true,
+        Google                          : true
     };
     
 })(window.jQuery, document, window.console);
