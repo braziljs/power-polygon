@@ -308,20 +308,20 @@ window.PPW= (function($, _d, console){
                       </div>',
         
             // the top-left toolbar content
-            toolBar: '<div id="ppw-toolbar-container" class="ppw-platform ppw-clickable">\
-                    <div id="ppw-toolbar" class="ppw-platform ppw-clickable">\
-                        <i class="icon-exchange icon-2x" id="ppw-goto-icon" onclick="PPW.showGoToComponent(false);" title="Go to a specific slide"></i>\
-                        <i class="icon-briefcase icon-2x" id="ppw-toolbox-icon" onclick="PPW.openPresentationTool();" title="Open Presentation Tool"></i>\
-                        <i class="icon-search icon-2x" id="ppw-search-icon" onclick="PPW.showSearchBox()" title="Search on slides"></i>\
-                        <i class="icon-fullscreen icon-2x" id="ppw-fullscreen-icon" onclick="PPW.enterFullScreen()" title="Go Fullscreen"></i>\
-                        <i class="icon-camer icon-2x" id="ppw-camera-icon" onclick="PPW.toggleCamera();" title="Start the camera"></i>\
-                        <i class="icon-cogs icon-2x" id="ppw-settings-icon" onclick="PPW.showConfiguration();" title="Settings"></i>\
+            toolBar: '<div id="ppw-toolbar-container" class="ppw-platform {{clickableClass}}">\
+                    <div id="ppw-toolbar" class="ppw-platform {{clickableClass}}">\
+                        <div class="img"><img id="ppw-goto-icon" onclick="PPW.showGoToComponent(false);" title="Go to a specific slide" /></div>\
+                        <div class="img"><img id="ppw-toolbox-icon" onclick="PPW.openPresentationTool();" title="Open Presentation Tool" /></div>\
+                        <div class="img"><img id="ppw-search-icon" onclick="PPW.showSearchBox()" title="Search on slides"/></div>\
+                        <div class="img"><img id="ppw-fullscreen-icon" onclick="PPW.enterFullScreen()" title="Go Fullscreen"/></div>\
+                        <div class="img"><img id="ppw-camera-icon" onclick="PPW.toggleCamera();" title="Start the camera"/></div>\
+                        <div class="img"><img id="ppw-settings-icon" onclick="PPW.showConfiguration();" title="Settings"/></div>\
                     </div>\
                     <div id="ppw-content-toolbar" class="ppw-platform">\
                         <span id="ppw-ct-text-small" title="Smaller fonts" onclick="PPW.smallerFonts();">A</span>\
                         <span id="ppw-ct-text-big" title="Bigger fonts" onclick="PPW.biggerFonts();">A</span>\
-                        <i class="icon-th icon-2x" id="ppw-ct-thumbs" onclick="PPW.showThumbs();" title="Show thumbnails"></i>\
-                        <i class="icon-print icon-2x" id="ppw-ct-print" onclick="PPW.print();" title="Print or save as PDF(alt+P)"></i>\
+                        <img id="ppw-ct-thumbs" onclick="PPW.showThumbs();" title="Show thumbnails"/>\
+                        <img id="ppw-ct-print" onclick="PPW.print();" title="Print or save as PDF(alt+P)"/>\
                         <div id="ppw-presentation-social-buttons">\
                             <div class="fb-like" data-href="{{likeSrc}}" data-send="false" data-width="450" data-show-faces="false"></div>\
                             <span class="gp-button"><div class="g-plusone" data-size="medium" data-annotation="none" data-href="{{likeSrc}}"></div></span>\
@@ -400,7 +400,7 @@ window.PPW= (function($, _d, console){
             // enables the Facebook Buttons
             Facebook: true,
             // enables the g+ buttons
-            Google: true
+            Google: true,
         },
         // a local reference to the $(document)
         $d= $(_d),
@@ -2297,7 +2297,34 @@ window.PPW= (function($, _d, console){
         
         // adding the toolbar
         if(_settings.useToolBar){
-            $b.append(_templates.toolBar.replace(/\{\{likeSrc\}\}/g, _l));
+            $b.append(_templates.toolBar
+                                .replace(/\{\{clickableClass\}\}/g, _conf.cons.CLICKABLE_ELEMENT
+                                .replace(/\{\{likeSrc\}\}/g, _l)));
+                                
+            // setting images to the icons on the toolbar and their behaviour
+            $('#ppw-goto-icon').attr('src', _settings.PPWSrc+'/_images/goto.png')
+                               .addClass(_conf.cons.CLICKABLE_ELEMENT)
+
+            $('#ppw-toolbox-icon').attr('src', _settings.PPWSrc+'/_images/toolbox.png')
+                                  .addClass(_conf.cons.CLICKABLE_ELEMENT);
+
+            $('#ppw-search-icon').attr('src', _settings.PPWSrc+'/_images/search.png')
+                                 .addClass(_conf.cons.CLICKABLE_ELEMENT);
+
+            $('#ppw-fullscreen-icon').attr('src', _settings.PPWSrc+'/_images/fullscreen.png')
+                                     .addClass(_conf.cons.CLICKABLE_ELEMENT);
+
+            $('#ppw-camera-icon').attr('src', _settings.PPWSrc+'/_images/camera.png')
+                                 .addClass(_conf.cons.CLICKABLE_ELEMENT);
+
+            $('#ppw-settings-icon').attr('src', _settings.PPWSrc+'/_images/settings-icon.png')
+                                   .addClass(_conf.cons.CLICKABLE_ELEMENT);
+
+            $('#ppw-ct-thumbs').attr('src', _settings.PPWSrc+'/_images/thumbs.png')
+                               .addClass(_conf.cons.CLICKABLE_ELEMENT);
+
+            $('#ppw-ct-print').attr('src', _settings.PPWSrc+'/_images/print.png')
+                               .addClass(_conf.cons.CLICKABLE_ELEMENT);
         }
 
         // adding the splash screen if enabled
@@ -3872,7 +3899,7 @@ window.PPW= (function($, _d, console){
         get                             : _get,
         set                             : _set,
         Facebook                        : true,
-        Google                          : true
+        Google                          : true,
     };
     
 })(window.jQuery, document, window.console);
