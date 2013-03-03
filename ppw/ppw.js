@@ -394,6 +394,9 @@ window.PPW= (function($, _d, console){
              *   9: errors, warnings and logs
              */
             verbose: 9,
+            // in case you want to change the zoom effect to be applied to a different element
+            // might be useful for addon or theme developers.
+            applyZoomTo: false,
             // enables the Facebook Buttons
             Facebook: true,
             // enables the g+ buttons
@@ -1076,7 +1079,6 @@ window.PPW= (function($, _d, console){
     var _applyTalkVariables= function(selector){
         
         $(selector || 'var').each(function(){
-            console.log(this)
             var controller= false, i= 0,
                 validSlides= _getValidSlides(),
                 slideEl= _elementInSlide(this),
@@ -1578,7 +1580,11 @@ window.PPW= (function($, _d, console){
                 
                 case 27: // esc
                     if(_d.getElementById('ppw-message-box').style.display != 'none'){
-                        _closeMessage();
+                        
+                        if(_conf.showingMessage){
+                            _closeMessage();
+                        }
+                        
                         _pauseCamera();
                         _preventDefaultstopPropagation(evt);
                         if(_conf.currentZoom != 1){
@@ -1810,9 +1816,26 @@ window.PPW= (function($, _d, console){
                     finalH= posH,//(centerH + ((centerH - posH)*-1)) * newZoom,
                     finalV= posV;
 
+// ONLY FOR A QUICK TEST -- REMOVE IT IF YOU SEE IT!
+/*
+if(!_d.getElementById('pointer-el-test')){
+    $b.append("<div id='pointer-el-test' style='position: absolute; left:0px; top:0px; width:10px; height:10px; background-color:red;z-index:99999999;'></div>");
+}
+var pointerTest= _d.getElementById('pointer-el-test');
+container.appendChild(pointerTest);
+alert(finalH)
+$(pointerTest).css({
+    left: finalH+'px',
+    top: finalV+'px'
+})
+*/
+/////////////////////
+
+
 // todo: Find a better way of applying a zoom referencing the mouse position
 //console.log({posH: posH, centerH: centerH, finalH: finalH, newZoom: newZoom});
 
+                /*
                 if(_conf.presentationStarted && !_isEditableTargetContent(evt.target)){
                     evt= evt.originalEvent;
 
@@ -1822,6 +1845,7 @@ window.PPW= (function($, _d, console){
                         _zoomBy(-0.1, finalH, finalV);
                     }
                 }
+                */
             }
             $d.bind('DOMMouseScroll', mouseWheelFn);
             $d.bind('mousewheel', mouseWheelFn);
@@ -2263,7 +2287,9 @@ window.PPW= (function($, _d, console){
                 else
                     $('#ppw-search-next').trigger('click');
             }else if(evt.keyCode == 27){ // esc
-                _closeMessage();
+                if(_conf.showingMessage){
+                    _closeMessage();
+                }
             }
         }, false);
         
@@ -2542,8 +2568,8 @@ window.PPW= (function($, _d, console){
                 PPW.lock($('#ppw-message-box-button').show()[0]);
         }
         
-        PPW.animate(box, 'fadeInDownBig', {
-            duration: '1s',
+        PPW.animate(box, 'fadeInDown', {
+            duration: '300ms',
             delay: '0s'
         });
         
@@ -2611,8 +2637,8 @@ window.PPW= (function($, _d, console){
         var box= $('#ppw-message-box'),
             fn= box.data('closeCallback');
         
-        PPW.animate(box, 'fadeOutUpBig', {
-                duration: '1s',
+        PPW.animate(box, 'fadeOutUp', {
+                duration: '300ms',
                 onstart: function(){
                     
                 },
@@ -2624,6 +2650,8 @@ window.PPW= (function($, _d, console){
                         PPW.unlock();
                         _b.focus();
                     }
+                    
+                    $('#ppw-message-box').hide().removeClass('ppw-anim-visible');
                     
                     if(fn && typeof fn == 'function')
                         fn();
@@ -3459,6 +3487,9 @@ window.PPW= (function($, _d, console){
         }
     };
     
+    /**
+     * Removes the CSS classes used by the animate method.
+     */
     var _removeAnimateCSSClasses= function(el){
         
         if(!el){
@@ -3495,7 +3526,8 @@ window.PPW= (function($, _d, console){
                     settings.onend(event, el, anim);
                 }catch(e){};
             }
-            //_removeAnimateCSSClasses(el);
+            if(anim.indexOf('out') >0 || anim.indexOf('Out') > 0)
+                _removeAnimateCSSClasses(el);
         };
         
         el= $(el);
@@ -3558,6 +3590,9 @@ window.PPW= (function($, _d, console){
         }
     };
     
+    /**
+     * Resets the coordinates, zoom and rotate effects currently applied.
+     */
     var _resetViewport= function(){
         if(_conf.currentZoom){
             _viewport({zoom: 1});
@@ -3588,10 +3623,11 @@ window.PPW= (function($, _d, console){
             callback= false,
             useObjectConfig= false,
             sentTarget= false,
-            container= $('.ppw-active-slide-element-container').eq(0),
+            container= _settings.applyZoomTo || $('.ppw-active-slide-element-container').eq(0),
             l, t, w, h, hCenter, vCenter, hLimit, vLimit;
         
-        if(!_conf.presentationStarted)
+        // only applies the effects if the presentation has started and it is not in thumbs view mode.
+        if(!_conf.presentationStarted || _conf.inThumbsMode)
             return false;
         
         useObjectConfig= true;
@@ -3674,6 +3710,15 @@ window.PPW= (function($, _d, console){
         return PPW;
     };
     
+    
+    /**
+     * Applies a zoom effect, incrementing the current zoom by the given value.
+     * 
+     * @param Real The multiplier which will be incremented to the current zoom.
+     * @param Int The left coordinate for the center of the effect.
+     * @param Int The right coordinate for the center of the effect.
+     * @param Real Degrees to rotate the canvas while zooming.
+     */
     var _zoomBy= function(by, left, top, rotate){
         _conf.currentZoom+= by;
         _viewport({zoom: _conf.currentZoom, left: left, top: top, rotate: rotate});
