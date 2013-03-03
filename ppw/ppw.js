@@ -2293,9 +2293,11 @@ window.PPW= (function($, _d, console){
         
         // adding the toolbar
         if(_settings.useToolBar){
-            $b.append(_templates.toolBar
-                                .replace(/\{\{clickableClass\}\}/g, _conf.cons.CLICKABLE_ELEMENT
-                                .replace(/\{\{likeSrc\}\}/g, _l)));
+            
+            var x= _templates.toolBar
+                                .replace(/\{\{clickableClass\}\}/g, _conf.cons.CLICKABLE_ELEMENT)
+                                .replace(/\{\{likeSrc\}\}/g, _l.protocol+'//'+(_l.host == 'localhost'? 'powerpolygon.com': _l.host)+''+_l.pathname);
+            $b.append(x);
                                 
             // setting images to the icons on the toolbar and their behaviour
             $('#ppw-goto-icon').attr('src', _settings.PPWSrc+'/_images/goto.png')
@@ -2370,10 +2372,10 @@ window.PPW= (function($, _d, console){
                 js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=281929191903584";
                 fjs.parentNode.insertBefore(js, fjs);
             }(_d, 'script', 'facebook-jssdk'));
+            
         }
             
         if(_n.onLine && _settings.Google){
-
             // applying the g+ buttons
             _loadScript('https://apis.google.com/js/plusone.js');
         }
