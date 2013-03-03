@@ -927,7 +927,7 @@ window.PPW= (function($, _d, console){
     /**
      * Hides all the invalid slides for the current profile
      */
-    var _setPresentationProfile= function(profile){
+    var _setPresentationProfile= function(profile, onload){
         
         var i= 0, l= _settings.slides.length,
             slide;
@@ -949,6 +949,10 @@ window.PPW= (function($, _d, console){
                 $('#'+slide.id).parent().addClass('ppw-slide-not-in-profile');
             }
         }
+        
+        if(!onload)
+            _pushSetVariable('profile', profile);
+        
     };
     
     /**
@@ -1153,12 +1157,17 @@ window.PPW= (function($, _d, console){
      * By the way, yes, LION stands for L10N(localization)
      * Also...case matters, when using for example en or EN.
      */
-    var _setLION= function(language){
+    var _setLION= function(language, onload){
         
         var lang= language||_n.language,
             i= 0 || false,
             list= _settings.languages,
-            rx= null;
+            rx= null,
+            hL= null;
+        
+        if(_conf.currentLang == lang){
+            return;
+        }
         
         _conf.currentLang= lang;
         
@@ -1179,8 +1188,30 @@ window.PPW= (function($, _d, console){
         _b.className= _b.className.replace(/LANG_[a-z]+( |$)/ig, '');
         PPW.language= lang;
         $b.addClass('LANG_'+lang);
+        
+        if(!onload){
+            _pushSetVariable('lang', lang);
+        }
+        
         _triggerEvent('onlangchange');
     }
+    
+    /**
+     * Pushes the history state setting a variable to the URL.
+     *
+     * This method will add a variable to the URL(or replace it,
+     * in case it was already there) keeping the current hash.
+     */
+    var _pushSetVariable= function(id, val){
+        var rx= new RegExp(id+'\=([a-zA-Z0-9\-_]+)'),
+            hL= _l.search.replace(rx, '')
+                         .replace(/\?\&/, '?')
+                         .replace(/\&\&/, '&')
+                         .replace(/\?$/, '');
+
+        hL= hL+ ((hL.indexOf('?')>-1)? '&':'?') + id+'='+val +_l.hash;
+        _h.pushState({}, val, hL);
+    };
     
     /**
      * Triggered when the last image is loaded.
@@ -1280,9 +1311,9 @@ window.PPW= (function($, _d, console){
             
             // when all the slides loaded
             _conf.slidesLoaded= true;
-            _setPresentationProfile();
+            _setPresentationProfile(_querystring('profile')||false, true);
             // set the current language to the loaded slide elements
-            _setLION(_querystring('lang')||_settings.defaultLanguage||_n.language);
+            _setLION(_querystring('lang')||_settings.defaultLanguage||_n.language, true);
             // setting the clonable elements
             _applyClonableElements();
             // setting the header/footer elements
