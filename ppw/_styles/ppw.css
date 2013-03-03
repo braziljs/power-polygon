@@ -748,21 +748,26 @@ background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(229,229,229,1
     width: 220px;
 }
 
+#ppw-search-container *{
+    display: inline;
+}
+
 #ppw-search-slide{
     width: 170px;
     float: left;
     clear: none;
     margin: 0px 0px 0px 8px;
 }
+
 #ppw-search-prev, #ppw-search-next{
     cursor: pointer;
-    /*margin-left: 3px;*/
     width: 23px;
     height: 18px;
     font-size: 11px;
     margin-left: 4px;
     margin-right: 0px;
 }
+
 #ppw-search-next{
     margin-left: 0px;
 }
@@ -933,7 +938,7 @@ background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(229,229,229,1
 }
 #ppw-social-buttons .fb-like,
 #ppw-presentation-social-buttons .fb-like{
-    width: 56px;
+    width: 50px;
     overflow: hidden;
     float: right;
     margin-left: 4px;
@@ -1010,9 +1015,6 @@ background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(229,229,229,1
     content: "Failed loading slide content!";
 }*/
 
-#ppw-search-found{
-    clear: both;
-}
 
 
 /* focusing/zooming feature */
