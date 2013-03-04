@@ -39,19 +39,21 @@ window.PPW.extend("demo", (function(data){
                 bottom: '-150px',
                 zIndex: 999999999,
                 backgroundColor: '#fff',
-                height: '90px',
-                width: '320px',
+                height: '100px',
+                width: '380px',
                 padding: '4px',
                 overflow: 'hidden',
                 boxShadow: '0px 0px 20px black',
                 color: '#444',
                 fontSize: '16px',
                 fontFamily: 'Verdana, Tahoma, Sans, Arial',
+                wordWrap: 'break-all',
                 opacity: 0
             });
 
             PPWSocialPlugin.el= el;
-            
+            PPWSocialPlugin.$el = $(PPWSocialPlugin.el);
+
             $(PPWSocialPlugin.el).bind('mouseover', function(){
                 window.clearTimeout(PPWSocialPlugin.timeOut);
             });
@@ -76,23 +78,32 @@ window.PPW.extend("demo", (function(data){
 })());
 
 window.PPWSocialPlugin= {
-    mentions: []
+    mentions: [],
+    _currentMention: -1,
+    hidden: false,
+    mainPopUpTemplate: '<div id="box"> <div style="cursor: pointer;"id="mentions-header"> \
+        <p>Your Mentions<span id="close-button" style="float:right">&times</span></p> <hr> </div> \
+        <div id="body"> <div id="left" style="position:absolute;left:10px;top:45px;display:inline;cursor:pointer;">\
+        <span>&lang;</span></div> \
+        <div id="mention-content" style="position:absolute;left:20px;line-height:18px;word-wrap:break-all;padding:4px;display:inline;"> \
+        <a href="#">Show all</a><br><a href="#">Show new ones</a>\
+         </div> <div id="right" style="position: absolute;left:95%;display:inline-block;top:45px;cursor:pointer;">&rang;</div> </div> </div>'
 };
 window.PPWSocialPlugin.twitterCallback= function(data){
-    var i= 0, l= 0, social= PPW.get('social'), el= null, w= 0, alertTime= 4000;
+    var i= 0, l= 0, social= PPW.get('social'), w= 0, alertTime= 4000;
     if(!PPWSocialPlugin.messages)
         PPWSocialPlugin.messages= [];
-    
+
     PPWSocialSearch= '&since_id='+data.max_id_str+'&';
     l= data.results.length;
 
     if(!l)
         return;
-    
+
     if(social.alertTime)
         alertTime= social.alertTime;
     PPWSocialPlugin.alertTime= alertTime;
-    
+
     for(; i<l; i++){
         PPWSocialPlugin.messages.push(data.results[i]);
         if(i>2){
@@ -100,64 +111,93 @@ window.PPWSocialPlugin.twitterCallback= function(data){
         }
     }
     $.merge(PPWSocialPlugin.mentions, PPWSocialPlugin.messages);
-    el= $(PPWSocialPlugin.el);
 
-    el.animate({
-        bottom: '6px',
-        opacity: 1
-    }, function(){
-        PPWSocialPlugin.showMentionsTip();
-    });
-};
-
-PPWSocialPlugin.showMentionsTip = function() {
-    var $el = $(PPWSocialPlugin.el);
-    $el.css({
+    this.$el.css({
         height: '90px'
     });
-    $el.html('<p>You have new mentions!</p> <a href="#">Show all</a><br><a href="#">Show new ones</a>');
-    var links = $el.find('a');
-    links.first().click(function() {
-        PPWSocialPlugin.listAllMentions();
-    });
-    links.last().click(function() {
-        PPWSocialPlugin.showPopMessage();
-    });
+
+    PPWSocialPlugin.showMainPopUp();
 };
 
 PPWSocialPlugin.showPopMessage= function(){
-    var el= $(PPWSocialPlugin.el), msg= null;
-    
+    var msg= null;
+
     msg= PPWSocialPlugin.messages.shift();
-    
+
     if(!PPWSocialPlugin.messages.length){
         PPWSocialPlugin.hideMessage();
+        PPWSocialPlugin.bindAll();
         return;
     }
-    el.html("@"+msg.from_user+": "+msg.text);
+    PPWSocialPlugin.$el.find('#mention-content').html("@"+msg.from_user+": "+msg.text);
     PPWSocialPlugin.timeOut= setTimeout(PPWSocialPlugin.showPopMessage, PPWSocialPlugin.alertTime);
 };
 
+PPWSocialPlugin.showMainPopUp = function() {
+    PPWSocialPlugin.hidden = false;
+    PPWSocialPlugin.$el.css('height', '100px');
+    PPWSocialPlugin.$el.html(PPWSocialPlugin.mainPopUpTemplate);
+    PPWSocialPlugin.$el.animate({
+        bottom: '6px',
+        opacity: 1
+    }, function() {});
+    PPWSocialPlugin.bindAll();
+};
+
 PPWSocialPlugin.listAllMentions = function() {
-    var $el = $(PPWSocialPlugin.el), str = '';
+    var str = '';
     $.each(PPWSocialPlugin.mentions, function() {
-        console.log('mgs', this);
         str += "@" + this.from_user + ": " + this.text;
         str += '<hr>';
     });
-    str += '<a href="#">close</a>';
-    $el.css({
+    PPWSocialPlugin.$el.css({
         height: '290px',
         'overflow-y': 'scroll'
-    }).html(str);
-    $el.find('a').click(function() {
-        PPWSocialPlugin.hideMessage();
+    }).find('#body').html(str);
+};
+
+PPWSocialPlugin.togglePopUp = function() {
+    return PPWSocialPlugin.hidden ? PPWSocialPlugin.showMainPopUp() : PPWSocialPlugin.hideMessage();
+};
+
+PPWSocialPlugin.bindAll = function() {
+    PPWSocialPlugin.$el.find('#mentions-header').click(function() {
+        PPWSocialPlugin.togglePopUp();
+    });
+    var links = PPWSocialPlugin.$el.find('a');
+
+    links.first().click(function() {
+        PPWSocialPlugin.listAllMentions();
+    });
+
+    links.last().click(function() {
+        PPWSocialPlugin.showPopMessage();
+    });
+    PPWSocialPlugin.$el.find('#right').click(function() {
+        PPWSocialPlugin.showMention(PPWSocialPlugin.nextMention());
+    });
+    PPWSocialPlugin.$el.find('#left').click(function() {
+        PPWSocialPlugin.showMention(PPWSocialPlugin.previousMention());
     });
 };
 
 PPWSocialPlugin.hideMessage= function(){
-    $(PPWSocialPlugin.el).animate({
-        bottom: '-150px',
-        opacity: 0
+    PPWSocialPlugin.hidden = true;
+    PPWSocialPlugin.$el.animate({
+        bottom:  -(parseInt(PPWSocialPlugin.$el.css('height'), 10) - 15) + 'px'
     }, function(){});
+};
+
+PPWSocialPlugin.showMention = function(mention) {
+    PPWSocialPlugin.$el.find('#mention-content').html("@"+mention.from_user+": "+mention.text);
+};
+
+PPWSocialPlugin.nextMention = function() {
+    var index = ++PPWSocialPlugin._currentMention % PPWSocialPlugin.mentions.length;
+    return PPWSocialPlugin.mentions[index < 0 ? -index : index];
+};
+
+PPWSocialPlugin.previousMention = function() {
+    var index = --PPWSocialPlugin._currentMention % PPWSocialPlugin.mentions.length;
+    return PPWSocialPlugin.mentions[index < 0 ? -index : index];
 };
