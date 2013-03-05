@@ -1781,14 +1781,8 @@ window.PPW= (function($, _d, console){
             if(_conf.presentationStarted && !_isEditableTargetContent(evt.target)){
                 
                 if(!_settings.useArrows || (_settings.useArrows && !_settings.useOnlyArrows)){
-                
-                /*if(_conf.currentZoom !== 1){
-                    _resetViewport();
-                }else{*/
                     if(!_conf.inThumbsMode)
                         _goNextSlide();
-                //}
-                
                 }
                 
                 return _preventDefaultstopPropagation(evt);
@@ -1796,57 +1790,9 @@ window.PPW= (function($, _d, console){
             return true;
         });
         
-        // scrolling, for zoom
+        // scrolling, used to apply zoom effects
         if(_settings.zoomOnScroll){
-            mouseWheelFn= function(event){
-
-                if(_isLocked(event)){
-                    console.warn("[PPW] User interaction(zoom) ignored because Power Polygon has been locked");
-                    return false;
-                }
-            
-                var container= $('.ppw-active-slide-element-container').eq(0)[0],
-                    centerH= container? container.offsetWidth/2: 0,
-                    centerV= container? container.offsetHeight/2: 0,
-                    evt= event.originalEvent,
-                    delta = evt.detail < 0 || evt.wheelDelta > 0 ? 1 : -1,
-                    zommAdd= delta>0? 0.1: -0.1,
-                    newZoom= _conf.currentZoom + zommAdd,
-                    posH= evt.offsetX, posV= evt.offsetY,
-                    finalH= posH,//(centerH + ((centerH - posH)*-1)) * newZoom,
-                    finalV= posV;
-
-// ONLY FOR A QUICK TEST -- REMOVE IT IF YOU SEE IT!
-/*
-if(!_d.getElementById('pointer-el-test')){
-    $b.append("<div id='pointer-el-test' style='position: absolute; left:0px; top:0px; width:10px; height:10px; background-color:red;z-index:99999999;'></div>");
-}
-var pointerTest= _d.getElementById('pointer-el-test');
-container.appendChild(pointerTest);
-alert(finalH)
-$(pointerTest).css({
-    left: finalH+'px',
-    top: finalV+'px'
-})
-*/
-/////////////////////
-
-
-// todo: Find a better way of applying a zoom referencing the mouse position
-//console.log({posH: posH, centerH: centerH, finalH: finalH, newZoom: newZoom});
-
-                /*
-                if(_conf.presentationStarted && !_isEditableTargetContent(evt.target)){
-                    evt= evt.originalEvent;
-
-                    if(delta > 0){ // up
-                        _zoomBy(0.1, finalH, finalV);
-                    }else{ // down
-                        _zoomBy(-0.1, finalH, finalV);
-                    }
-                }
-                */
-            }
+            mouseWheelFn= _mouseWheelZoom;
             $d.bind('DOMMouseScroll', mouseWheelFn);
             $d.bind('mousewheel', mouseWheelFn);
         }
@@ -1917,6 +1863,56 @@ $(pointerTest).css({
             return _preventDefaultstopPropagation(evt);
         });*/
     };
+    
+    var _mouseWheelZoom= function(event){
+
+            if(_isLocked(event)){
+                console.warn("[PPW] User interaction(zoom) ignored because Power Polygon has been locked");
+                return false;
+            }
+
+            var container= $('.ppw-active-slide-element-container').eq(0)[0],
+                centerH= container? container.offsetWidth/2: 0,
+                centerV= container? container.offsetHeight/2: 0,
+                evt= event.originalEvent,
+                delta = evt.detail < 0 || evt.wheelDelta > 0 ? 1 : -1,
+                zommAdd= delta>0? 0.1: -0.1,
+                newZoom= _conf.currentZoom + zommAdd,
+                posH= evt.offsetX, posV= evt.offsetY,
+                finalH= posH,//(centerH + ((centerH - posH)*-1)) * newZoom,
+                finalV= posV;
+            
+    // ONLY FOR A QUICK TEST -- REMOVE IT IF YOU SEE IT!
+    /*
+    if(!_d.getElementById('pointer-el-test')){
+    $b.append("<div id='pointer-el-test' style='position: absolute; left:0px; top:0px; width:10px; height:10px; background-color:red;z-index:99999999;'></div>");
+    }
+    var pointerTest= _d.getElementById('pointer-el-test');
+    container.appendChild(pointerTest);
+    alert(finalH)
+    $(pointerTest).css({
+    left: finalH+'px',
+    top: finalV+'px'
+    })
+    */
+    /////////////////////
+
+
+    // todo: Find a better way of applying a zoom referencing the mouse position
+    //console.log({posH: posH, centerH: centerH, finalH: finalH, newZoom: newZoom});
+
+            /*
+            if(_conf.presentationStarted && !_isEditableTargetContent(evt.target)){
+                evt= evt.originalEvent;
+
+                if(delta > 0){ // up
+                    _zoomBy(0.1, finalH, finalV);
+                }else{ // down
+                    _zoomBy(-0.1, finalH, finalV);
+                }
+            }
+            */
+       };
     
     /**
      * Shows the help pannell
@@ -3270,6 +3266,9 @@ $(pointerTest).css({
     
     /**
      * Go to a specific slide by index.
+     * 
+     * @param Int The slide number.
+     * @param Boolean Flag used internaly to prevent actions or finish the talk.
      */
     var _goToSlide= function(idx, prevent){
         
