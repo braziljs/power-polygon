@@ -159,7 +159,7 @@ window.PPW= (function($, _d, console){
         
         // internal configuration properties
         _conf= {
-            loadSteps: 7,
+            loadSteps: 0,
             curLoaded: 0,
             showingCamera: false,
             showingMessage: false,
@@ -802,6 +802,104 @@ window.PPW= (function($, _d, console){
     }
 
     /**
+     * Loads an external script.
+     * 
+     * @param String External script file.
+     * @param Boolean Whether or not to add a loadStep.
+     * @param Function Callback to be executed when the script is loaded.
+     */
+    var _loadScript= function(src, loadStep, fn){
+        if(loadStep){
+            _conf.loadSteps++;
+        }
+        $.getScript(src, fn||function(){});
+    };
+    
+    /**
+     * Loads an array of external script.
+     * 
+     * @param Array External script files.
+     * @param Boolean Whether or not to add a loadStep.
+     * @param Function/String The string to be executed or a function callback
+     */
+    var _loadScripts= function(scripts, loadStep, fn){
+        var l= scripts.length;
+        for(var i=0;i<l;i++){
+            _loadScript(_settings.PPWSrc+scripts[i], loadStep, fn);
+        }
+    }
+    
+    /**
+     * Loads external scripts of a theme.
+     * 
+     * @param String The name of the theme.
+     * @param Array External script files of the theme.
+     * @param Boolean Whether or not to add a loadStep.
+     * @param Function Callback to be executed when the script is loaded.
+     */
+    var _loadThemeScripts= function(theme, scripts, loadStep, fn){
+        var l= scripts.length;
+        for(var i=0;i<l;i++){
+            _loadScript(_settings.PPWSrc+'/_themes/'+ theme+'/'+scripts[i], loadStep, fn);
+        }
+    };
+    
+    /**
+     * Loads a css file to the head element of the page.
+     * 
+     * @param String CSS file source.
+     * @param Boolean Whether or not to add a loadStep.
+     * @param Function/String The string to be executed or a function callback
+     * @param Boolean Whether or not to bind the function callback
+     */
+    var _loadStyle= function(src, loadStep, fn, bind){
+        if(loadStep){
+            _conf.loadSteps++;
+        }
+        if(bind){
+            $("head").append($("<link rel='stylesheet' href='"+src
+                             +"' type='text/css' media='screen' />")
+                            .bind('load', fn));
+        }else{
+            $("<link/>", {
+                rel: "stylesheet",
+                type: "text/css",
+                href: src,
+                onload: fn
+            }).appendTo("head");
+        }
+    };
+    
+    /**
+     * Loads an array of css files to the head element of the page.
+     * 
+     * @param Array CSS files.
+     * @param Boolean Whether or not to add a loadStep.
+     * @param Function/String The string to be executed or a function callback
+     */
+    var _loadStyles= function(styles, loadStep, fn){
+        var l= styles.length;
+        for(var i=0;i<l;i++){
+            _loadStyle(_settings.PPWSrc+styles[i], loadStep, fn, false);
+        }
+    }
+    
+    /**
+     * Loads the css files of a theme to the head element of the page.
+     * 
+     * @param String The name of the theme.
+     * @param Array CSS files of the theme.
+     * @param Boolean Whether or not to add a loadStep.
+     * @param Function/String The string to be executed or a function callback
+     */
+    var _loadThemeStyles= function(theme, styles, loadStep, fn){
+        var l= styles.length;
+        for(var i=0;i<l;i++){
+            _loadStyle(_settings.PPWSrc+'/_themes/'+theme+'/'+styles[i], loadStep, fn, true);
+        }
+    }
+    
+    /**
      * Loads the theme's files.
      * 
      * This method loads the theme' manifes.json file, and then, its
@@ -827,16 +925,13 @@ window.PPW= (function($, _d, console){
             _settings.directionalIconsStyle= directionalIconsStyle;
         }
         
-        _conf.loadSteps+= _settings.theme.length-1;
+        _conf.loadSteps+= _settings.theme.length;
         
         $(_settings.theme).each(function(){
             var theme= this.toString();
             $.getJSON(_settings.PPWSrc+'/_themes/'+theme+'/manifest.json', function(data, status){
 
-                var dependencies= false,
-                    i= 0,
-                    l= 0,
-                    url= '';
+                var dependencies= false;
 
                 console.log("[PPW] Loading theme: "+ theme);
 
@@ -846,34 +941,11 @@ window.PPW= (function($, _d, console){
                     dependencies= _conf.themeData.dependencies||[];
 
                     if(dependencies.css){
-                        _conf.loadSteps+= dependencies.css.length;
-                        l= dependencies.css.length;
-
-                        for(i= 0; i<l; i++){
-                            url= _settings.PPWSrc+'/_themes/'+
-                                 theme+'/'+dependencies.css[i];
-
-                            $("head").append($("<link rel='stylesheet' href='"+
-                                                url+"' type='text/css' media='screen' />")
-                                            .bind('load',
-                                                  function(){
-                                                      _setLoadingBarStatus();
-                                                  }));
-                        }
+                        _loadThemeStyles(theme, dependencies.css, true, function(){ _setLoadingBarStatus(); });
                     }
 
                     if(dependencies.js){
-
-                        _conf.loadSteps+= dependencies.js.length;
-                        l= dependencies.js.length;
-
-                        for(i= 0; i<l; i++){
-                            $.getScript(_settings.PPWSrc+'/_themes/'+
-                                        theme+'/'+dependencies.js[i],
-                                        function(data, status, xhr){
-                                            _setLoadingBarStatus();
-                                        });
-                        }
+                        _loadThemeScripts(theme, dependencies.js, true, function(data, status, xhr){ _setLoadingBarStatus(); });
                     }
 
                 }else{
@@ -882,31 +954,6 @@ window.PPW= (function($, _d, console){
                 _setLoadingBarStatus();
             });
         });
-    };
-    
-    /**
-     * Loads a css file to the head element of the page.
-     * 
-     * @param String CSS file source.
-     * @param Function/String The string to be executed or a function callback
-     */
-    var _loadStyle= function(src, fn){
-        $("<link/>", {
-            rel: "stylesheet",
-            type: "text/css",
-            href: src,
-            onload: fn
-         }).appendTo("head");
-    };
-    
-    /**
-     * Loads external script.
-     * 
-     * @param String Source address.
-     * @param Function Callback to be executed when the script is loaded.
-     */
-    var _loadScript= function(src, fn){
-        $.getScript(src, fn||function(){});
     };
     
     /**
@@ -936,11 +983,10 @@ window.PPW= (function($, _d, console){
              background: '#f66'
          });
         
-         _loadStyle(_settings.PPWSrc+"/_styles/font-awesome.min.css", "PPW.setLoadingBarStatus()");
-         _loadStyle(_settings.PPWSrc+"/_styles/ppw.css", "PPW.setLoadingBarStatus()");
-         _loadStyle(_settings.PPWSrc+"/_styles/animate.css", "PPW.setLoadingBarStatus()");
-         _loadStyle(_settings.PPWSrc+"/_styles/jquery-ui-1.8.23.custom.css", "PPW.setLoadingBarStatus()");
-         _loadScript(_settings.PPWSrc+"/_scripts/jquery-ui-1.8.23.custom.min.js", PPW.setLoadingBarStatus);
+         var styles=["/_styles/ppw.css", "/_styles/animate.css", "/_styles/jquery-ui-1.8.23.custom.css", "/_styles/font-awesome.min.css"];
+         _loadStyles(styles, true, "PPW.setLoadingBarStatus()", false);
+         var scripts=["/_scripts/jquery-ui-1.8.23.custom.min.js"];
+         _loadScripts(scripts, true, PPW.setLoadingBarStatus);
          
          _tmp.lnk = _d.createElement('link');
          _tmp.lnk.type = 'image/x-icon';
@@ -2368,6 +2414,7 @@ window.PPW= (function($, _d, console){
      * going to be created.
      */
     var _createSplashScreen= function(){
+        _conf.loadSteps++;
         
         _b= _d.body;
         $b= $(_b);
