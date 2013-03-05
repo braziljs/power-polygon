@@ -748,6 +748,12 @@ background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(229,229,229,1
     width: 220px;
 }
 
+#ppw-search-container *{
+    display: inline;
+}
+#ppw-search-found{
+    clear: both;
+}
 #ppw-search-slide{
     width: 170px;
     float: left;
@@ -756,15 +762,11 @@ background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(229,229,229,1
 }
 #ppw-search-prev, #ppw-search-next{
     cursor: pointer;
-    /*margin-left: 3px;*/
     width: 23px;
     height: 18px;
     font-size: 11px;
     margin-left: 4px;
     margin-right: 0px;
-}
-#ppw-search-next{
-    margin-left: 0px;
 }
 
 /** END TOOBOX **/
@@ -1009,11 +1011,6 @@ background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(229,229,229,1
     color: white;
     content: "Failed loading slide content!";
 }*/
-
-#ppw-search-found{
-    clear: both;
-}
-
 
 /* focusing/zooming feature */
 body, .ppw-active-slide-element-container{
