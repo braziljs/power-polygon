@@ -119,7 +119,7 @@ window.PPW= (function($, _d, console){
         
         // internal configuration properties
         _conf= {
-            loadSteps: 6,
+            loadSteps: 7,
             curLoaded: 0,
             showingCamera: false,
             showingMessage: false,
@@ -220,6 +220,7 @@ window.PPW= (function($, _d, console){
                 alertAt: [30, 40],
                 theme: 'thm-default',
                 transition: 'trans-slider',
+                directionalIconsStyle: 'chevron',
                 slideType: 'content',
                 slideTitleSize: 40,
                 containerID: 'ppw-slides-container'
@@ -283,12 +284,12 @@ window.PPW= (function($, _d, console){
                             The content could not be found in any of these expected places!</div>",
         
             // the arrows element to go forward and backward
-            arrows: "<div id='ppw-arrows-container' class='ppw-clickable'><div id='ppw-arrow-previous-slide' onclick='if(!PPW.isLocked()) PPW.goPrev();'>◄</div><div id='ppw-arrow-next-slide' onclick='if(!PPW.isLocked()) PPW.goNext();'>►</div></div>",
+            arrows: "<div id='ppw-arrows-container' class='ppw-clickable'><div id='ppw-arrow-previous-slide' onclick='if(!PPW.isLocked()) PPW.goPrev();'><i class='icon-{{directionaliconsstyle}}-left'></i></div><div id='ppw-arrow-next-slide' onclick='if(!PPW.isLocked()) PPW.goNext();'><i class='icon-{{directionaliconsstyle}}-right'></i></div></div>",
         
             // the search tool content
-            searchTool: "<div style='float: left;'>Search into slides:</div>\
+            searchTool: "<div id='ppw-search-container'><div style='float: left;'>Search into slides:</div>\
                          <div style='float: right;'><input type='search' id='ppw-search-slide' value='' placeholder='Search' />\
-                         <input type=button id='ppw-search-prev' class='ppw-clickable' title='Find in previous slides(shift+enter)' value='◄' /> <input type=button id='ppw-search-next' title='Find in next slides(enter)' class='ppw-clickable' value='►' /></div><div id='ppw-search-found' class='ppw-clickable'></div>",
+                         <div id='ppw-search-arrow-container' class='ppw-clickable'><div id='ppw-search-prev' class='ppw-clickable' title='Find in previous slides(shift+enter)'><i class='icon-{{directionaliconsstyle}}-left'></i></div><div id='ppw-search-next' class='ppw-clickable' title='Find in next slides(enter)'><i class='icon-{{directionaliconsstyle}}-right'></i></div></div></div><div id='ppw-search-found' class='ppw-clickable'></div></div>",
             
             // the message box element itself
             messages: '<div id="ppw-message-box"  class="ppw-clickable ppw-platform">\
@@ -344,7 +345,7 @@ window.PPW= (function($, _d, console){
             // the separator to be used on the address bar
             hashSeparator: '#',
             // wondering the talk is in /talks/talkname for example
-            PPWSrc: "../../ppw/",
+            PPWSrc: "../../ppw",
             // enables or not, the shortcuts
             shortcutsEnable: true,
             // may be false(also, 'num') or id(slide's id)
@@ -357,6 +358,8 @@ window.PPW= (function($, _d, console){
             theme: _conf.defaults.theme,
             // the default transition
             transition: _conf.defaults.transition,
+            // the default directionalIconsStyle
+            directionalIconsStyle: _conf.defaults.directionalIconsStyle,
             // the pattern to find the external slides
             fsPattern: _conf.cons.fs.SLIDE_ID_DIR_ID,
             // times in minutes to be alerted
@@ -398,9 +401,9 @@ window.PPW= (function($, _d, console){
             // might be useful for addon or theme developers.
             applyZoomTo: false,
             // enables the Facebook Buttons
-            Facebook: true,
+            Facebook: false,
             // enables the g+ buttons
-            Google: true
+            Google: false
         },
         // a local reference to the $(document)
         $d= $(_d),
@@ -589,8 +592,9 @@ window.PPW= (function($, _d, console){
         var o= {
                 title: _d.title,
                 authors: [],
-                PPWSrc: "../../ppw/",
+                PPWSrc: "../../ppw",
                 transition: _conf.defaults.transition,
+                directionalIconsStyle: _conf.defaults.directionalIconsStyle,
                 theme: _conf.defaults.theme
             },
             i= 0,
@@ -756,7 +760,7 @@ window.PPW= (function($, _d, console){
         while ((m=re.exec(_l.search)) != null) r.push(m[1]);
         return r.length? r[0]: false;
     }
-    
+
     /**
      * Loads the theme's files.
      * 
@@ -766,7 +770,8 @@ window.PPW= (function($, _d, console){
     var _loadTheme= function(){
         
         var theme= null,
-            transition= _querystring('transition');
+            transition= _querystring('transition'),
+            directionalIconsStyle= _querystring('directionalIconsStyle');
         
         if(typeof _settings.theme == 'string')
             _settings.theme= _settings.theme.replace(/ /g, '').split(',');
@@ -777,6 +782,10 @@ window.PPW= (function($, _d, console){
         
         if(_settings.transition)
             _settings.theme.push(_settings.transition);
+        
+        if(directionalIconsStyle){
+            _settings.directionalIconsStyle= directionalIconsStyle;
+        }
         
         _conf.loadSteps+= _settings.theme.length-1;
         
@@ -871,7 +880,7 @@ window.PPW= (function($, _d, console){
          $b.append(_templates.loading);
          
          if(_settings.useArrows){
-             $b.append(_templates.arrows);
+             $b.append(_templates.arrows.replace(/\{\{directionaliconsstyle\}\}/g, _settings.directionalIconsStyle));
          }
          
          $('#ppw-loadingbarParent').css({
@@ -887,6 +896,7 @@ window.PPW= (function($, _d, console){
              background: '#f66'
          });
         
+         _loadStyle(_settings.PPWSrc+"/_styles/font-awesome.min.css", "PPW.setLoadingBarStatus()");
          _loadStyle(_settings.PPWSrc+"/_styles/ppw.css", "PPW.setLoadingBarStatus()");
          _loadStyle(_settings.PPWSrc+"/_styles/animate.css", "PPW.setLoadingBarStatus()");
          _loadStyle(_settings.PPWSrc+"/_styles/jquery-ui-1.8.23.custom.css", "PPW.setLoadingBarStatus()");
@@ -2265,7 +2275,7 @@ $(pointerTest).css({
      * @param Boolean Force the search box to replace the current alert message.
      */
     var _showSearchBox= function(force){
-        var content= _templates.searchTool,
+        var content= _templates.searchTool.replace(/\{\{directionaliconsstyle\}\}/g, _settings.directionalIconsStyle),
             el= null;
         
         if(_conf.showingMessage && !force)
@@ -2313,7 +2323,7 @@ $(pointerTest).css({
     };
     
     /**
-     * Creates the spash screen.
+     * Creates the splash screen.
      * 
      * This screen ofers access to useful tools before the presentation begins.
      * This method is always called, but if the settings define that no splash
@@ -2385,7 +2395,7 @@ $(pointerTest).css({
         // adding the splash screen if enabled
         if(_settings.useSplashScreen){
             
-            $.get(_settings.PPWSrc+"_tools/splash-screen.html", {}, function(data){
+            $.get(_settings.PPWSrc+"/_tools/splash-screen.html", {}, function(data){
 
                 _d.body.innerHTML+= data;
                 _setLoadingBarStatus();
@@ -3972,8 +3982,8 @@ $(pointerTest).css({
         isLocked                        : function(){return _conf.locked;},
         get                             : _get,
         set                             : _set,
-        Facebook                        : true,
-        Google                          : true
+        Facebook                        : false,
+        Google                          : false
     };
     
 })(window.jQuery, document, window.console);
