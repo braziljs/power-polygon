@@ -441,9 +441,9 @@ window.PPW= (function($, _d, console){
             // might be useful for addon or theme developers.
             applyZoomTo: false,
             // enables the Facebook Buttons
-            Facebook: false,
+            Facebook: true,
             // enables the g+ buttons
-            Google: false
+            Google: true
         },
         // a local reference to the $(document)
         $d= $(_d),
@@ -4068,8 +4068,8 @@ window.PPW= (function($, _d, console){
         isLocked                        : function(){return _conf.locked;},
         get                             : _get,
         set                             : _set,
-        Facebook                        : false,
-        Google                          : false
+        Facebook                        : true,
+        Google                          : true
     };
     
 })(window.jQuery, document, window.console);
