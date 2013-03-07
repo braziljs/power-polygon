@@ -384,8 +384,6 @@ window.PPW= (function($, _d, console){
         _settings= {
             // the separator to be used on the address bar
             hashSeparator: '#',
-            // wondering the talk is in /talks/talkname for example
-            PPWSrc: "../../ppw",
             // enables or not, the shortcuts
             shortcutsEnable: true,
             // may be false(also, 'num') or id(slide's id)
@@ -632,7 +630,6 @@ window.PPW= (function($, _d, console){
         var o= {
                 title: _d.title,
                 authors: [],
-                PPWSrc: "../../ppw",
                 transition: _conf.defaults.transition,
                 directionalIconsStyle: _conf.defaults.directionalIconsStyle,
                 theme: _conf.defaults.theme
@@ -802,6 +799,37 @@ window.PPW= (function($, _d, console){
     }
 
     /**
+     * Creates a path to a file in the PPWSrc folder.
+     * 
+     * @param String Location of the file within the PPWSrc folder.
+     */
+    var _createPPWSrcPath= function(file){
+        var ppw= 'ppw.js';
+        var src= null;
+        var styles= _d.getElementsByTagName('script');
+        var l= styles.length;
+        for(var i=0;i<l;i++){
+            src=styles[i].src.split('/');
+            if(src.pop() == ppw){
+                break;
+            }
+        }
+        var uri= _d.location.href.split('/').slice(0, -1);
+        l= src.length;
+        for(var i=0;i<l;i++){
+            if(src[i] !== uri[i]){
+                break;
+            }
+        }
+        file=src.splice(i).join('/')+'/'+file;
+        l= uri.length-i;
+        for(var i=0;i<l;i++){
+            file= '../'+file;
+        }
+        return file.replace(/\/\//g, '/');
+    }
+    
+    /**
      * Loads an external script.
      * 
      * @param String External script file.
@@ -825,7 +853,7 @@ window.PPW= (function($, _d, console){
     var _loadScripts= function(scripts, loadStep, fn){
         var l= scripts.length;
         for(var i=0;i<l;i++){
-            _loadScript(_settings.PPWSrc+scripts[i], loadStep, fn);
+            _loadScript(_createPPWSrcPath(scripts[i]), loadStep, fn);
         }
     }
     
@@ -840,7 +868,7 @@ window.PPW= (function($, _d, console){
     var _loadThemeScripts= function(theme, scripts, loadStep, fn){
         var l= scripts.length;
         for(var i=0;i<l;i++){
-            _loadScript(_settings.PPWSrc+'/_themes/'+ theme+'/'+scripts[i], loadStep, fn);
+            _loadScript(_createPPWSrcPath('/_themes/'+ theme+'/'+scripts[i]), loadStep, fn);
         }
     };
     
@@ -880,7 +908,7 @@ window.PPW= (function($, _d, console){
     var _loadStyles= function(styles, loadStep, fn){
         var l= styles.length;
         for(var i=0;i<l;i++){
-            _loadStyle(_settings.PPWSrc+styles[i], loadStep, fn, false);
+            _loadStyle(_createPPWSrcPath(styles[i]), loadStep, fn, false);
         }
     }
     
@@ -895,7 +923,7 @@ window.PPW= (function($, _d, console){
     var _loadThemeStyles= function(theme, styles, loadStep, fn){
         var l= styles.length;
         for(var i=0;i<l;i++){
-            _loadStyle(_settings.PPWSrc+'/_themes/'+theme+'/'+styles[i], loadStep, fn, true);
+            _loadStyle(_createPPWSrcPath('/_themes/'+theme+'/'+styles[i]), loadStep, fn, true);
         }
     }
     
@@ -929,7 +957,7 @@ window.PPW= (function($, _d, console){
         
         $(_settings.theme).each(function(){
             var theme= this.toString();
-            $.getJSON(_settings.PPWSrc+'/_themes/'+theme+'/manifest.json', function(data, status){
+            $.getJSON(_createPPWSrcPath('/_themes/'+theme+'/manifest.json'), function(data, status){
 
                 var dependencies= false;
 
@@ -991,7 +1019,7 @@ window.PPW= (function($, _d, console){
          _tmp.lnk = _d.createElement('link');
          _tmp.lnk.type = 'image/x-icon';
          _tmp.lnk.rel = 'shortcut icon';
-         _tmp.lnk.href = _settings.PPWSrc+'/_images/power-polygon-icon.png';
+         _tmp.lnk.href = _createPPWSrcPath('/_images/power-polygon-icon.png');
          _d.getElementsByTagName('head')[0].appendChild(_tmp.lnk);
          delete _tmp.lnk;
 
@@ -1910,7 +1938,7 @@ window.PPW= (function($, _d, console){
             if(_n.battery){
                 _n.battery.addEventListener('chargingchange', function(data){
                     if(!_n.battery.charging){ // was charging and is not anymore
-                        _showNotification("<img src='"+_settings.PPWSrc+"/_images/electricity.png' width='20' alt='Your battery stoped charging!' />");
+                        _showNotification("<img src='"+_createPPWSrcPath('/_images/electricity.png')+"' width='20' alt='Your battery stoped charging!' />");
                     }else{
                         _closeNotification();
                     }
@@ -1921,7 +1949,7 @@ window.PPW= (function($, _d, console){
                     setTimeout(function(){
                         if(!_n.battery.charging){
                             if(_n.battery.dischargingTime < _settings.duration){
-                                _showNotification("<img src='"+_settings.PPWSrc+"/_images/electricity.png' width='20' title='You have "+ (_n.battery.dischargingTime / 60)+" minutes of battery!' />");
+                                _showNotification("<img src='"+_createPPWSrcPath('/_images/electricity.png')+"' width='20' title='You have "+ (_n.battery.dischargingTime / 60)+" minutes of battery!' />");
                             }
                         }
                     }, 1000);
@@ -2450,35 +2478,35 @@ window.PPW= (function($, _d, console){
             $b.append(x);
                                 
             // setting images to the icons on the toolbar and their behaviour
-            $('#ppw-goto-icon').attr('src', _settings.PPWSrc+'/_images/goto.png')
+            $('#ppw-goto-icon').attr('src', _createPPWSrcPath('/_images/goto.png'))
                                .addClass(_conf.cons.CLICKABLE_ELEMENT)
 
-            $('#ppw-toolbox-icon').attr('src', _settings.PPWSrc+'/_images/toolbox.png')
+            $('#ppw-toolbox-icon').attr('src', _createPPWSrcPath('/_images/toolbox.png'))
                                   .addClass(_conf.cons.CLICKABLE_ELEMENT);
 
-            $('#ppw-search-icon').attr('src', _settings.PPWSrc+'/_images/search.png')
+            $('#ppw-search-icon').attr('src', _createPPWSrcPath('/_images/search.png'))
                                  .addClass(_conf.cons.CLICKABLE_ELEMENT);
 
-            $('#ppw-fullscreen-icon').attr('src', _settings.PPWSrc+'/_images/fullscreen.png')
+            $('#ppw-fullscreen-icon').attr('src', _createPPWSrcPath('/_images/fullscreen.png'))
                                      .addClass(_conf.cons.CLICKABLE_ELEMENT);
 
-            $('#ppw-camera-icon').attr('src', _settings.PPWSrc+'/_images/camera.png')
+            $('#ppw-camera-icon').attr('src', _createPPWSrcPath('/_images/camera.png'))
                                  .addClass(_conf.cons.CLICKABLE_ELEMENT);
 
-            $('#ppw-settings-icon').attr('src', _settings.PPWSrc+'/_images/settings-icon.png')
+            $('#ppw-settings-icon').attr('src', _createPPWSrcPath('/_images/settings-icon.png'))
                                    .addClass(_conf.cons.CLICKABLE_ELEMENT);
 
-            $('#ppw-ct-thumbs').attr('src', _settings.PPWSrc+'/_images/thumbs.png')
+            $('#ppw-ct-thumbs').attr('src', _createPPWSrcPath('/_images/thumbs.png'))
                                .addClass(_conf.cons.CLICKABLE_ELEMENT);
 
-            $('#ppw-ct-print').attr('src', _settings.PPWSrc+'/_images/print.png')
+            $('#ppw-ct-print').attr('src', _createPPWSrcPath('/_images/print.png'))
                                .addClass(_conf.cons.CLICKABLE_ELEMENT);
         }
 
         // adding the splash screen if enabled
         if(_settings.useSplashScreen){
             
-            $.get(_settings.PPWSrc+"/_tools/splash-screen.html", {}, function(data){
+            $.get(_createPPWSrcPath("/_tools/splash-screen.html"), {}, function(data){
 
                 _d.body.innerHTML+= data;
                 _setLoadingBarStatus();
@@ -2893,13 +2921,13 @@ window.PPW= (function($, _d, console){
         /*var el= _d.getElementById('ppw-audioTestElement');
         if(!el){
             $b.append("<audio id='ppw-audioTestElement' autoplay='autoplay' loop='loop' controls='controls'>\
-                                <source src='"+_settings.PPWSrc+"/_audios/water.mp3'/>\
-                                <source src='"+_settings.PPWSrc+"/_audios/water.ogg'/>\
+                                <source src='"+_createPPWSrcPath('/_audios/water.mp3')+"'/>\
+                                <source src='"+_createPPWSrcPath('/_audios/water.ogg')+"'/>\
                                </audio>");
             el= _d.getElementById('ppw-audioTestElement');
         }*/
         //el.play();
-        _showMessage("Playing audio<br/><div style='background: url("+_settings.PPWSrc+"/_images/animated-wave-sound.gif) 0px -37px no-repeat; position: relative; width: 220px; height: 30px; margin: auto; background-size: 248px 108px; border-left: solid 1px #fcc; border-right: solid 1px #fcc;' onclick='var audio = document.getElementById(\"ppw-audioTestElement\"); var t = \"Stopped\";  if(audio.paused) { audio.play(); t = \"Playing\" } else { audio.pause(); }; console.log(\"[PPW] Currently \" + t); '/><div id='ppw-audioPlaceHolder'></div>",
+        _showMessage("Playing audio<br/><div style='background: url("+_createPPWSrcPath('/_images/animated-wave-sound.gif')+") 0px -37px no-repeat; position: relative; width: 220px; height: 30px; margin: auto; background-size: 248px 108px; border-left: solid 1px #fcc; border-right: solid 1px #fcc;' onclick='var audio = document.getElementById(\"ppw-audioTestElement\"); var t = \"Stopped\";  if(audio.paused) { audio.play(); t = \"Playing\" } else { audio.pause(); }; console.log(\"[PPW] Currently \" + t); '/><div id='ppw-audioPlaceHolder'></div>",
                      function(){
                          
                          var el= _d.getElementById('ppw-audioTestElement'),
@@ -2909,8 +2937,8 @@ window.PPW= (function($, _d, console){
                          audio.pause();
                      });
         $('#ppw-audioPlaceHolder').html("<audio id='ppw-audioTestElement' autoplay='autoplay' loop='loop' >\
-                                <source src='"+_settings.PPWSrc+"/_audios/water.mp3'/>\
-                                <source src='"+_settings.PPWSrc+"/_audios/water.ogg'/>\
+                                <source src='"+_createPPWSrcPath('/_audios/water.mp3')+"'/>\
+                                <source src='"+_createPPWSrcPath('/_audios/water.ogg')+"'/>\
                                </audio>");
     };
     
@@ -2922,7 +2950,7 @@ window.PPW= (function($, _d, console){
      * Also, the time remaning/lapsed and the shortcut keys.
      */
     var _openPresentationTool= function(){
-        var toolSrc= _settings.PPWSrc+'/_tools/presentation-tool.html',
+        var toolSrc= _createPPWSrcPath('/_tools/presentation-tool.html'),
             toolName= 'ppw-Presentation-tool',
             toolProps= "width=780,height=520,left=40,top=10";
         
