@@ -83,11 +83,11 @@ window.PPWSocialPlugin= {
     hidden: false,
     mainPopUpTemplate: '<div id="box"> <div style="cursor: pointer;"id="mentions-header"> \
         <p>Your Mentions<span id="close-button" style="float:right">&times</span></p> <hr> </div> \
-        <div id="body"> <div id="left" style="position:absolute;left:10px;top:45px;display:inline;cursor:pointer;">\
+        <div id="body"> <div id="left" style="position: absolute;left: 0px;top: 50%;cursor: pointer;width: 12px;height: 50px;background: #e0e0e0;text-align: center;font-weight: bolder;margin-top: -25px;padding-top: 14px;box-sizing: border-box;" onmouseover="this.style.backgroundColor=\'#b0b0b0\'" onmouseout="this.style.backgroundColor=\'#e0e0e0\'">\
         <span>&lang;</span></div> \
         <div id="mention-content" style="position:absolute;left:20px;line-height:18px;word-wrap:break-all;padding:4px;display:inline;"> \
         <a href="#">Show all</a><br><a href="#">Show new ones</a>\
-         </div> <div id="right" style="position: absolute;left:95%;display:inline-block;top:45px;cursor:pointer;">&rang;</div> </div> </div>'
+        </div> <div id="right" style="position: absolute;right: 0px;top: 50%;cursor: pointer;width: 12px;height: 50px;background: #e0e0e0;text-align: center;font-weight: bolder;margin-top: -25px;padding-top: 14px;box-sizing: border-box;" onmouseover="this.style.backgroundColor=\'#b0b0b0\'" onmouseout="this.style.backgroundColor=\'#e0e0e0\'">&rang;</div> </div> </div>'
 };
 window.PPWSocialPlugin.twitterCallback= function(data){
     var i= 0, l= 0, social= PPW.get('social'), w= 0, alertTime= 4000;
