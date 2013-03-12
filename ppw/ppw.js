@@ -264,6 +264,7 @@ window.PPW= (function($, _d, console){
                 slideType: 'content',
                 slideTitleSize: 40,
                 containerID: 'ppw-slides-container'
+		autoGenerateSlides: true
             },
             
             // constant values and names for css classes and patterns
@@ -629,7 +630,8 @@ window.PPW= (function($, _d, console){
     var _autoGenerateConfig= function(conf){
         var o= {
                 title: _d.title,
-                authors: [],
+                authors: $('meta[name=author]').attr("content"),
+                date: $('meta[name="dcterms.date"]').attr("content"),
                 transition: _conf.defaults.transition,
                 directionalIconsStyle: _conf.defaults.directionalIconsStyle,
                 theme: _conf.defaults.theme
@@ -640,6 +642,13 @@ window.PPW= (function($, _d, console){
         
         if(conf){
             o= $.extend(o, conf);
+        }
+        
+        if(_conf.defaults.autoGenerateSlides){
+            _b= _d.body;
+            $b= $(_b);
+            $b.prepend('<section><h1>'+o.title+'<br/><br/>'+o.authors+'<br/><br/><br/>'+o.date+'</h1></section>');
+            $b.append('<section style="text-align: center;"><h1>Vragen</h1><i class="icon-question-sign" style="font-size: 24em"></i></section>');
         }
         
         o.slides= [];
