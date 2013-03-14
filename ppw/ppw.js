@@ -180,6 +180,7 @@ window.PPW= (function($, _d, console){
             currentSlide: 0,
             presentationStarted: false,
             inThumbsMode: false,
+            defaultRemoteServer: "", // TODO: create and release the service online
             
             // a default css format
             prevStyle: {
@@ -355,6 +356,7 @@ window.PPW= (function($, _d, console){
                         <div class="img"><img id="ppw-search-icon" onclick="PPW.showSearchBox()" title="Search on slides"/></div>\
                         <div class="img"><img id="ppw-fullscreen-icon" onclick="PPW.enterFullScreen()" title="Go Fullscreen"/></div>\
                         <div class="img"><img id="ppw-camera-icon" onclick="PPW.toggleCamera();" title="Start the camera"/></div>\
+                        <div class="img"><img id="ppw-remote-icon" onclick="PPW.enableRemote();" title="No remote server found"/></div>\
                         <div class="img"><img id="ppw-settings-icon" onclick="PPW.showConfiguration();" title="Settings"/></div>\
                     </div>\
                     <div id="ppw-content-toolbar" class="ppw-platform">\
@@ -711,6 +713,13 @@ window.PPW= (function($, _d, console){
         }
         
         $.extend(_settings, conf);
+        _settings.canonic= _l.pathname
+                             .replace(/(\?|\&).*/, '')
+                             .replace(/(\/index\.[a-zA-Z0-9]*)|(\/$)/, '')
+                             .replace(/\ /ig, '-')
+                             .split('/')
+                             .pop();
+        
         
        /** 0/false: no messages 
         *   1: errors
@@ -2493,6 +2502,13 @@ window.PPW= (function($, _d, console){
             $('#ppw-camera-icon').attr('src', _createPPWSrcPath('/_images/camera.png'))
                                  .addClass(_conf.cons.CLICKABLE_ELEMENT);
 
+            if(_settings.remote && _settings.remote.useButton !== false){
+                $('#ppw-remote-icon').attr('src', _createPPWSrcPath('/_images/remote-conection-status-no-server.png'))
+                                     .addClass(_conf.cons.CLICKABLE_ELEMENT);
+            }else{
+                $('#ppw-remote-icon').parent().hide();
+            }
+
             $('#ppw-settings-icon').attr('src', _createPPWSrcPath('/_images/settings-icon.png'))
                                    .addClass(_conf.cons.CLICKABLE_ELEMENT);
 
@@ -3924,6 +3940,32 @@ window.PPW= (function($, _d, console){
             return true;
         }
     }
+    
+    
+    /**
+     * Tries to enable the remote control to the talk.
+     */
+    var _enableRemote= function(){
+        PPW.remote.connect();
+    };
+    
+    var _initRemoteService= function(){
+        
+        var srv= _settings.remote.server||_conf.defaultRemoteServer;
+        
+        if(!_settings.remote)
+            return false;
+        //alert('going')
+        if(!PPW.remote.server){
+            $('#ppw-remote-io-script').remove();
+            $("head").append("<script src='"+_settings.remote.server+"/ppw/_tools/remote/server.js' id='ppw-remote-io-script'></script>");
+            
+            // in 3 seconds, verify again for the status
+            setTimeout(_initRemoteService, 3000);
+        }else{
+            PPW.remote.init(_self, _settings, _conf, _createPPWSrcPath(''));
+        }
+    };
 
     /**
      * Unlocks the user controls.
@@ -4026,6 +4068,8 @@ window.PPW= (function($, _d, console){
         }else{
             _goToSlide(0);
         }
+        
+        _initRemoteService();
     };
     
     _addListener('onload', _constructor)
@@ -4083,6 +4127,8 @@ window.PPW= (function($, _d, console){
         viewport                        : _viewport,
         rotate                          : _rotate,
         goToSlide                       : _goToSlide,
+        enableRemote                    : _enableRemote,
+        remote                          : {},
         // API GETTERS/SETTERS METHODS
         getSlides                       : _getSlides,
         getValidSlides                  : _getValidSlides,
