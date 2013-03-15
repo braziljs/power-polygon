@@ -382,6 +382,8 @@ window.PPW= (function($, _d, console){
         
         // user defined settings...the following values come by default if the user did not set them
         _settings= {
+            // wondering the talk is in /talks/talkname for example
+            PPWSrc: '',
             // the separator to be used on the address bar
             hashSeparator: '#',
             // enables or not, the shortcuts
@@ -803,30 +805,37 @@ window.PPW= (function($, _d, console){
      * 
      * @param String Location of the file within the PPWSrc folder.
      */
-    var _createPPWSrcPath= function(file){
-        var ppw= 'ppw.js';
-        var src= null;
-        var styles= _d.getElementsByTagName('script');
-        var l= styles.length;
-        for(var i=0;i<l;i++){
-            src=styles[i].src.split('/');
-            if(src.pop() == ppw){
-                break;
+    var _createPPWSrcPath= function(filepath){
+        var PPWSrc= _settings.PPWSrc;
+        if(!PPWSrc){
+            var parentpath= '../';
+            var ppw= 'ppw.js';
+            var src= null;
+            var styles= _d.getElementsByTagName('script');
+            var l= styles.length;
+            for(var i=0;i<l;i++){
+                src=styles[i].src.split('/');
+                if(src.pop() == ppw){
+                    break;
+                }
             }
-        }
-        var uri= _d.location.href.split('/').slice(0, -1);
-        l= src.length;
-        for(var i=0;i<l;i++){
-            if(src[i] !== uri[i]){
-                break;
+            var uri= _d.location.href.split('/').slice(0, -1);
+            l= src.length;
+            for(var i=0;i<l;i++){
+                if(src[i] !== uri[i]){
+                    break;
+                }
             }
+            PPWSrc= src.splice(i).join('/')+'/'+filepath;
+            l= uri.length-i;
+            for(var i=0;i<l;i++){
+                PPWSrc= parentpath+PPWSrc;
+            }
+            _settings.PPWSrc= PPWSrc.replace(filepath, '');
+        }else{
+            PPWSrc= _settings.PPWSrc+'/'+filepath;
         }
-        file=src.splice(i).join('/')+'/'+file;
-        l= uri.length-i;
-        for(var i=0;i<l;i++){
-            file= '../'+file;
-        }
-        return file.replace(/\/\//g, '/');
+        return PPWSrc.replace(/\/\//g, '/');
     }
     
     /**
