@@ -1,0 +1,11 @@
+{
+  "name": "power-polygon",
+  "description": "The definitive Presentation tool, based on free open web technologies.",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "express": "3.1.0",
+    "socket.io": "0.9.13",
+    "sqlite3": "*"
+  }
+}
