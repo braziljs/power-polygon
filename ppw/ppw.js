@@ -2479,7 +2479,7 @@ window.PPW= (function($, _d, console){
                    </svg>');
         
         // adding the toolbar
-        if(_settings.useToolBar){
+        if(_settings.useToolBar && !_querystring('remote-controller')){
             
             var x= _templates.toolBar
                                 .replace(/\{\{clickableClass\}\}/g, _conf.cons.CLICKABLE_ELEMENT)
@@ -3103,7 +3103,8 @@ window.PPW= (function($, _d, console){
         }, 200, function(){
             $('#ppw-splash-screen').fadeOut();
         });
-        _conf.presentationStarted= (new Date()).getTime();
+        
+        _settings.presentationStarted= _conf.presentationStarted= (new Date()).getTime();
         _goToSlide(_getCurrentSlideFromURL());
         if(el)
             el.blur();
@@ -4069,7 +4070,11 @@ window.PPW= (function($, _d, console){
             _goToSlide(0);
         }
         
-        _initRemoteService();
+        if(_querystring('remote-controller')){
+            top.ppwFrame= window.PPW;
+        }else{
+            _initRemoteService();
+        }
     };
     
     _addListener('onload', _constructor)

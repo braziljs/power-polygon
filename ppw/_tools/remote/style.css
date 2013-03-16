@@ -1,6 +1,69 @@
 html, body{
     height: 100%;
     width: 100%;
+}
+*{
     box-sizing: border-box;
     -moz-box-sizing: border-box;
+}
+#re-lock-interface{
+    display: none;
+}
+.talk-list{
+    list-style: none;
+    padding: 0px;
+}
+.talk-list li{
+    height: 38px;
+    cursor: default;
+    padding: 9px;
+    position: relative;
+    border-radius: 4px;
+    margin-bottom: 3px;
+}
+.talk-list li:hover{
+    background-color: #e6e6f6;
+}
+.talk-butons{
+    margin-right: 18px;
+    height: 36px;
+    overflow: hidden;
+    position: absolute;
+    right: 0px;
+    top: 2px;
+    text-align: right;
+}
+
+.talk-butons a{
+    display: inline-block;
+    width: 36px;
+    height: 36px;
+    background-position: center center;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.talk-butons a:nth-child(1){
+    margin-right: 6px;
+    background-image: url(../../_images/presentation-ico.png);
+}
+.talk-butons a:nth-child(2){
+    display: none;
+    background-image: url(../../_images/remote-control-full.png);
+}
+.talk-butons a:nth-child(3){
+    display: none;
+    background-image: url(../../_images/remote-control-basic.png);
+}
+
+/* if it is a small mobile device, it will not support full remote control */
+@media screen and (max-width: 799px){
+    .talk-butons a:nth-child(2){
+        position: absolute;
+        left: -9000px;
+    }
+}
+
+#demosList{
+    background-color: #fcefa1;
 }

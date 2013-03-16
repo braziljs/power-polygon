@@ -27,13 +27,19 @@ var express = require('express')
 /* MIDLEWARES */
 app.use(express.compress());
 app.use(express.cookieParser());
-app.use(express.bodyParser({ keepExtensions: true, uploadDir: '/ppw/tmp/' }));
+app.use(express.bodyParser({
+    keepExtensions: true,
+    uploadDir: '/ppw/tmp/',
+    expires: new Date(Date.now() + (120 * 60 * 1000)) // expires in two hours
+}));
 app.use(express.session({
     secret: serverConf.serverSecret,
     store: store
 }));
 
-
+/**
+ * Useful services to work with the API
+ */
 Services= (function(){
     
     var listDir= function(path){
@@ -115,7 +121,9 @@ Services= (function(){
         
         // if already logged
         if(_isLogged(req)){
-            return {auth: req.session.hash, status: 200};
+            res.writeHead(200);
+            res.end(JSON.stringify({auth: true, status: 200}));
+            return;
         }
         
         db.serialize(function(){
@@ -145,14 +153,15 @@ Services= (function(){
     
     var _init= function(){
         
-        var url= ""
+        var url= "",
+            root= '/ppw/_tools/remote/index.html';
             
         app.get('/run.js', function(req, res){
-            url= '/ppw/_tools/remote/index.html';
+            url= root;
             deliver(url, req, res);
         });
         app.get('/', function(req, res){
-            url= '/ppw/_tools/remote/index.html';
+            url= root;
             deliver(url, req, res);
         });
 
@@ -168,6 +177,10 @@ Services= (function(){
             
             res.setHeader('Content-Type', 'text/json; charset=utf-8');
             switch(req.params.command){
+                case "verifylogin":{
+                        // will just return the data object as it is
+                    break;
+                }
                 case "getTalksList":{
                         data.talks= Services.listDir('./talks/');
                     break;
@@ -201,6 +214,15 @@ Services= (function(){
             //res.end(JSON.stringify(data));
         });
         
+        // filtering only authenticated users
+        app.get(/^\/ppw\/_tools\/remote\/(basic|full)\/.*/, function(req, res){
+            if(_isLogged(req, res))
+                deliver(req.url, req, res);
+            else{
+                res.redirect('/');
+            }
+        });
+        
         // File deliveries
         app.get(/^\/ppw\/.*/, function(req, res){
             deliver(req.url, req, res);
@@ -213,6 +235,7 @@ Services= (function(){
         app.get(/^\/_demos\/.*/, function(req, res){
             deliver(req.url, req, res);
         });
+        
     
         // listeners
         server= app.listen(serverConf.port);

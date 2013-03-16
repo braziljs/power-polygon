@@ -2,54 +2,109 @@ $(document).ready(function(){
     
     var talks= null;
     
-    $.get('/api/getDemosList/', null, function(o){
-        
-        var ul= $('#demosList');
-        
-        $(o.demos).each(function(){
-            ul.append("<li><a href='_demos/"+this+"/'>"+this+"</a></li>");
-        });
-        
-        talks= o.talks;
-        
-    }, 'json');
+    // screen interactions
+    var unlockButtons= function(){
+        $('.talk-butons a').css('display', 'inline-block');
+        $('#unlock-interface').hide();
+        $('#re-lock-interface').show();
+    };
+    var lockButtons= function(){
+        $('#unlock-interface').show();
+        $('#re-lock-interface').hide();
+        $('.talk-butons a:not(:first-child)').hide();
+    };
+    var verifySession= function(){
+        $.get('/api/verifylogin', null, function(o){
+            if(o.auth){
+                unlockButtons();
+            }
+        }, 'json');
+    };
     
-    $.get('/api/getTalksList/', null, function(o){
+    var buildListElement= function(name, demo){
         
-        var ul= $('#talksList');
+        var oName= name;
+            name= demo? '_demos/'+name: 'talks/'+name;
         
-        $(o.talks).each(function(){
-            ul.append("<li><a href='talks/"+this+"/'>"+this+"</a></li>");
-        });
-        
-    }, 'json');
+        var str= "  <li>"+oName+"\
+                    <div class='talk-butons'>\
+                       <a href='talks/"+name+"/' title='Open presentation'></a>\
+                       <a href='ppw/_tools/remote/full/index.html?p="+name+"/' title='Full remote control'></a>\
+                       <a href='ppw/_tools/remote/basic/index.html?p="+name+"/' title='Basic remote control'></a>\
+                    </div>\
+                  </li>";
+        return str;
+    }
     
-    $('#createNewTalk-btn').click(function(){
-        var talktt= prompt("Talk name");
-        
-        if(talks !== null && talks.indexOf(talktt)<0){
-            $.get('/api/createTalk/'+talktt, null, function(o){
-                console.log(o);
+    var buildLists= function(callback){
+        // mounting the screen
+        $.get('/api/getDemosList/', null, function(o){
+
+            // building the list of demos
+            var ul= $('#demosList'),
+                str= '';
+                
+            $(o.demos).each(function(){
+                str+= buildListElement(this, true);
+            });
+            ul.html(str);
+            
+            // building the list of talks
+            $.get('/api/getTalksList/', null, function(o){
+
+                var ul= $('#talksList'),
+                    str= "";
+
+                $(o.talks).each(function(){
+                    //ul.append("<li><a href='talks/"+this+"/'>"+this+"</a></li>");
+                    str+= buildListElement(this);
+                });
+                ul.html(str);
+                talks= o.talks;
+                
+                callback();
+
             }, 'json');
-        }
-    });
-    
-    $('#unlock-interface').click(function(){
-        var token= window.prompt("What is your token, please?");
-        $.post('/api/auth', {token: token}, function(o){
-            console.log(o);
+            
         }, 'json');
-    });
+
+    };
     
-    $('#verify-session').click(function(){
-        $.get('/api/remoteControl', null, function(o){
-            console.log(o);
-        }, 'json');
-    });
+    var bindEvents= function(){
+        /*$('#createNewTalk-btn').click(function(){
+            var talktt= prompt("Talk name");
+
+            if(talks !== null && talks.indexOf(talktt)<0){
+                $.get('/api/createTalk/'+talktt, null, function(o){
+                    console.log(o);
+                }, 'json');
+            }
+        });*/
+
+        $('#unlock-interface').click(function(){
+            var token= window.prompt("What is your token, please?");
+            $.post('/api/auth', {token: token}, function(o){
+                if(o.auth){
+                    unlockButtons();
+                }else{
+                    alert("Invalid token!");
+                }
+            }, 'json');
+        });
+
+
+        $('#re-lock-interface').click(function(){
+            $.get('/api/logoff', null, function(o){
+                lockButtons();
+            }, 'json');
+        });
+    };
     
-    $('#re-lock-interface').click(function(){
-        $.get('/api/logoff', null, function(o){
-            console.log(o);
-        }, 'json');
-    });
+    /* THE CONSTRUCTOR */
+    var _constructor= function(){
+        bindEvents();
+        buildLists(verifySession);
+    }
+    
+    _constructor();
 });
