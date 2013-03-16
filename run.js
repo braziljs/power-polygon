@@ -4,7 +4,8 @@ var serverConf= {
     usedefaultuser: true,
     defaultuser: 'admin',
     dbsrc: '.sqldb',
-    port: 8081
+    port: 8081,
+    serverSecret: 'onlyMeAndGitHubUsersKnowIt! - Please,change this for your use'
 }
 
 /* DEFINITIONS */
@@ -23,13 +24,12 @@ var express = require('express')
              output: process.stdout
          });
 
-
+/* MIDLEWARES */
 app.use(express.compress());
 app.use(express.cookieParser());
-//app.use(express.static(__dirname + '/ppw/'));
-//app.use(express.static(__dirname + '/ppw/'));
-app.use(express.cookieSession({
-    secret: 'ppw-node-server-session',
+app.use(express.bodyParser({ keepExtensions: true, uploadDir: '/ppw/tmp/' }));
+app.use(express.session({
+    secret: serverConf.serverSecret,
     store: store
 }));
 
@@ -53,6 +53,8 @@ Services= (function(){
     var deliver= function(url, req, res){
         
         url= url.replace(/(\/\..*)|(\?.*)|(\#.*)/ig, '');
+        if(url[url.length-1] == '/')
+            url+= 'index.html';
         
         fs.readFile(__dirname+url, function(err, data){
             
@@ -89,17 +91,64 @@ Services= (function(){
         });
     };
     
+    var _logoff= function(req, res){
+        var data= { status: 'done' };
+        req.session.destroy();
+        res.writeHead(200);
+        res.end(JSON.stringify(data));
+    };
+    
+    var _isLogged= function(req){
+        return req.session.auth? true: false;
+    };
+    
+    var _login= function(req, res){
+        
+        var token= req.body.token,
+            qr= "SELECT userid,\
+                        username,\
+                        usertoken\
+                   FROM userdata\
+                  WHERE usertoken= ?",
+            auth= false,
+            data= {};
+        
+        // if already logged
+        if(_isLogged(req)){
+            return {auth: req.session.hash, status: 200};
+        }
+        
+        db.serialize(function(){
+            db.each(qr, token, function(err, row){
+                auth= row.usertoken;
+                return false;
+            }, function(){
+                
+                if(auth){
+                    data.auth= true;
+                    data.status= 200;
+                    
+                    req.session.token= token;
+                    req.session.auth= true;
+                }else{
+                    req.session= null;
+                    data.status= 200;
+                    data.auth= false;
+                }
+                
+                res.writeHead(200);
+                res.end(JSON.stringify(data));
+            });
+        });
+        
+    };
+    
     var _init= function(){
         
-        var url= "",
-            data= {
-                demos: [],
-                talks: [],
-                errors: []
-            };
+        var url= ""
             
         app.get('/run.js', function(req, res){
-            url= 'not-found';
+            url= '/ppw/_tools/remote/index.html';
             deliver(url, req, res);
         });
         app.get('/', function(req, res){
@@ -107,22 +156,55 @@ Services= (function(){
             deliver(url, req, res);
         });
 
-        app.get('/api/getTalksList/', function(req, res){
-            res.setHeader('Content-Type', 'text/json');
-            data.talks= Services.listDir('./talks/');
-            res.end(JSON.stringify(data));
-        });
-
-        app.get('/api/getDemosList/', function(req, res){
-            res.setHeader('Content-Type', 'text/json');
-            data.demos= Services.listDir('./_demos/');
+        // API - get
+        app.get('/api/:command', function(req, res){
+            
+            var data= {
+                demos: [],
+                talks: [],
+                errors: [],
+                auth: _isLogged(req)
+            }
+            
+            res.setHeader('Content-Type', 'text/json; charset=utf-8');
+            switch(req.params.command){
+                case "getTalksList":{
+                        data.talks= Services.listDir('./talks/');
+                    break;
+                }
+                case "getDemosList":{
+                        data.demos= Services.listDir('./_demos/');
+                    break;
+                }
+                case "logoff":{
+                    _logoff(req, res);
+                    return;
+                    break;
+                }
+                case "remoteControl":{
+                    //
+                    break;
+                }
+            }
             res.end(JSON.stringify(data));
         });
         
+        // API - post
+        app.post('/api/:command', function(req, res){
+            res.setHeader('Content-Type', 'text/json; charset=utf-8');
+            switch(req.params.command){
+                case "auth":{
+                    _login(req, res);
+                    break;
+                }
+            }
+            //res.end(JSON.stringify(data));
+        });
+        
+        // File deliveries
         app.get(/^\/ppw\/.*/, function(req, res){
             deliver(req.url, req, res);
         });
-        
         
         app.get(/^\/talks\/.*/, function(req, res){
             deliver(req.url, req, res);
@@ -131,21 +213,16 @@ Services= (function(){
         app.get(/^\/_demos\/.*/, function(req, res){
             deliver(req.url, req, res);
         });
-        
-        /*url= req.url.replace(/((\?|\#)|(^\.)).* /ig, '');
-console.log("UUUURRRRLLL", url)*/
-        
+    
+        // listeners
         server= app.listen(serverConf.port);
         io= require('socket.io').listen(server);
         
-        
+        // just announcing the server initialization...
         console.log('[PPW] Listening on port '+serverConf.port);
         if(_token)
             console.log('[PPW] Your token is ' + _token);
         
-        //app.use(express.directory(__dirname + '/./'));
-        //app.use(express.static(__dirname + '/./'));
-       
         console.log();
     };
     
@@ -155,7 +232,9 @@ console.log("UUUURRRRLLL", url)*/
     }
 })();
 
-
+/**
+ * Asks for the token, on the CONSOLE, the first time the user runs it.
+ */
 var getToken= function(fn, repeat){
 
     if(!repeat)
@@ -181,6 +260,11 @@ var getToken= function(fn, repeat){
                 });
 };
 
+/**
+ * Verifies wether the database exists or not.
+ * 
+ * In case it does not exist, it is created with its tables.
+ */
 var verifyDB= function(){
     
     var stats = null;
@@ -231,6 +315,9 @@ var verifyDB= function(){
     }
 }
 
+/**
+ * Returns the current user(from session or from submited login).
+ */
 var getUser= function(req){
     // if it should use a default user
     // what means, no other users will work on this server
@@ -246,6 +333,7 @@ var getUser= function(req){
     }
 };
 
+// initializing everything, starting by calling the verifyDB.
 verifyDB();
 
 

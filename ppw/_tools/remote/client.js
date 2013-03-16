@@ -40,4 +40,16 @@ $(document).ready(function(){
             console.log(o);
         }, 'json');
     });
+    
+    $('#verify-session').click(function(){
+        $.get('/api/remoteControl', null, function(o){
+            console.log(o);
+        }, 'json');
+    });
+    
+    $('#re-lock-interface').click(function(){
+        $.get('/api/logoff', null, function(o){
+            console.log(o);
+        }, 'json');
+    });
 });

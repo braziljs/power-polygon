@@ -22,3 +22,5 @@ node_modules
 !/talks/README
 #/_docs
 .sqldb
+/ppw/tmp/
+!/ppw/tmp/README
