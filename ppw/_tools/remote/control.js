@@ -4,7 +4,10 @@ $(document).ready(function(){
         version= presentationIframe[0]? 'full': 'basic',
         presentation= null,
         notesContainer= null,
-        showingNotes= false;
+        showingNotes= false,
+        socketServer= false,
+        _socket= null,
+        talkId= null;
         
     var getParameterByName= function (name){
         name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
@@ -80,6 +83,7 @@ $(document).ready(function(){
             // TODO: send to socket
         });
         
+        // go previous
         $('#btn-previous-slide').click(function(){
             if(version == 'full'){
                 if(ppwFrame().get('presentationStarted')){
@@ -87,8 +91,14 @@ $(document).ready(function(){
                 }
             }
             // TODO: send to socket
+            _broadcast({
+                act: 'goNext',
+                talk: presentation,
+                data: null
+            });
         });
         
+        // toggle camera
         $('#btn-toggle-camera').click(function(){
             if(version == 'full'){
                 if(ppwFrame().get('presentationStarted')){
@@ -100,30 +110,39 @@ $(document).ready(function(){
         
     };
     
+    var _broadcast= function(obj){
+        /*$.post('/api/broadcast', obj, function(o){
+            console.log(o);
+        }, 'json');*/
+        alert('will broadcast!');
+        _socket.emit('remote-control-send', obj);
+    };
+    
     var ppwFrame= function(){
         return version == 'full'? presentationIframe[0].contentWindow.PPW: false;
     }
     
     var _init= function(){
+        _socket= io.connect(socketServer);
+        alert('I will join the group '+talkId+' now')
+        _socket.emit('listening', talkId);
         _bindEvents();
-        
     }
     
     if(version == 'full'){
         presentation= getParameterByName('p');
+        socketServer= location.protocol+'//'+location.host+'/'+presentation;
+        talkId= presentation.split('/').pop();
         
         if(!presentation){
             return false;
         }
         
-        presentationIframe.attr('src', '../../../../'+presentation+'?remote-controller=true');
-        //presentationIframe[0].addEventListener('DOMContentLoaded', _init);
-        //presentationIframe[0].contentWindow.document.addEventListener('DOMContentLoaded', _init);
-        _init();
+        presentationIframe.attr('src', '/'+presentation+'?remote-controller=true');
     }else{
         $('#btn-annotations').hide();
-        _init();
     }
+    _init();
     
     
 });

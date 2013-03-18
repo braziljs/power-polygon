@@ -180,7 +180,7 @@ window.PPW= (function($, _d, console){
             currentSlide: 0,
             presentationStarted: false,
             inThumbsMode: false,
-            defaultRemoteServer: "", // TODO: create and release the service online
+            defaultRemoteServer: location.protocol +'//'+ location.host, // TODO: create and release the service online
             
             // a default css format
             prevStyle: {
@@ -3959,7 +3959,8 @@ window.PPW= (function($, _d, console){
         //alert('going')
         if(!PPW.remote.server){
             $('#ppw-remote-io-script').remove();
-            $("head").append("<script src='"+_settings.remote.server+"/ppw/_tools/remote/server.js' id='ppw-remote-io-script'></script>");
+            
+            $("head").append("<script src='"+srv+"/ppw/_tools/remote/server.js' id='ppw-remote-io-script'></script>");
             
             // in 3 seconds, verify again for the status
             setTimeout(_initRemoteService, 3000);

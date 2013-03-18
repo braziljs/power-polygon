@@ -151,6 +151,19 @@ Services= (function(){
         
     };
     
+    var _socketsEvents= function (socket) {
+        
+        socket.on('listening', function (talk) {
+            console.log("someone joined =================== ", talk);
+            socket.join(talk);
+        });
+        socket.on('remote-control-send', function (data) {
+            socket.broadcast.emit('control-command', data);
+        });
+        
+        
+    }
+    
     var _init= function(){
         
         var url= "",
@@ -204,13 +217,27 @@ Services= (function(){
         
         // API - post
         app.post('/api/:command', function(req, res){
+            
+            var postData= req.body;
             res.setHeader('Content-Type', 'text/json; charset=utf-8');
-            switch(req.params.command){
-                case "auth":{
-                    _login(req, res);
+            
+            if(req.params.command == 'auth'){
+                _login(req, res);
+                return;
+            }
+            
+            if(!_isLogged(req, res)){
+                return false;
+            }
+            
+            /*switch(req.params.command){
+                case "broadcast":{
+                    postData;
+                    //io.sockets.in(postData.talk).send('control-command', postData);
+                    ('control-command', postData);
                     break;
                 }
-            }
+            }*/
             //res.end(JSON.stringify(data));
         });
         
@@ -240,9 +267,10 @@ Services= (function(){
         // listeners
         server= app.listen(serverConf.port);
         io= require('socket.io').listen(server);
+        io.sockets.on('connection', _socketsEvents);
         
         // just announcing the server initialization...
-        console.log('[PPW] Listening on port '+serverConf.port);
+        console.log('[PPW] Listening on '+ server.address().address, server.address().port);
         if(_token)
             console.log('[PPW] Your token is ' + _token);
         

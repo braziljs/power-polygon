@@ -25,6 +25,13 @@ PPW.remote= (function(){
             }
             //_socket.join(PPW.get('canonic'));
         });
+        
+        _socket.on('control-command', function(data){
+            console.log(data);
+            alert("!!!");
+            //PPW.goNext();
+        });
+        
     };
     
     var _connect= function(){
@@ -38,7 +45,7 @@ PPW.remote= (function(){
     var _stablish= function(){
         
         //if(!_socket){
-            _socket = io.connect(_settings.remote.server);
+            _socket = _io.connect(_settings.remote.server);// + '/'+PPW.get('title'));
             _setListeners();
             
         /*}else{
@@ -63,6 +70,7 @@ PPW.remote= (function(){
     }
     var _setAsOnline= function(){
         $('#ppw-remote-icon').attr('src', PPWSrc+"/_images/remote-conection-status-on.png").attr('title', 'Connected/listening - click to disconnect');
+        _socket.emit('listening', location.pathname.replace('/index.html', '').split('/').pop());
         _status= 'online';
     }
     var _setAsNoServer= function(){
@@ -82,6 +90,9 @@ PPW.remote= (function(){
         _conf= conf,
         PPWSrc= src;
         
+        if(!_settings.remote.server){
+            _settings.remote.server= location.protocol+'//'+location.host;
+        }
         $.getScript(_settings.remote.server+"/socket.io/socket.io.js", function(){
             //_setAsOffline();
             _io= io;
