@@ -6,6 +6,12 @@ html, body{
     box-sizing: border-box;
     -moz-box-sizing: border-box;
 }
+
+#demosList-container{
+    width: 100%;
+    clear: both;
+}
+
 #re-lock-interface{
     display: none;
 }
@@ -20,6 +26,10 @@ html, body{
     position: relative;
     border-radius: 4px;
     margin-bottom: 3px;
+    width: 50%;
+    float: left;
+    overflow: hidden;
+    padding-right: 150px;
 }
 .talk-list li:hover{
     background-color: #e6e6f6;

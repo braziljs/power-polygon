@@ -26,12 +26,12 @@ $(document).ready(function(){
         var oName= name;
             name= demo? '_demos/'+name: 'talks/'+name;
         
-        var str= "  <li>"+oName+"\
-                    <div class='talk-butons'>\
-                       <a href='"+name+"/' title='Open presentation'></a>\
-                       <a href='ppw/_tools/remote/full/index.html?p="+name+"/' title='Full remote control'></a>\
-                       <a href='ppw/_tools/remote/basic/index.html?p="+name+"/' title='Basic remote control'></a>\
-                    </div>\
+        var str= "<li>"+oName+"\
+                      <div class='talk-butons'>\
+                         <a href='"+name+"/' title='Open presentation'></a>\
+                         <a href='ppw/_tools/remote/full/index.html?p="+name+"/' title='Full remote control'></a>\
+                         <a href='ppw/_tools/remote/basic/index.html?p="+name+"/' title='Basic remote control'></a>\
+                      </div>\
                   </li>";
         return str;
     }
