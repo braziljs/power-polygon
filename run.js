@@ -265,6 +265,7 @@ Services= (function(){
         
     
         // listeners
+        
         server= app.listen(serverConf.port);
         io= require('socket.io').listen(server);
         io.sockets.on('connection', _socketsEvents);
@@ -347,6 +348,7 @@ var verifyDB= function(){
             });
         });
     }else{
+        
         // database exists, let's verify the server config
         db.each("SELECT confid, usedefaultuser, defaultuser  FROM serverconfig", function(err, row) {
             if(err){
@@ -360,7 +362,17 @@ var verifyDB= function(){
                     stmt.run(serverConf.usedefaultuser, serverConf.defaultuser);
                     stmt.finalize();
                 }
-                Services.init();
+                
+                if(process.argv.indexOf('renew') >= 0 ){
+                    getToken(function(token){
+                        var stmt = db.prepare("UPDATE userdata SET usertoken=? where username=?");
+                        stmt.run(token, serverConf.defaultuser);
+                        stmt.finalize();
+                        Services.init();
+                    });
+                }else{
+                    Services.init();
+                }
             }
         });
     }
