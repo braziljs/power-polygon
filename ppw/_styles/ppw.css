@@ -1030,3 +1030,15 @@ body, .ppw-active-slide-element-container{
     -o-transition: -o-transform 500ms linear, -o-transform-origin 500ms linear;
     transition: transform 500ms linear, transform-origin 500ms linear;
 }
+
+
+/* REMOTE CONTROL CANVAS */
+#ppw-remote-control-canvas{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    z-index: 99999999;
+    display: none;
+}

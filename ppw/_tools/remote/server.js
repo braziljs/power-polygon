@@ -129,6 +129,9 @@ PPW.remote= (function(){
         if(!_settings.remote.server){
             _settings.remote.server= location.protocol+'//'+location.host;
         }
+        
+        $(document.body).append("<canvas id='ppw-remote-control-canvas'></canvas>");
+        
         $.getScript(_settings.remote.server+"/socket.io/socket.io.js", function(){
             _setAsOffline();
             _io= io;
