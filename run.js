@@ -155,10 +155,16 @@ Services= (function(){
         
         socket.on('listening', function (talk) {
             console.log("someone joined =================== "+talk);
+            socket.set('watchingTo', talk);
             socket.join(talk);
         });
         socket.on('remote-control-send', function (data) {
-            socket.broadcast.emit('control-command', data); // IS WORKING!!!
+            //socket.broadcast.emit('control-command', data); // IS WORKING!!!
+            socket.get('watchingTo', function(err, watchingTo){
+                socket.broadcast
+                      .to( watchingTo )
+                      .emit('control-command', data);
+            });
         });
         
         
