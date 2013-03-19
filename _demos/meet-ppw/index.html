@@ -145,6 +145,9 @@
                 friendlyURL: 'id',
                 // should ppw open the splash screen first?
                 useSplashScreen: true,
+                // preload the images
+                preloadImages: true,
+                //useSplashScreen: false,
                 
                 /**
                  * Defines the pattern to be used to load external slides.
@@ -228,7 +231,13 @@
                     },
                     {
                         type: 'content',
-                        id: 'about'
+                        id: 'about',
+                        notes: [
+                            "Annotation one about this slide",
+                            "Another note about it!",
+                            "Don't forget to say this...",
+                            "And also that!",
+                        ]
                     },
                     {
                         type: 'content',
@@ -236,7 +245,10 @@
                     },
                     {
                         type: 'content',
-                        id: 'presentationTool'
+                        id: 'presentationTool',
+                        notes: [
+                            "This is an awesome slide, too!"
+                        ]
                     },
                     {
                         type: 'section',
@@ -288,6 +300,12 @@
                     'F10': function(){
                         alert('F10 was pressed!!!');
                     }
+                },
+                
+                remote: {
+                    autoConnect: false,
+                    //server: 'http://127.0.0.1:81',
+                    useButton: true
                 }
             });
         </script>

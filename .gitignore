@@ -3,6 +3,7 @@
 ##
 *.*~*
 *.*~
+*.swp
 .project
 .DS_Store
 ./nbproject
@@ -10,6 +11,8 @@
 .project
 nbproject
 nbproject/*
+npm-debug.log
+node_modules
 
 ##
 ## Internal use
@@ -18,3 +21,6 @@ nbproject/*
 /talks/
 !/talks/README
 #/_docs
+.sqldb
+/ppw/tmp/
+!/ppw/tmp/README
