@@ -67,6 +67,8 @@ $(document).ready(function(){
         
         // go next
         $('#btn-next-slide').click(function(){
+            var syncSlide= false;
+            
             if(version == 'full'){
                 if(!ppwFrame().get('presentationStarted')){
                     ppwFrame().startPresentation();
@@ -79,28 +81,34 @@ $(document).ready(function(){
                 }else{
                     ppwFrame().goNext();
                 }
+                syncSlide= ppwFrame().getCurrentSlide().index-1;
             }
+            
             _broadcast({
                 act: 'goNext',
                 talk: presentation,
                 data: {
-                    curSlide: ppwFrame().getCurrentSlide().index-1
+                    curSlide: syncSlide
                 }
             });
         });
         
         // go previous
         $('#btn-previous-slide').click(function(){
+            var syncSlide= false;
+            
             if(version == 'full'){
                 if(ppwFrame().get('presentationStarted')){
                     ppwFrame().goPrev();
                 }
+                syncSlide= ppwFrame().getCurrentSlide().index-1;
             }
+            
             _broadcast({
                 act: 'goPrev',
                 talk: presentation,
                 data: {
-                    curSlide: ppwFrame().getCurrentSlide().index-1
+                    curSlide: false
                 }
             });
         });
@@ -122,9 +130,6 @@ $(document).ready(function(){
     };
     
     var _broadcast= function(obj){
-        /*$.post('/api/broadcast', obj, function(o){
-            console.log(o);
-        }, 'json');*/
         _socket.emit('remote-control-send', obj);
     };
     
@@ -138,11 +143,12 @@ $(document).ready(function(){
         _bindEvents();
     }
     
+    presentation= getParameterByName('p');
+    talkId= presentation.replace(/\/$/, '').split('/').pop();
+    
     if(version == 'full'){
-        presentation= getParameterByName('p');
-        socketServer= location.protocol+'//'+location.host;//+'/'+presentation;
         
-        talkId= presentation.replace(/\/$/, '').split('/').pop();
+        socketServer= location.protocol+'//'+location.host;//+'/'+presentation;
         
         if(!presentation){
             return false;

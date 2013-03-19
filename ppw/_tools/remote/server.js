@@ -35,6 +35,8 @@ PPW.remote= (function(){
             }
             
             if(command.data &&
+                (command.data.curSlide || command.data.curSlide===0)
+                &&
                 (command.data.curSlide != PPW.getCurrentSlide().index)){
                 PPW.goToSlide(command.data.curSlide);
             }
@@ -46,18 +48,18 @@ PPW.remote= (function(){
                     }else{
                         PPW.goNext();
                     }
-                    break;
+                break;
                 case 'goPrev':
                     PPW.goPrev();
-                    break;
+                break;
                 case 'toggleCamera':
                     PPW.toggleCamera();
-                    break;
+                break;
             }
-            if(command.data &&
+            /*if(command.data &&
                 (command.data.curSlide != PPW.getCurrentSlide().index)){
                 PPW.goToSlide(command.data.curSlide);
-            }
+            }*/
         });
         
     };
