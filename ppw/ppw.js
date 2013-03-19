@@ -349,7 +349,7 @@ window.PPW= (function($, _d, console){
                       </div>',
         
             // the top-left toolbar content
-            toolBar: '<div id="ppw-toolbar-container" class="ppw-platform {{clickableClass}}">\
+            toolBar: '<div id="ppw-toolbar-container" tabindex="0" class="ppw-platform {{clickableClass}}">\
                     <div id="ppw-toolbar" class="ppw-platform {{clickableClass}}">\
                         <div class="img"><img id="ppw-goto-icon" onclick="PPW.showGoToComponent(false);" title="Go to a specific slide" /></div>\
                         <div class="img"><img id="ppw-toolbox-icon" onclick="PPW.openPresentationTool();" title="Open Presentation Tool" /></div>\

@@ -664,15 +664,23 @@
     white-space: normal;
     position: absolute;
     left: 0px;
-    /*top: -240px;*/
-    top: 0px;
+    top: -250px;
     width: 40px;
-    height: 255px;
+    height: 270px;
     z-index: 999999999;
     -webkit-transition: all 200ms linear;
     -moz-transition: all 200ms linear;
     transition: all 200ms linear;
 }
+
+@media screen and (max-width: 799px){
+    #ppw-toolbar-container{
+        -webkit-transform: scale(3);
+        -moz-transform: scale(3);
+        transform: scale(3);
+    }
+}
+
 #ppw-toolbar{
     position: relative;
     z-index: 3;
@@ -743,7 +751,7 @@
     background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%); /* W3C */
 }
 
-#ppw-toolbar-container:hover{
+#ppw-toolbar-container:hover, #ppw-toolbar-container:active{
     top: 0px;
 }
 #ppw-go-to-slide{
