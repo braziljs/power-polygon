@@ -14,7 +14,7 @@
  * @scope Global
  *
  */
-window.PPW= (function($, _d, console){
+window.PPW = (function ($, _d, console){
     
     "use strict";
     
@@ -35,13 +35,13 @@ window.PPW= (function($, _d, console){
      *
      * First of all, let's check if it has not been already loaded
      */
-    if(window.PPW)
-       throw new Error("PowerPolygon framework already loaded!");
+    if (window.PPW) 
+        throw new Error("PowerPolygon framework already loaded!");
 
     /**
      * Now, let's verify if jQuery(the only dependency) is loaded
      */
-    if(!$){
+    if (!$){
        console.warn("[PPW] Dependency required!");
        alert("ERROR:\nMissing dependency:\n    - jQuery");
        window.PPW= {
@@ -268,7 +268,7 @@ window.PPW= (function($, _d, console){
                   ALT: Go to slide<br/>\
                   ALT+F: Search into slides<br/>\
                   ALT+Space: Show slides thumbnails<br/>\
-                  Scroll: Applies zoom in and out<br/>\
+                  : Applies zoom in and out<br/>\
                   F6, F7, F8, F9, F10: Custom",
         
             // the loading element
