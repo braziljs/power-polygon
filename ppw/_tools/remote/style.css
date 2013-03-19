@@ -1,6 +1,7 @@
 html, body{
     height: 100%;
     width: 100%;
+    font-family: Arial, Tahoma, sans-serif;
 }
 *{
     box-sizing: border-box;

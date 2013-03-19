@@ -80,7 +80,13 @@ $(document).ready(function(){
                     ppwFrame().goNext();
                 }
             }
-            // TODO: send to socket
+            _broadcast({
+                act: 'goNext',
+                talk: presentation,
+                data: {
+                    curSlide: ppwFrame().getCurrentSlide().index-1
+                }
+            });
         });
         
         // go previous
@@ -90,11 +96,12 @@ $(document).ready(function(){
                     ppwFrame().goPrev();
                 }
             }
-            // TODO: send to socket
             _broadcast({
-                act: 'goNext',
+                act: 'goPrev',
                 talk: presentation,
-                data: null
+                data: {
+                    curSlide: ppwFrame().getCurrentSlide().index-1
+                }
             });
         });
         
@@ -105,7 +112,11 @@ $(document).ready(function(){
                     ppwFrame().toggleCamera();
                 }
             }
-            // TODO: send to socket
+            _broadcast({
+                act: 'toggleCamera',
+                talk: presentation,
+                data: null
+            });
         });
         
     };
@@ -114,7 +125,6 @@ $(document).ready(function(){
         /*$.post('/api/broadcast', obj, function(o){
             console.log(o);
         }, 'json');*/
-        alert('will broadcast!');
         _socket.emit('remote-control-send', obj);
     };
     
@@ -124,15 +134,15 @@ $(document).ready(function(){
     
     var _init= function(){
         _socket= io.connect(socketServer);
-        alert('I will join the group '+talkId+' now')
         _socket.emit('listening', talkId);
         _bindEvents();
     }
     
     if(version == 'full'){
         presentation= getParameterByName('p');
-        socketServer= location.protocol+'//'+location.host+'/'+presentation;
-        talkId= presentation.split('/').pop();
+        socketServer= location.protocol+'//'+location.host;//+'/'+presentation;
+        
+        talkId= presentation.replace(/\/$/, '').split('/').pop();
         
         if(!presentation){
             return false;

@@ -154,11 +154,11 @@ Services= (function(){
     var _socketsEvents= function (socket) {
         
         socket.on('listening', function (talk) {
-            console.log("someone joined =================== ", talk);
+            console.log("someone joined =================== "+talk);
             socket.join(talk);
         });
         socket.on('remote-control-send', function (data) {
-            socket.broadcast.emit('control-command', data);
+            socket.broadcast.emit('control-command', data); // IS WORKING!!!
         });
         
         
