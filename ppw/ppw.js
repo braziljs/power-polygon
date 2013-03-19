@@ -180,6 +180,7 @@ window.PPW= (function($, _d, console){
             currentSlide: 0,
             presentationStarted: false,
             inThumbsMode: false,
+            defaultRemoteServer: location.protocol +'//'+ location.host, // TODO: create and release the service online
             
             // a default css format
             prevStyle: {
@@ -263,8 +264,8 @@ window.PPW= (function($, _d, console){
                 directionalIconsStyle: 'chevron',
                 slideType: 'content',
                 slideTitleSize: 40,
-                containerID: 'ppw-slides-container'
-		autoGenerateSlides: true
+                containerID: 'ppw-slides-container',
+                autoGenerateSlides: false
             },
             
             // constant values and names for css classes and patterns
@@ -349,13 +350,14 @@ window.PPW= (function($, _d, console){
                       </div>',
         
             // the top-left toolbar content
-            toolBar: '<div id="ppw-toolbar-container" class="ppw-platform {{clickableClass}}">\
+            toolBar: '<div id="ppw-toolbar-container" tabindex="0" class="ppw-platform {{clickableClass}}">\
                     <div id="ppw-toolbar" class="ppw-platform {{clickableClass}}">\
                         <div class="img"><img id="ppw-goto-icon" onclick="PPW.showGoToComponent(false);" title="Go to a specific slide" /></div>\
                         <div class="img"><img id="ppw-toolbox-icon" onclick="PPW.openPresentationTool();" title="Open Presentation Tool" /></div>\
                         <div class="img"><img id="ppw-search-icon" onclick="PPW.showSearchBox()" title="Search on slides"/></div>\
                         <div class="img"><img id="ppw-fullscreen-icon" onclick="PPW.enterFullScreen()" title="Go Fullscreen"/></div>\
                         <div class="img"><img id="ppw-camera-icon" onclick="PPW.toggleCamera();" title="Start the camera"/></div>\
+                        <div class="img"><img id="ppw-remote-icon" onclick="PPW.enableRemote();" title="No remote server found"/></div>\
                         <div class="img"><img id="ppw-settings-icon" onclick="PPW.showConfiguration();" title="Settings"/></div>\
                     </div>\
                     <div id="ppw-content-toolbar" class="ppw-platform">\
@@ -383,6 +385,8 @@ window.PPW= (function($, _d, console){
         
         // user defined settings...the following values come by default if the user did not set them
         _settings= {
+            // wondering the talk is in /talks/talkname for example
+            PPWSrc: '',
             // the separator to be used on the address bar
             hashSeparator: '#',
             // enables or not, the shortcuts
@@ -720,6 +724,13 @@ window.PPW= (function($, _d, console){
         }
         
         $.extend(_settings, conf);
+        _settings.canonic= _l.pathname
+                             .replace(/(\?|\&).*/, '')
+                             .replace(/(\/index\.[a-zA-Z0-9]*)|(\/$)/, '')
+                             .replace(/\ /ig, '-')
+                             .split('/')
+                             .pop();
+        
         
        /** 0/false: no messages 
         *   1: errors
@@ -812,30 +823,37 @@ window.PPW= (function($, _d, console){
      * 
      * @param String Location of the file within the PPWSrc folder.
      */
-    var _createPPWSrcPath= function(file){
-        var ppw= 'ppw.js';
-        var src= null;
-        var styles= _d.getElementsByTagName('script');
-        var l= styles.length;
-        for(var i=0;i<l;i++){
-            src=styles[i].src.split('/');
-            if(src.pop() == ppw){
-                break;
+    var _createPPWSrcPath= function(filepath){
+        var PPWSrc= _settings.PPWSrc;
+        if(!PPWSrc){
+            var parentpath= '../';
+            var ppw= 'ppw.js';
+            var src= null;
+            var styles= _d.getElementsByTagName('script');
+            var l= styles.length;
+            for(var i=0;i<l;i++){
+                src=styles[i].src.split('/');
+                if(src.pop() == ppw){
+                    break;
+                }
             }
-        }
-        var uri= _d.location.href.split('/').slice(0, -1);
-        l= src.length;
-        for(var i=0;i<l;i++){
-            if(src[i] !== uri[i]){
-                break;
+            var uri= _d.location.href.split('/').slice(0, -1);
+            l= src.length;
+            for(var i=0;i<l;i++){
+                if(src[i] !== uri[i]){
+                    break;
+                }
             }
+            PPWSrc= src.splice(i).join('/')+'/'+filepath;
+            l= uri.length-i;
+            for(var i=0;i<l;i++){
+                PPWSrc= parentpath+PPWSrc;
+            }
+            _settings.PPWSrc= PPWSrc.replace(filepath, '');
+        }else{
+            PPWSrc= _settings.PPWSrc+'/'+filepath;
         }
-        file=src.splice(i).join('/')+'/'+file;
-        l= uri.length-i;
-        for(var i=0;i<l;i++){
-            file= '../'+file;
-        }
-        return file.replace(/\/\//g, '/');
+        return PPWSrc.replace(/\/\//g, '/');
     }
     
     /**
@@ -2479,7 +2497,7 @@ window.PPW= (function($, _d, console){
                    </svg>');
         
         // adding the toolbar
-        if(_settings.useToolBar){
+        if(_settings.useToolBar && !_querystring('remote-controller')){
             
             var x= _templates.toolBar
                                 .replace(/\{\{clickableClass\}\}/g, _conf.cons.CLICKABLE_ELEMENT)
@@ -2501,6 +2519,13 @@ window.PPW= (function($, _d, console){
 
             $('#ppw-camera-icon').attr('src', _createPPWSrcPath('/_images/camera.png'))
                                  .addClass(_conf.cons.CLICKABLE_ELEMENT);
+
+            if(_settings.remote && _settings.remote.useButton !== false){
+                $('#ppw-remote-icon').attr('src', _createPPWSrcPath('/_images/remote-conection-status-no-server.png'))
+                                     .addClass(_conf.cons.CLICKABLE_ELEMENT);
+            }else{
+                $('#ppw-remote-icon').parent().hide();
+            }
 
             $('#ppw-settings-icon').attr('src', _createPPWSrcPath('/_images/settings-icon.png'))
                                    .addClass(_conf.cons.CLICKABLE_ELEMENT);
@@ -3096,7 +3121,8 @@ window.PPW= (function($, _d, console){
         }, 200, function(){
             $('#ppw-splash-screen').fadeOut();
         });
-        _conf.presentationStarted= (new Date()).getTime();
+        
+        _settings.presentationStarted= _conf.presentationStarted= (new Date()).getTime();
         _goToSlide(_getCurrentSlideFromURL());
         if(el)
             el.blur();
@@ -3933,6 +3959,33 @@ window.PPW= (function($, _d, console){
             return true;
         }
     }
+    
+    
+    /**
+     * Tries to enable the remote control to the talk.
+     */
+    var _enableRemote= function(){
+        PPW.remote.connect();
+    };
+    
+    var _initRemoteService= function(){
+        
+        var srv= _settings.remote.server||_conf.defaultRemoteServer;
+        
+        if(!_settings.remote)
+            return false;
+        //alert('going')
+        if(!PPW.remote.server){
+            $('#ppw-remote-io-script').remove();
+            
+            $("head").append("<script src='"+srv+"/ppw/_tools/remote/server.js' id='ppw-remote-io-script'></script>");
+            
+            // in 3 seconds, verify again for the status
+            setTimeout(_initRemoteService, 3000);
+        }else{
+            PPW.remote.init(_self, _settings, _conf, _createPPWSrcPath(''));
+        }
+    };
 
     /**
      * Unlocks the user controls.
@@ -4035,6 +4088,12 @@ window.PPW= (function($, _d, console){
         }else{
             _goToSlide(0);
         }
+        
+        if(_querystring('remote-controller')){
+            top.ppwFrame= window.PPW;
+        }else{
+            _initRemoteService();
+        }
     };
     
     _addListener('onload', _constructor)
@@ -4092,6 +4151,8 @@ window.PPW= (function($, _d, console){
         viewport                        : _viewport,
         rotate                          : _rotate,
         goToSlide                       : _goToSlide,
+        enableRemote                    : _enableRemote,
+        remote                          : {},
         // API GETTERS/SETTERS METHODS
         getSlides                       : _getSlides,
         getValidSlides                  : _getValidSlides,
