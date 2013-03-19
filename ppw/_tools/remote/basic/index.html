@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
     <head>
-        <title></title>
+        <title>Power Polygon - Basic remote control</title>
         
         <script src="/ppw/_scripts/jquery-1.8.2.min.js"></script>
         <script src="/socket.io/socket.io.js"></script>
@@ -19,6 +19,12 @@
         <div id="annotations-container"></div>
         <nav id="buttons-container">
             <ul class="nav">
+                <li id="btn-toggle-camera">
+                  <a href="#">
+                    <span class="btn-icon icon-facetime-video"></span>
+                    <span class="screen-reader-text">Toggle Camera</span>
+                  </a>
+                </li>
                 <li id="btn-previous-slide">
                   <a href="#">
                     <span class="btn-icon icon-chevron-left"></span>
@@ -31,13 +37,11 @@
                     <span class="screen-reader-text">Next slide</span>
                   </a>
                 </li>
-                <li id="btn-toggle-camera">
-                  <a href="#">
-                    <span class="btn-icon icon-facetime-video"></span>
-                    <span class="screen-reader-text">Toggle Camera</span>
-                  </a>
-                </li>
             </ul>
         </nav>​
     </body>
+    <script>
+        //alert(document.body.clientWidth)
+        //alert(document.body.clientHeight)
+    </script>
 </html>

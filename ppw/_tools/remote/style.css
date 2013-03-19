@@ -73,6 +73,10 @@ html, body{
         position: absolute;
         left: -9000px;
     }
+    .talk-list li{
+        float: none;
+        width: 100%;
+    }
 }
 
 #demosList{

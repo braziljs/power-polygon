@@ -8,15 +8,25 @@ html, body{
     box-sizing: border-box;
     -moz-box-sizing: border-box;
 }
+
 body{
-    background: rgb(30,87,153); /* Old browsers */
-    background: -moz-linear-gradient(-45deg, rgba(30,87,153,1) 0%, rgba(41,137,216,1) 50%, rgba(32,124,202,1) 51%, rgba(125,185,232,1) 100%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, right bottom, color-stop(0%,rgba(30,87,153,1)), color-stop(50%,rgba(41,137,216,1)), color-stop(51%,rgba(32,124,202,1)), color-stop(100%,rgba(125,185,232,1))); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(-45deg, rgba(30,87,153,1) 0%,rgba(41,137,216,1) 50%,rgba(32,124,202,1) 51%,rgba(125,185,232,1) 100%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(-45deg, rgba(30,87,153,1) 0%,rgba(41,137,216,1) 50%,rgba(32,124,202,1) 51%,rgba(125,185,232,1) 100%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(-45deg, rgba(30,87,153,1) 0%,rgba(41,137,216,1) 50%,rgba(32,124,202,1) 51%,rgba(125,185,232,1) 100%); /* IE10+ */
-    background: linear-gradient(135deg, rgba(30,87,153,1) 0%,rgba(41,137,216,1) 50%,rgba(32,124,202,1) 51%,rgba(125,185,232,1) 100%); /* W3C */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#1e5799', endColorstr='#7db9e8',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+background: rgb(30,87,153); 
+background: -moz-linear-gradient(-45deg, rgba(30,87,153,1) 0%, rgba(41,137,216,1) 50%, rgba(32,124,202,1) 51%, rgba(125,185,232,1) 100%); 
+background: -webkit-gradient(linear, left top, right bottom, color-stop(0%,rgba(30,87,153,1)), color-stop(50%,rgba(41,137,216,1)), color-stop(51%,rgba(32,124,202,1)), color-stop(100%,rgba(125,185,232,1)));
+background: -webkit-linear-gradient(-45deg, rgba(30,87,153,1) 0%,rgba(41,137,216,1) 50%,rgba(32,124,202,1) 51%,rgba(125,185,232,1) 100%); 
+background: -o-linear-gradient(-45deg, rgba(30,87,153,1) 0%,rgba(41,137,216,1) 50%,rgba(32,124,202,1) 51%,rgba(125,185,232,1) 100%);
+background: -ms-linear-gradient(-45deg, rgba(30,87,153,1) 0%,rgba(41,137,216,1) 50%,rgba(32,124,202,1) 51%,rgba(125,185,232,1) 100%);
+background: linear-gradient(135deg, rgba(30,87,153,1) 0%,rgba(41,137,216,1) 50%,rgba(32,124,202,1) 51%,rgba(125,185,232,1) 100%);
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#1e5799', endColorstr='#7db9e8',GradientType=1 );
+
+/*background: rgb(184,225,252);
+background: -moz-linear-gradient(-45deg, rgba(184,225,252,1) 0%, rgba(169,210,243,1) 10%, rgba(144,186,228,1) 25%, rgba(144,188,234,1) 37%, rgba(144,191,240,1) 50%, rgba(107,168,229,1) 51%, rgba(162,218,245,1) 83%, rgba(189,243,253,1) 100%);
+background: -webkit-gradient(linear, left top, right bottom, color-stop(0%,rgba(184,225,252,1)), color-stop(10%,rgba(169,210,243,1)), color-stop(25%,rgba(144,186,228,1)), color-stop(37%,rgba(144,188,234,1)), color-stop(50%,rgba(144,191,240,1)), color-stop(51%,rgba(107,168,229,1)), color-stop(83%,rgba(162,218,245,1)), color-stop(100%,rgba(189,243,253,1)));
+background: -webkit-linear-gradient(-45deg, rgba(184,225,252,1) 0%,rgba(169,210,243,1) 10%,rgba(144,186,228,1) 25%,rgba(144,188,234,1) 37%,rgba(144,191,240,1) 50%,rgba(107,168,229,1) 51%,rgba(162,218,245,1) 83%,rgba(189,243,253,1) 100%);
+background: -o-linear-gradient(-45deg, rgba(184,225,252,1) 0%,rgba(169,210,243,1) 10%,rgba(144,186,228,1) 25%,rgba(144,188,234,1) 37%,rgba(144,191,240,1) 50%,rgba(107,168,229,1) 51%,rgba(162,218,245,1) 83%,rgba(189,243,253,1) 100%);
+background: -ms-linear-gradient(-45deg, rgba(184,225,252,1) 0%,rgba(169,210,243,1) 10%,rgba(144,186,228,1) 25%,rgba(144,188,234,1) 37%,rgba(144,191,240,1) 50%,rgba(107,168,229,1) 51%,rgba(162,218,245,1) 83%,rgba(189,243,253,1) 100%);
+background: linear-gradient(135deg, rgba(184,225,252,1) 0%,rgba(169,210,243,1) 10%,rgba(144,186,228,1) 25%,rgba(144,188,234,1) 37%,rgba(144,191,240,1) 50%,rgba(107,168,229,1) 51%,rgba(162,218,245,1) 83%,rgba(189,243,253,1) 100%);
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#b8e1fc', endColorstr='#bdf3fd',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
 }
 
 #presentation-iframe, #canvas, #buttons-container,
@@ -64,8 +74,8 @@ body{
 
 #btn-toggle-camera{
     position: absolute;
-    top: 10px;
-    right: 0px;
+    top: -70px;
+    right: -60px;
 }
 #btn-next-slide{
     position: absolute;
@@ -184,8 +194,78 @@ html {
   font-size: 0.9em;
 }
 
+
+@media screen and (max-width: 319px){
+    .nav a:link, .nav a:visited {
+        width: 90px;
+        height: 90px;
+        padding-top: 0px;
+    }
+    .icon-facetime-video:before{
+        content: "C" !important;
+        position: absolute;
+        top: -30px !important;
+        left: -4px !important;
+        width: 100%;
+        font-weight: bold;
+        font-family: Arial, Tahoma, sans-serif;
+    }
+    .icon-chevron-right:before{
+        content: ">" !important;
+        font-weight: bold;
+        position: absolute;
+        width: 100%;
+        top: -30px !important;
+        left: 4px;
+    }
+    .icon-chevron-left:before{
+        content: "<" !important;
+        font-weight: bold;
+        position: absolute;
+        width: 100%;
+        top: -30px !important;
+        left: 4px;
+    }
+}
+
+@media screen and (max-height: 239px){
+    .nav a:link, .nav a:visited {
+        width: 90px;
+        height: 90px;
+        padding-top: 0px;
+    }
+    .icon-facetime-video:before{
+        content: "C" !important;
+        position: absolute;
+        top: -30px !important;
+        left: -4px !important;
+        width: 100%;
+        font-weight: bold;
+        font-family: Arial, Tahoma, sans-serif;
+    }
+    #btn-next-slide{
+        left: 140px !important;
+    }
+    .icon-chevron-right:before{
+        content: ">" !important;
+        font-weight: bold;
+        position: absolute;
+        width: 100%;
+        top: -30px !important;
+        left: 4px;
+    }
+    .icon-chevron-left:before{
+        content: "<" !important;
+        font-weight: bold;
+        position: absolute;
+        width: 100%;
+        top: -30px !important;
+        left: 4px;
+    }
+}
+
 .nav a:hover {
   text-decoration: none;
   color: #555;
   background: #f5f5f5;
-}​
+}
