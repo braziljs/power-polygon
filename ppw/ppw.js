@@ -651,8 +651,16 @@ window.PPW= (function($, _d, console){
         if(_conf.defaults.autoGenerateSlides){
             _b= _d.body;
             $b= $(_b);
-            $b.prepend('<section><h1>'+o.title+'<br/><br/>'+o.authors+'<br/><br/><br/>'+o.date+'</h1></section>');
-            $b.append('<section style="text-align: center;"><h1>Vragen</h1><i class="icon-question-sign" style="font-size: 24em"></i></section>');
+            var section= '<section><h1>'+o.title;
+            if(o.authors){
+                section+= '<br/><br/>'+o.authors;
+            }
+            if(o.date){
+                section+= '<br/><br/><br/>'+o.date;
+            }
+            section+= '</h1></section>';
+            $b.prepend(section);
+            $b.append('<section><style type="text/css">#outer {height: 100%; overflow: hidden; position: relative; text-align: center; width: 100%;} #outer[id] {display: table; position: static;} #middle {position: absolute; top: 50%;} /* for adaptive (quirk) explorer only*/ #middle[id] {display: table-cell; vertical-align: middle; width: 100%; position: static;} #inner {position: relative; top: -50%} /* for adaptive (quirk) explorer only */</style><div id="outer"><div id="middle"><div id="inner"><i class="icon-question-sign" style="font-size: 24em"></i></div></div></div></section>');
         }
         
         o.slides= [];
