@@ -14,15 +14,9 @@ Watch the Video:<br/>
 For detailed information and documentation, please read the wiki:
 [https://github.com/braziljs/power-polygon/wiki](https://github.com/braziljs/power-polygon/wiki/Start)
 
-### See some live demos
+### See a live demo
 You can access this address and see a live demo of some of the main tools PowerPolygon provides you.
-* [Live demo Presentation in Power Polygon](http://felipenmoura.org/talks/meet-ppw/)
-* A presentation showing the [BrazilJS Conference 2012 information](http://felipenmoura.org/talks/braziljs-2012/?lang=en)
-* [A demo using the parallax theme](http://felipenmoura.org/talks/demo-parallax/?lang=en)
-* [A slider theme demo](http://felipenmoura.org/talks/yesterday-news/?lang=en)
-* Using a 3D effect for slide transitions: [example 1](http://felipenmoura.org/talks/yesterday-news/?lang=en&transition=trans-3d-3#thanks) and [example 2](http://felipenmoura.org/talks/yesterday-news/?lang=en&transition=trans-3d-4#thanks)
-
-
+[Live demo Presentation in Power Polygon](http://felipenmoura.org/talks/meet-ppw/)
 
 ### Get involved
 * For PowerPolygon, test it and share your opinion and experience with us!

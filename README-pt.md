@@ -12,14 +12,9 @@ Assista ao vídeo:<br/>
 Para obter informações detalhadas, acesse a wiki do Power Polygon:
 [https://github.com/braziljs/power-polygon/wiki](https://github.com/braziljs/power-polygon/wiki/In%C3%ADcio)
 
-### Veja algumas apresentações demo
+### Veja uma apresentação demo
 Veja no endereço abaixo um demo de uma apresentação com as principais funcionalidades que o Power Polygon fornece  
-* [Live demo Presentation in Power Polygon](http://felipenmoura.org/talks/meet-ppw/)
-* Apresentação com os dados [da BrazilJS Conference 2012](http://felipenmoura.org/talks/braziljs-2012/?lang=en)
-* [Um demo utilizando o tema parallax](http://felipenmoura.org/talks/demo-parallax/?lang=en)
-* [Demo utilizando o tema slider](http://felipenmoura.org/talks/yesterday-news/?lang=en)
-* Utilizando 3D para transições de slides: [exemplo 1](http://felipenmoura.org/talks/yesterday-news/?lang=en&transition=trans-3d-3#thanks) and [exemplo 2](http://felipenmoura.org/talks/yesterday-news/?lang=en&transition=trans-3d-4#thanks)
-
+[Live demo Presentation in Power Polygon](http://felipenmoura.org/talks/meet-ppw/)
 
 ### Envolva-se com o Power Polygon
 * Teste e compartilhe a sua opinião e experiência conosco!
