@@ -45,7 +45,6 @@
     };
 
     var startScrollPath= function(){
-        alert(settings['drawPath']);
         $('#slide-container').scrollPath({
             drawPath: settings['drawPath'],
             wrapAround: false,
