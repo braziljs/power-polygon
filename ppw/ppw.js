@@ -265,7 +265,6 @@ window.PPW= (function($, _d, console){
                 slideType: 'content',
                 slideTitleSize: 40,
                 containerID: 'ppw-slides-container',
-                autoGenerateSlides: false
             },
             
             // constant values and names for css classes and patterns
@@ -638,6 +637,7 @@ window.PPW= (function($, _d, console){
                 date: $('meta[name="dcterms.date"]').attr("content"),
                 transition: _conf.defaults.transition,
                 directionalIconsStyle: _conf.defaults.directionalIconsStyle,
+                autoGenerateSlides: _conf.defaults.autoGenerateSlides,
                 theme: _conf.defaults.theme
             },
             i= 0,
@@ -648,7 +648,7 @@ window.PPW= (function($, _d, console){
             o= $.extend(o, conf);
         }
         
-        if(_conf.defaults.autoGenerateSlides){
+        if(o.autoGenerateSlides){
             _b= _d.body;
             $b= $(_b);
             var section= '<section><h1>'+o.title;
@@ -972,7 +972,8 @@ window.PPW= (function($, _d, console){
         
         var theme= null,
             transition= _querystring('transition'),
-            directionalIconsStyle= _querystring('directionalIconsStyle');
+            directionalIconsStyle= _querystring('directionalIconsStyle'),
+            autoGenerateSlides= _querystring('autoGenerateSlides');
         
         if(typeof _settings.theme == 'string')
             _settings.theme= _settings.theme.replace(/ /g, '').split(',');
@@ -986,6 +987,10 @@ window.PPW= (function($, _d, console){
         
         if(directionalIconsStyle){
             _settings.directionalIconsStyle= directionalIconsStyle;
+        }
+        
+        if(autoGenerateSlides){
+            _settings.autoGenerateSlides = autoGenerateSlides;
         }
         
         _conf.loadSteps+= _settings.theme.length;
