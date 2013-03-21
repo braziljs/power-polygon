@@ -7,8 +7,172 @@ PPW.remote= (function(){
         _socket= null,
         _io= null,
         _status= 'offline',
-        _lastState= window.sessionStorage.getItem('lastRemoteControlState')||'off';
+        _lastState= window.sessionStorage.getItem('lastRemoteControlState')||'off',
+        _canvasState= null,
+        _canvas= null,
+        _ctx= null,
+        _b= null,
+        _canvasCurrentDrawState= {},
+        _canvasIterator= null,
+        _clearCanvasTimeOut= 1000,
+        _closingCanvasTO= null;
     
+    /**
+     * Interactions
+     */
+    var _showCanvas= function(){
+        
+        var w= _b.clientWidth,
+            h= _b.clientHeight;
+        
+        if(!_canvasState)
+            _canvasState= {};
+        
+        clearTimeout(_closingCanvasTO);
+        if(_canvasState.visible){
+            if(_canvasCurrentDrawState.type != _canvasState.type){
+                //console.log(_canvasCurrentDrawState.type, _canvasState.type)
+                _clearCanvas();
+                _canvasCurrentDrawState= {};
+            }
+            
+            _drawOnCanvas();
+            return;
+        }
+        
+        _canvasState.visible= true;
+        _canvasCurrentDrawState= {};
+        
+        _canvas= _canvas||document.getElementById('ppw-remote-control-canvas');
+        _ctx= _ctx||_canvas.getContext('2d');
+        
+        _canvas.width= w;
+        _canvas.height= h;
+        
+        $(_canvas).show();
+        _drawOnCanvas();
+        
+        
+    };
+    
+    var _percToPx= function(perc, x){
+        return (_b[x? 'clientWidth': 'clientHeight'] * perc) /100;
+    }
+    
+    var _clearCanvas= function(){
+        
+        /*var w= _canvas.width,
+            h= _canvas.height;*/
+        _ctx.clearRect(0, 0, 4000, 3500);
+        _canvasCurrentDrawState= {};
+    };
+    
+    var _hideCanvas= function(){
+        
+        _canvasCurrentDrawState= {};
+        _canvasCurrentDrawState.type= _canvasState.type;
+        
+        if(_ctx && _canvasCurrentDrawState.inPath){
+            _ctx.closePath();
+            _canvasCurrentDrawState.inPath= false;
+        }
+        
+        _closingCanvasTO= setTimeout(function(){
+                              _canvasState.visible= false;
+                              _canvasCurrentDrawState= {};
+                              _clearCanvas();
+                              $(_canvas).hide();
+                          }, _clearCanvasTimeOut); // TODO: change it to a smaller interval
+    }
+    
+    function _clipMask(pointX, pointY){
+        
+        var grd = _ctx.createRadialGradient(pointX, pointY, 0, pointX, pointY, 120);
+        
+        _ctx.globalCompositeOperation = 'destination-out';
+        
+        grd.addColorStop(0, "rgba(255,255,255, 1)"); 
+        grd.addColorStop(1, "transparent");
+        _ctx.fillStyle = grd;
+        _ctx.beginPath();
+        _ctx.arc(pointX,pointY, 120, 0, Math.PI*2,true);
+        _ctx.fill();
+        _ctx.closePath();
+        _ctx.globalCompositeOperation = 'source-over';
+    }
+    
+    var _drawOnCanvas= function(){
+        
+        _canvasState.x= _percToPx(_canvasState.x, true);
+        _canvasState.y= _percToPx(_canvasState.y, false);
+        
+        switch(_canvasState.type){
+            case 'drawing':
+                
+                _canvasCurrentDrawState.type= _canvasState.type;
+                
+                if(!_canvasCurrentDrawState.inPath)
+                    _ctx.beginPath();
+                
+                _canvasCurrentDrawState.inPath= true;
+                
+                _ctx.fillStyle= 'red';
+                _ctx.moveTo(_canvasCurrentDrawState.x || _canvasState.x,
+                            _canvasCurrentDrawState.y || _canvasState.y);
+               
+                _canvasCurrentDrawState.x= _canvasState.x;
+                _canvasCurrentDrawState.y= _canvasState.y;
+                
+                _ctx.lineWidth= 5;
+                _ctx.strokeStyle = 'red';
+                _ctx.lineTo(_canvasState.x, _canvasState.y);
+                _ctx.stroke();
+
+            break;
+            case 'spotlight':
+                _canvasCurrentDrawState.type= _canvasState.type;
+                
+                _ctx.beginPath();
+                _ctx.fillStyle= 'rgba(0, 0, 0, 1)';
+                _ctx.rect(0, 0, _b.clientWidth, _b.clientHeight);
+                _ctx.fill();
+                _ctx.closePath();
+                _clipMask(_canvasState.x, _canvasState.y);
+            break;
+            case 'laserpoint':
+                
+                
+                //_ctx.closePath();
+                _ctx.beginPath();
+                
+                _canvasCurrentDrawState.type= _canvasState.type;
+                
+                _ctx.fillStyle = 'red';
+                _ctx.arc(_canvasState.x, _canvasState.y, _canvasState.radius||10, 0 , 2 * Math.PI, false);
+                
+                _clearCanvas();
+                _ctx.fill();
+                //_ctx.lineWidth = 2;
+                //_ctx.strokeStyle = '#003300';
+                //_ctx.stroke();
+            break;
+            case 'clear':
+                _canvasCurrentDrawState.type= _canvasState.type;
+                _ctx.clearRect(0, 0, _b.clientWidth, _b.clientHeight);
+            break;
+        };
+        //_canvasIterator= setTimeout(_drawOnCanvas, 120);
+    };
+    
+    var _setCanvasState= function(o){
+        var v= _canvasState && _canvasState.visible? true: false;
+        _canvasState= o;
+        _canvasState.visible= v;
+    };
+    
+    /**
+     * Socket communications
+     */
     var _setListeners= function(){
         _socket.on('disconnect', function(){
             _lastState= _status == 'online'? 'on': 'off'
@@ -23,7 +187,6 @@ PPW.remote= (function(){
             }else{
                 _setAsOffline();
             }
-            //_socket.join(PPW.get('canonic'));
         });
         
         _socket.on('control-command', function(command){
@@ -55,6 +218,38 @@ PPW.remote= (function(){
                 case 'toggleCamera':
                     PPW.toggleCamera();
                 break;
+                case 'goToSlide':
+                    PPW.goToSlide(command.data.curSlide);
+                break;
+                case 'interactionEnd':
+                    _hideCanvas();
+                break;
+                case 'spotlight':
+                    _setCanvasState({
+                        type: 'spotlight',
+                        x: command.data.x,
+                        y: command.data.y
+                    })
+                    _showCanvas();
+                    // TODO: draw spotlight on the right position
+                break;
+                case 'laserpoint':
+                    _showCanvas();
+                    _setCanvasState({
+                        type: 'laserpoint',
+                        x: command.data.x,
+                        y: command.data.y
+                    })
+                    _showCanvas();
+                break;
+                case 'drawing':
+                    _setCanvasState({
+                        type: 'drawing',
+                        x: command.data.x,
+                        y: command.data.y
+                    })
+                    _showCanvas();
+                break;
             }
             /*if(command.data &&
                 (command.data.curSlide != PPW.getCurrentSlide().index)){
@@ -75,25 +270,8 @@ PPW.remote= (function(){
     };
     
     var _stablish= function(){
-        
-        //if(!_socket){
-            _socket = _io.connect(_settings.remote.server);// + '/'+PPW.get('title'));
-            _setListeners();
-            
-        /*}else{
-            
-            if(_status == 'offline'){
-                _socket = io.connect(_settings.remote.server);
-                _setListeners();
-                _setAsOnline();
-            }else{
-                _socket.disconnect();
-                _setAsOffline();
-            }
-        }*/
-        
-        
-        
+        _socket = _io.connect(_settings.remote.server);// + '/'+PPW.get('title'));
+        _setListeners();
     };
     
     var _setAsOffline= function(){
@@ -125,6 +303,7 @@ PPW.remote= (function(){
         _settings= settings;
         _conf= conf,
         PPWSrc= src;
+        _b= document.body;
         
         if(!_settings.remote.server){
             _settings.remote.server= location.protocol+'//'+location.host;
