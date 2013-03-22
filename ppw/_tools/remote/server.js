@@ -101,7 +101,15 @@ PPW.remote= (function(){
         _ctx.globalCompositeOperation = 'source-over';
     }
     
-    var _drawOnCanvas= function(){
+    var _drawOnCanvas= function(conf){
+        
+        if(conf){
+            _setCanvasState(conf);
+            _showCanvas();
+            if(conf.type != 'drawing')
+                _hideCanvas();
+            return;
+        }
         
         _canvasState.x= _percToPx(_canvasState.x, true);
         _canvasState.y= _percToPx(_canvasState.y, false);
@@ -161,6 +169,8 @@ PPW.remote= (function(){
                 _ctx.clearRect(0, 0, _b.clientWidth, _b.clientHeight);
             break;
         };
+        if(conf)
+            _hideCanvas();
         //_canvasIterator= setTimeout(_drawOnCanvas, 120);
     };
     
@@ -317,6 +327,9 @@ PPW.remote= (function(){
             _stablish();
         });
     };
+    
+    PPW.drawOnCanvas= _drawOnCanvas;
+    PPW.hideCanvas= _hideCanvas;
     
     return {
         server: 'online',

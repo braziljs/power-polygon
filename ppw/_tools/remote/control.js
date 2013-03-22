@@ -213,14 +213,16 @@ $(document).ready(function(){
     }
     
     var _movingAroundEnd= function(){
+        
         _broadcast({
-                act: 'interactionEnd',
-                talk: presentation,
-                data: {
-                    x: 0,
-                    y: 0
-                }
-            });
+            act: 'interactionEnd',
+            talk: presentation,
+            data: {
+                x: 0,
+                y: 0
+            }
+        });
+        ppwFrame().hideCanvas();
     };
     
     var _movingAround= function(evt){
@@ -246,6 +248,7 @@ $(document).ready(function(){
         y= _pxToPerc(y, false);
         
         if(_currentInteractionState){
+            
             _broadcast({
                 act: _currentInteractionState,
                 talk: presentation,
@@ -253,6 +256,12 @@ $(document).ready(function(){
                     x: x,
                     y: y
                 }
+            });
+            
+            ppwFrame().drawOnCanvas({
+                x: x,
+                y: y,
+                type: _currentInteractionState
             });
         }
         

@@ -4082,9 +4082,8 @@ window.PPW = (function ($, _d, console){
         
         if(_querystring('remote-controller')){
             top.ppwFrame= window.PPW;
-        }else{
-            _initRemoteService();
         }
+        _initRemoteService();
     };
     
     _addListener('onload', _constructor)
