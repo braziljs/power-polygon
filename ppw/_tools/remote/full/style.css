@@ -187,28 +187,55 @@ iframe{
     height: 48px;
 }
 
-#state-buttons-container div{
-    border: outset 2px;
-    margin-right: 8px;
-    border-radius: 6px;
-    background-color: #f0f0f0;
+#state-buttons-container>div{
+    /*border: outset 3px;*/
+    border: solid 1px #999;
+    margin-right: 4px;
+    border-radius: 10px;
+    /*background-color: #f0f0f0;*/
     background-size: 100%;
+    width: 48px;
+    height: 48px;
+    float: left;
+    
+    background: rgb(242,246,248); /* Old browsers */
+    background: -moz-linear-gradient(top, rgba(242,246,248,1) 0%, rgba(216,225,231,1) 50%, rgba(181,198,208,1) 51%, rgba(224,239,249,1) 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(242,246,248,1)), color-stop(50%,rgba(216,225,231,1)), color-stop(51%,rgba(181,198,208,1)), color-stop(100%,rgba(224,239,249,1))); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, rgba(242,246,248,1) 0%,rgba(216,225,231,1) 50%,rgba(181,198,208,1) 51%,rgba(224,239,249,1) 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, rgba(242,246,248,1) 0%,rgba(216,225,231,1) 50%,rgba(181,198,208,1) 51%,rgba(224,239,249,1) 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, rgba(242,246,248,1) 0%,rgba(216,225,231,1) 50%,rgba(181,198,208,1) 51%,rgba(224,239,249,1) 100%); /* IE10+ */
+    background: linear-gradient(to bottom, rgba(242,246,248,1) 0%,rgba(216,225,231,1) 50%,rgba(181,198,208,1) 51%,rgba(224,239,249,1) 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f2f6f8', endColorstr='#e0eff9',GradientType=0 ); /* IE6-9 */
+}
+#state-buttons-container div div{
     background-position: center center;
 }
 #state-buttons-container .selected{
-    border: inset 2px;
+    /*border: outset 2px;*/
     background-color: #a33;
+    
+    
+    background: rgb(187,208,219); /* Old browsers */
+    background: -moz-linear-gradient(top, rgba(187,208,219,1) 0%, rgba(169,189,203,1) 50%, rgba(141,168,183,1) 51%, rgba(158,205,236,1) 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(187,208,219,1)), color-stop(50%,rgba(169,189,203,1)), color-stop(51%,rgba(141,168,183,1)), color-stop(100%,rgba(158,205,236,1))); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, rgba(187,208,219,1) 0%,rgba(169,189,203,1) 50%,rgba(141,168,183,1) 51%,rgba(158,205,236,1) 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, rgba(187,208,219,1) 0%,rgba(169,189,203,1) 50%,rgba(141,168,183,1) 51%,rgba(158,205,236,1) 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, rgba(187,208,219,1) 0%,rgba(169,189,203,1) 50%,rgba(141,168,183,1) 51%,rgba(158,205,236,1) 100%); /* IE10+ */
+    background: linear-gradient(to bottom, rgba(187,208,219,1) 0%,rgba(169,189,203,1) 50%,rgba(141,168,183,1) 51%,rgba(158,205,236,1) 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#bbd0db', endColorstr='#9ecdec',GradientType=0 ); /* IE6-9 */
+}
+#state-buttons-container .selected>div{
     background-size: 70%;
 }
 
 
-#btn-cursor{
+#btn-cursor>div{
     background: url(/ppw/_images/cursor.png) no-repeat;
     width: 48px;
     height: 48px;
     float: left;
 }
-#btn-spotlight{
+#btn-spotlight>div{
     background: url(/ppw/_images/spotlight.png) no-repeat;
     width: 48px;
     height: 48px;
@@ -224,23 +251,22 @@ iframe{
         background-color: red;
         box-shadow: 0px 0px 6px red;
         margin: auto;
-        margin-top: 14px;
+        margin-top: 10px;
         width: 20px;
         height: 20px;
         display: block;
         border-radius: 50%;
         border: solid 1px white;
     }
-#btn-drawing{
+#btn-drawing>div{
     background: url(/ppw/_images/drawing.png) no-repeat;
     width: 48px;
     height: 48px;
-    float: left;
 }
-#btn-thumbs{
+#btn-thumbs>div{
     background: url(/ppw/_images/thumbs.png) no-repeat;
+    background-position: center center;
     width: 48px;
     height: 48px;
-    float: left;
     background-size: auto !important;
 }
