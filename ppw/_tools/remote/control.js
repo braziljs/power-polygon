@@ -104,10 +104,12 @@ $(document).ready(function(){
         $('#btn-next-slide').click(function(){
             var syncSlide= false;
             
-            if(!ppwFrame().get('presentationStarted')){
-                ppwFrame().startPresentation();
-            }else{
-                ppwFrame().goNext();
+            if(version == 'full'){
+                if(!ppwFrame().get('presentationStarted')){
+                    ppwFrame().startPresentation();
+                }else{
+                    ppwFrame().goNext();
+                }
             }
             
             _broadcast({
@@ -204,8 +206,76 @@ $(document).ready(function(){
             $(document.body).bind('touchmove', _movingAround);
             $(document.body).bind('touchend', _movingAroundEnd);
             
+        }else{
+            $('#basic-pointer').bind('mousedown', function(){
+                $(document.body).bind('mousemove', _dragBasicPointer);
+                $(document.body).one('mouseup', function(){
+                    $(document.body).unbind('mousemove', _dragBasicPointer);
+                    _broadcast({
+                        act: 'interactionEnd',
+                        talk: presentation,
+                        data: {
+                            x: 0,
+                            y: 0
+                        }
+                    });
+                });
+            });
+            $('#basic-pointer').bind('touchstart', function(evt){
+                evt.preventDefault();
+                $(document.body).bind('touchmove', _dragBasicPointer);
+                $(document.body).one('touchend', function(){
+                    $(document.body).unbind('touchmove', _dragBasicPointer);
+                    _broadcast({
+                        act: 'interactionEnd',
+                        talk: presentation,
+                        data: {
+                            x: 0,
+                            y: 0
+                        }
+                    });
+                });
+            });
+            $(document).bind("touchmove",function(event){
+                event.preventDefault();
+           });
         }
         
+    };
+    
+    var _dragBasicPointer= function(evt){
+        
+        var x, y, touch;
+
+        if(touch = evt.originalEvent.changedTouches){ // is a touch event
+            evt.preventDefault();
+            touch= touch[0];
+
+            x= touch.pageX;
+            y= touch.pageY;
+            
+        }else{ // is a click event
+            x= evt.clientX;
+            y= evt.clientY;
+        }
+        
+        $('#basic-pointer').css({
+            left: x+'px',
+            top: y+'px'
+        });
+        
+        x= _pxToPerc(x, true);
+        y= _pxToPerc(y, false);
+        
+        _broadcast({
+            act: 'laserpoint',
+            talk: presentation,
+            data: {
+                x: x,
+                y: y
+            }
+        });
+        return false;
     };
     
     var _pxToPerc= function(px, x){
@@ -231,7 +301,7 @@ $(document).ready(function(){
             y= 0,
             touch= null;
         
-        if(touch = evt.changedTouches){ // is a touch event
+        if(touch = evt.originalEvent.changedTouches){ // is a touch event
             
             touch= touch[0];
 

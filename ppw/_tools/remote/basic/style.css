@@ -3,6 +3,7 @@ html, body{
     width: 100%;
     overflow: hidden;
     margin: 0px;
+    overflow: hidden;
 }
 *{
     box-sizing: border-box;
@@ -268,4 +269,15 @@ html {
   text-decoration: none;
   color: #555;
   background: #f5f5f5;
+}
+
+#basic-pointer{
+    position: absolute;
+    left: 20px;
+    top: 10px;
+    width: 20px;
+    height: 20px;
+    background: red;
+    border-radius: 50%;
+    z-index: 999999;
 }
