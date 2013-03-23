@@ -439,6 +439,8 @@ window.PPW = (function ($, _d, console){
              *   9: errors, warnings and logs
              */
             verbose: 9,
+            // sets the talk to use remote control
+            remote: true,
             // in case you want to change the zoom effect to be applied to a different element
             // might be useful for addon or theme developers.
             applyZoomTo: false,

@@ -143,11 +143,11 @@ $(document).ready(function(){
         
         // toggle camera
         $('#btn-toggle-camera').click(function(){
-            if(version == 'full'){
+            /*if(version == 'full'){
                 if(ppwFrame().get('presentationStarted')){
-                    ppwFrame().toggleCamera();
+                    //ppwFrame().toggleCamera();
                 }
-            }
+            }*/
             _broadcast({
                 act: 'toggleCamera',
                 talk: presentation,
@@ -236,10 +236,11 @@ $(document).ready(function(){
                     });
                 });
             });
-            $(document).bind("touchmove",function(event){
-                event.preventDefault();
-           });
         }
+        
+        $(document).bind("touchmove",function(event){
+            event.preventDefault();
+        });
         
     };
     
@@ -386,8 +387,10 @@ $(document).ready(function(){
         if(!presentation){
             return false;
         }
-        
+        //alert('?')
         presentationIframe.attr('src', '/'+presentation+'?remote-controller=true');
+        
+        //presentationIframe.attr('src', 'http://www.google.com/');
     }else{
         $('#btn-annotations').hide();
     }
