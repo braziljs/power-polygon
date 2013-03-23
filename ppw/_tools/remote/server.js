@@ -321,7 +321,7 @@ PPW.remote= (function(){
         
         $(document.body).append("<canvas id='ppw-remote-control-canvas'></canvas>");
         
-        $.getScript(_settings.remote.server+"/socket.io/socket.io.js", function(){
+        $.getScript("/socket.io/socket.io.js", function(){
             _setAsOffline();
             _io= io;
             _stablish();
