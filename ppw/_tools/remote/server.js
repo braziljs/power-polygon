@@ -63,14 +63,18 @@ PPW.remote= (function(){
         
         /*var w= _canvas.width,
             h= _canvas.height;*/
-        _ctx.clearRect(0, 0, 4000, 3500);
+        if(_ctx)
+            _ctx.clearRect(0, 0, 4000, 3500);
+        
         _canvasCurrentDrawState= {};
     };
     
-    var _hideCanvas= function(){
+    var _hideCanvas= function(fn){
         
         _canvasCurrentDrawState= {};
-        _canvasCurrentDrawState.type= _canvasState.type;
+        _canvasCurrentDrawState.type= (_canvasState && _canvasState.type)?
+                                            _canvasState.type:
+                                            false;
         
         if(_ctx && _canvasCurrentDrawState.inPath){
             _ctx.closePath();
@@ -78,11 +82,22 @@ PPW.remote= (function(){
         }
         
         _closingCanvasTO= setTimeout(function(){
+                              
+                              _canvasState= _canvasState||{};
                               _canvasState.visible= false;
                               _canvasCurrentDrawState= {};
                               _clearCanvas();
                               $(_canvas).hide();
-                          }, _clearCanvasTimeOut); // TODO: change it to a smaller interval
+                              
+                              if(fn && typeof fn == 'function'){
+                                  try{
+                                      fn();
+                                  }catch(e){
+                                      console.error('[PPW][remote] Error calling the callback for the end of drawing actions!', e);
+                                  };
+                              }
+                              
+                          }, _clearCanvasTimeOut);
     }
     
     function _clipMask(pointX, pointY){
@@ -176,6 +191,8 @@ PPW.remote= (function(){
     
     var _setCanvasState= function(o){
         var v= _canvasState && _canvasState.visible? true: false;
+        if(!_canvasState)
+            _canvasState= {};
         _canvasState= o;
         _canvasState.visible= v;
     };

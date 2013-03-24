@@ -30,6 +30,7 @@ html, body{
     width: 50%;
     float: left;
     overflow: hidden;
+    white-space: nowrap;
     padding-right: 150px;
 }
 .talk-list li:hover{

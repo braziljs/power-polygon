@@ -10,6 +10,7 @@ $(document).ready(function(){
         _mouseInteractionEnabled= false,
         _socket= null,
         talkId= null,
+        _hiddenControls= false,
         _b= document.body;
         
     var getParameterByName= function (name){
@@ -90,10 +91,7 @@ $(document).ready(function(){
                             curSlide: ppwFrame().getCurrentSlide().index-1
                         }
                     });
-                    $('#buttons-container, \
-                       #annotations-container,\
-                       #canvas,\
-                       #state-buttons-container').fadeIn('fast');
+                    _showControls();
                 }
             });
             
@@ -178,10 +176,7 @@ $(document).ready(function(){
                 if(ppwFrame() && ppwFrame().get('presentationStarted')){
                     //_setInteractionState('thumbs');
                     ppwFrame().showThumbs();
-                    $('#buttons-container, \
-                       #annotations-container,\
-                       #canvas,\
-                       #state-buttons-container').fadeOut('fast');
+                    _hideControls();
                 }
                 
             }).on('mousedown', function(){
@@ -193,8 +188,14 @@ $(document).ready(function(){
             });
             
             $(document.body).bind('mousemove', _movingAround);
-            $($('#buttons-container')).bind('mousedown', function(evt){
-                if(evt.target.parentNode && evt.target.parentNode.id == 'buttons-container')
+            $($(document.body)).bind('mousedown', function(evt){
+                if(evt.target.parentNode &&
+                        (
+                            evt.target.parentNode.id == 'buttons-container'
+                                ||
+                            evt.target.id == 'canvas'
+                        )
+                  )
                     _mouseInteractionEnabled= true;
             });
             $(document.body).bind('mouseup', function(){
@@ -293,7 +294,9 @@ $(document).ready(function(){
                 y: 0
             }
         });
-        ppwFrame().hideCanvas();
+        ppwFrame().hideCanvas(function(){
+            _showControls();
+        });
     };
     
     var _movingAround= function(evt){
@@ -301,7 +304,7 @@ $(document).ready(function(){
         var x= 0,
             y= 0,
             touch= null;
-        
+
         if(touch = evt.originalEvent.changedTouches){ // is a touch event
             
             touch= touch[0];
@@ -310,13 +313,17 @@ $(document).ready(function(){
             y= touch.pageY;
             
         }else{ // is a click event
+            
             if(!_mouseInteractionEnabled) // if is not pressed
                 return;
+            
             x= evt.clientX;
             y= evt.clientY;
         }
+        
         x= _pxToPerc(x, true);
         y= _pxToPerc(y, false);
+        
         
         if(_currentInteractionState){
             
@@ -329,6 +336,7 @@ $(document).ready(function(){
                 }
             });
             
+            _hideControls();
             ppwFrame().drawOnCanvas({
                 x: x,
                 y: y,
@@ -337,6 +345,34 @@ $(document).ready(function(){
         }
         
     }
+    
+    var _hideControls= function(canvasToo){
+        
+        var els= '#buttons-container, \
+                  #annotations-container,\
+                  #state-buttons-container';
+        if(canvasToo)
+            els+= ', #canvas';
+        
+        _hiddenControls= true;
+        
+        $(els).fadeOut('fast');
+    };
+    
+    
+    var _showControls= function(canvasToo){
+        
+        var els= '#buttons-container, \
+                  #annotations-container,\
+                  #state-buttons-container';
+        
+        if(canvasToo)
+            els+= ', #canvas';
+        
+        _hiddenControls= false;
+        
+        $(els).fadeIn('fast');
+    };
     
     var _setInteractionState= function(s){
         _currentInteractionState= s;

@@ -672,6 +672,9 @@
     -moz-transition: all 200ms linear;
     transition: all 200ms linear;
 }
+#ppw-toolbar-container:focus, #ppw-toolbar-container:active{
+    outline: none !important;
+}
 
 @media screen and (max-width: 799px){
     #ppw-toolbar-container{

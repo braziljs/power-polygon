@@ -1723,7 +1723,8 @@ window.PPW = (function ($, _d, console){
                     break;
                 
                 case 27: // esc
-                    if(_d.getElementById('ppw-message-box').style.display != 'none'){
+                    
+                    if($('#ppw-message-box').css('display') != 'none'){
                         
                         if(_conf.showingMessage){
                             _closeMessage();
@@ -1979,7 +1980,7 @@ window.PPW = (function ($, _d, console){
         
         // window events
         _w.addEventListener('blur', function(){
-            if(_d.getElementById('ppw-message-box').style.display != 'none'){
+            if($('#ppw-message-box').css('display') != 'none'){
                 if(_d.getElementById('ppw-message-box-button').style.display == 'none'){
                     _closeMessage();
                 }
