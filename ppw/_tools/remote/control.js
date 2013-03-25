@@ -56,7 +56,9 @@ $(document).ready(function(){
                 }
                 h= (document.body.clientHeight - btn[0].offsetHeight - 10)+'px';
 
-                
+                if(str == '')
+                    str= "<ul><li>No notes for the current slide</li></ul>";
+                    
                 notesContainer.html(str);
                 notesContainer.css('height', h);
                 btn.css('bottom', h);
@@ -174,9 +176,8 @@ $(document).ready(function(){
             $('#btn-thumbs').click(function(){
                 
                 if(ppwFrame() && ppwFrame().get('presentationStarted')){
-                    //_setInteractionState('thumbs');
                     ppwFrame().showThumbs();
-                    _hideControls();
+                    _hideControls(true);
                 }
                 
             }).on('mousedown', function(){
@@ -364,10 +365,8 @@ $(document).ready(function(){
         
         var els= '#buttons-container, \
                   #annotations-container,\
+                  #canvas,\
                   #state-buttons-container';
-        
-        if(canvasToo)
-            els+= ', #canvas';
         
         _hiddenControls= false;
         
