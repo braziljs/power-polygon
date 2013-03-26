@@ -11,6 +11,7 @@ $(document).ready(function(){
         _socket= null,
         talkId= null,
         _hiddenControls= false,
+        _swipeStart= [],
         _b= document.body;
         
     var getParameterByName= function (name){
@@ -34,6 +35,48 @@ $(document).ready(function(){
         });
         
         return str+"</ul>";
+    }
+    
+    // go next
+    var _goNext= function(){
+
+        var syncSlide= false;
+
+        if(version == 'full'){
+            if(!ppwFrame().get('presentationStarted')){
+                ppwFrame().startPresentation();
+            }else{
+                ppwFrame().goNext();
+            }
+        }
+
+        _broadcast({
+            act: 'goNext',
+            talk: presentation,
+            data: {
+                //curSlide: syncSlide
+            }
+        });
+    }
+
+    // go previous
+    var _goPrev= function(){
+        var syncSlide= false;
+
+        if(version == 'full'){
+            if(ppwFrame().get('presentationStarted')){
+                ppwFrame().goPrev();
+            }
+            syncSlide= ppwFrame().getCurrentSlide().index-1;
+        }
+
+        _broadcast({
+            act: 'goPrev',
+            talk: presentation,
+            data: {
+                //curSlide: false
+            }
+        });
     }
     
     var _bindEvents= function(){
@@ -100,46 +143,9 @@ $(document).ready(function(){
             syncSlide= ppwFrame().getCurrentSlide().index-1;
         }
         
-        // go next
-        $('#btn-next-slide').click(function(){
-            var syncSlide= false;
-            
-            if(version == 'full'){
-                if(!ppwFrame().get('presentationStarted')){
-                    ppwFrame().startPresentation();
-                }else{
-                    ppwFrame().goNext();
-                }
-            }
-            
-            _broadcast({
-                act: 'goNext',
-                talk: presentation,
-                data: {
-                    //curSlide: syncSlide
-                }
-            });
-        });
+        $('#btn-next-slide').click(_goNext);
         
-        // go previous
-        $('#btn-previous-slide').click(function(){
-            var syncSlide= false;
-            
-            if(version == 'full'){
-                if(ppwFrame().get('presentationStarted')){
-                    ppwFrame().goPrev();
-                }
-                syncSlide= ppwFrame().getCurrentSlide().index-1;
-            }
-            
-            _broadcast({
-                act: 'goPrev',
-                talk: presentation,
-                data: {
-                    //curSlide: false
-                }
-            });
-        });
+        $('#btn-previous-slide').click(_goPrev);
         
         // toggle camera
         $('#btn-toggle-camera').click(function(){
@@ -213,6 +219,11 @@ $(document).ready(function(){
                 $(document.body).bind('mousemove', _dragBasicPointer);
                 $(document.body).one('mouseup', function(){
                     $(document.body).unbind('mousemove', _dragBasicPointer);
+                    _showControls();
+                    $('#basic-pointer').css({
+                        top: '10px',
+                        left: '20px'
+                    })
                     _broadcast({
                         act: 'interactionEnd',
                         talk: presentation,
@@ -228,6 +239,7 @@ $(document).ready(function(){
                 $(document.body).bind('touchmove', _dragBasicPointer);
                 $(document.body).one('touchend', function(){
                     $(document.body).unbind('touchmove', _dragBasicPointer);
+                    _showControls();
                     _broadcast({
                         act: 'interactionEnd',
                         talk: presentation,
@@ -236,30 +248,71 @@ $(document).ready(function(){
                             y: 0
                         }
                     });
+                    $('#basic-pointer').css({
+                        top: '10px',
+                        left: '20px'
+                    })
                 });
             });
         }
         
-        $(document).bind("touchmove",function(event){
+        $(document.body).bind("touchstart", function(event){
+            var touches = event.originalEvent.touches;
+            
+            if(touches.length == 2 && !_swipeStart.length){
+                
+                _swipeStart= [touches[0].pageX, touches[0].pageY];
+                
+                $(document.body).bind("touchmove", _swiping);
+            }
+        });
+        
+        $(document).bind("touchmove", function(event){
             event.preventDefault();
         });
         
+    };
+    
+    var _swiping= function(event){
+        
+        var touch = event.originalEvent.changedTouches[0],
+            x= touch.pageX;
+        
+        if(!_swipeStart.length)
+            return;
+        // swiping left
+        
+        if(x > _swipeStart[0]){
+            $(document.body).unbind("touchmove", _swiping);
+            _goPrev();
+            _swipeStart= [];
+        }else if(x < _swipeStart[0]){
+            $(document.body).unbind("touchmove", _swiping);
+            _swipeStart= [];
+            _goNext();
+        }
     };
     
     var _dragBasicPointer= function(evt){
         
         var x, y, touch;
 
+        _hideControls();
+        
         if(touch = evt.originalEvent.changedTouches){ // is a touch event
             evt.preventDefault();
+            
+            if(touch.length>1)
+                return;
+            
             touch= touch[0];
 
-            x= touch.pageX;
-            y= touch.pageY;
+            x= touch.pageX - 10;
+            y= touch.pageY - 10;
             
         }else{ // is a click event
-            x= evt.clientX;
-            y= evt.clientY;
+            x= evt.clientX - 10;
+            y= evt.clientY - 10;
         }
         
         $('#basic-pointer').css({
@@ -307,6 +360,9 @@ $(document).ready(function(){
             touch= null;
 
         if(touch = evt.originalEvent.changedTouches){ // is a touch event
+            
+            if(touch.length>1)
+                return;
             
             touch= touch[0];
 
