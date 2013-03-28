@@ -18,6 +18,10 @@ $(document).ready(function(){
             if(o.auth){
                 unlockButtons();
             }
+            setTimeout(function(){
+                $('#opening').fadeOut();
+                document.body.style.overflow= 'auto';
+            }, 600);
         }, 'json');
     };
     
@@ -81,23 +85,26 @@ $(document).ready(function(){
             }
         });*/
 
-        $('#unlock-interface').click(function(){
+        $('#unlock-interface img').click(function(){
             var token= window.prompt("What is your token, please?");
-            $.post('/api/auth', {token: token}, function(o){
-                if(o.auth){
-                    unlockButtons();
-                }else{
-                    alert("Invalid token!");
-                }
-            }, 'json');
+            if(token){
+                $.post('/api/auth', {token: token}, function(o){
+                    if(o.auth){
+                        unlockButtons();
+                    }else{
+                        alert("Invalid token!");
+                    }
+                }, 'json');
+            }
         });
 
 
-        $('#re-lock-interface').click(function(){
+        $('#re-lock-interface img').click(function(){
             $.get('/api/logoff', null, function(o){
                 lockButtons();
             }, 'json');
         });
+        
     };
     
     /* THE CONSTRUCTOR */

@@ -4074,6 +4074,12 @@ window.PPW = (function ($, _d, console){
         _w.global= 'global';
         _w._p= _w.P= PPW;
         
+        if(_querystring('remote-controller')){
+            _settings.Facebook= false;
+            _settings.Google= false;
+            top.ppwFrame= _w.PPW;
+        }
+        
         _createSplashScreen();
         
         if(!_isInPrintableVersion()){
@@ -4083,9 +4089,6 @@ window.PPW = (function ($, _d, console){
             _goToSlide(0);
         }
         
-        if(_querystring('remote-controller')){
-            top.ppwFrame= window.PPW;
-        }
         _initRemoteService();
     };
     

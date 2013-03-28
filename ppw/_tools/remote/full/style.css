@@ -193,9 +193,9 @@ iframe{
     margin-right: 4px;
     border-radius: 10px;
     /*background-color: #f0f0f0;*/
-    background-size: 100%;
-    width: 48px;
-    height: 48px;
+    /*background-size: 100%;*/
+    width: 60px;
+    height: 60px;
     float: left;
     
     background: rgb(242,246,248); /* Old browsers */
@@ -208,6 +208,8 @@ iframe{
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f2f6f8', endColorstr='#e0eff9',GradientType=0 ); /* IE6-9 */
 }
 #state-buttons-container div div{
+    width: 100%;
+    height: 100%;
     background-position: center center;
 }
 #state-buttons-container .selected{
@@ -242,8 +244,8 @@ iframe{
     float: left;
 }
 #btn-laserpoint{
-    width: 48px;
-    height: 48px;
+    width: 100%;
+    height: 100%;
     float: left;
 }
     #btn-laserpoint:before{

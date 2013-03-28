@@ -166,7 +166,7 @@
     -moz-box-sizing: border-box;
     left: 0px;
     top: 0px;
-    z-index: 999999995;
+    z-index: 99999995;
     /*background: url(../_images/ppw-gray-bg.png);*/
     /*background: url(../_images/splash-screen-bg-3.png);*/
     background: url(../_images/splash-screen-bg.jpg);
@@ -858,7 +858,7 @@
     width: 100% !IMPORTANT;
     height: 100% !IMPORTANT;
     /*background-color: #777 !IMPORTANT;*/
-    background: url(../_images/splash-screen-bg-3.png);
+    background: url(../_images/splash-screen-bg.jpg);
     background-size: 100% 100%;
     overflow-y: auto !IMPORTANT;
     position: absolute !IMPORTANT;

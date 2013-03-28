@@ -475,7 +475,8 @@ $(document).ready(function(){
     
     if(version == 'full'){
         
-        socketServer= location.protocol+'//'+location.host;//+'/'+presentation;
+        //socketServer= location.protocol+'//'+location.host;//+'/'+presentation;
+        socketServer= '/'+presentation;
         
         if(!presentation){
             return false;

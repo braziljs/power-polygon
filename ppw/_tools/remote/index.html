@@ -12,21 +12,31 @@
     </head>
     <body>
         
-        <a href="https://github.com/braziljs/power-polygon/wiki" target="_blank">Documentation</a>
-        <a href="https://github.com/braziljs/power-polygon/" target="_blank">Fork me on Github</a>
-        <input id="unlock-interface" type="button" value="unlock" />
-        <input id="re-lock-interface" type="button" value="logout" />
+        <!--<input id="unlock-interface" type="button" value="unlock" />-->
+        <div id="unlock-interface">
+            Advanced tools are locked<img src="/ppw/_images/unlock.png"/>
+        </div>
+        <!--<input id="re-lock-interface" type="button" value="logout" />-->
+        <div id="re-lock-interface">
+            Click to re-lock <img src="/ppw/_images/lock.png" />
+        </div>
         
         <div id="demosList-container">
             <ul id="demosList" class="talk-list"></ul>
         </div>
+        
+        <div class="links">
+            <a href="https://github.com/braziljs/power-polygon/wiki" target="_blank">Documentation</a>
+            <a href="https://github.com/braziljs/power-polygon/" target="_blank">Fork me on Github</a>
+        </div>
+        
         <div id="talksList-container">
             <ul id="talksList" class="talk-list"></ul>
         </div>
         
         <!--<input id="createNewTalk-btn" type="button" value="create" />-->
         
-        
+        <div id="opening"><div class="logo"></div><h1>Power Polygon</h1></div>
         <script src="/ppw/_tools/remote/client.js"></script>
     </body>
 </html>

@@ -105,7 +105,6 @@ PPW.remote= (function(){
         var grd = _ctx.createRadialGradient(pointX, pointY, 0, pointX, pointY, 120);
         
         _ctx.globalCompositeOperation = 'destination-out';
-        
         grd.addColorStop(0, "rgba(255,255,255, 1)"); 
         grd.addColorStop(1, "transparent");
         _ctx.fillStyle = grd;
@@ -125,6 +124,8 @@ PPW.remote= (function(){
                 _hideCanvas();
             return;
         }
+        
+        _canvas.style.opacity= '1';
         
         _canvasState.x= _percToPx(_canvasState.x, true);
         _canvasState.y= _percToPx(_canvasState.y, false);
@@ -153,8 +154,8 @@ PPW.remote= (function(){
 
             break;
             case 'spotlight':
+                _canvas.style.opacity= '0.7';
                 _canvasCurrentDrawState.type= _canvasState.type;
-                
                 _ctx.beginPath();
                 _ctx.fillStyle= 'rgba(0, 0, 0, 1)';
                 _ctx.rect(0, 0, _b.clientWidth, _b.clientHeight);
@@ -258,7 +259,6 @@ PPW.remote= (function(){
                         y: command.data.y
                     })
                     _showCanvas();
-                    // TODO: draw spotlight on the right position
                 break;
                 case 'laserpoint':
                     _showCanvas();

@@ -3,10 +3,32 @@ html, body{
     width: 100%;
     font-family: Arial, Tahoma, sans-serif;
 }
+body{
+    margin: 0px;
+    overflow: hidden;
+}
 *{
     box-sizing: border-box;
     -moz-box-sizing: border-box;
 }
+#opening{
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    background: url(/ppw/_images/ppw-gray-bg.png);
+}
+
+#opening .logo{
+    margin: auto;
+    margin-top: 20px;
+    width: 186px;
+    height: 178px;
+    background: url(/ppw/_images/power-polygon-logo.png) no-repeat;
+}
+
 
 #demosList-container{
     width: 100%;
@@ -19,19 +41,20 @@ html, body{
 .talk-list{
     list-style: none;
     padding: 0px;
+    margin-top: 4px;
 }
 .talk-list li{
     height: 38px;
     cursor: default;
     padding: 9px;
     position: relative;
-    border-radius: 4px;
     margin-bottom: 3px;
-    width: 50%;
-    float: left;
+    /*width: 50%;
+    float: left;*/
     overflow: hidden;
     white-space: nowrap;
     padding-right: 150px;
+    border-top: dotted 1px #e0e0e0;
 }
 .talk-list li:hover{
     background-color: #e6e6f6;
@@ -80,6 +103,37 @@ html, body{
     }
 }
 
+#unlock-interface, #re-lock-interface{
+    background-color: #e0e0e0;
+    min-height: 40px;
+    font-style: italic;
+    padding-top: 12px;
+    padding-left: 10px;
+    /*background: url(/ppw/_images/power-polygon-icon.png) no-repeat;*/
+}
+#unlock-interface img, #re-lock-interface img{
+    height: 38px;
+    cursor: pointer;
+    position: absolute;
+    top: 0px;
+    right: 26px;
+}
+
 #demosList{
     background-color: #fcefa1;
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+.links{
+    background-color: #e0e0e0;
+    min-height: 40px;
+    padding-top: 6px;
+    line-height: 30px;
+    text-align: center;
+}
+.links a{
+    margin: 0px 10px 0px 10px;
+    color: #444;
+    text-decoration: none;
 }
