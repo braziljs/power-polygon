@@ -275,6 +275,7 @@ $(document).ready(function(){
     
     var _swiping= function(event){
         
+        /*
         var touch = event.originalEvent.changedTouches[0],
             x= touch.pageX;
         
@@ -291,6 +292,7 @@ $(document).ready(function(){
             _swipeStart= [];
             _goNext();
         }
+        */
     };
     
     var _dragBasicPointer= function(evt){
