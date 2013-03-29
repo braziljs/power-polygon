@@ -447,7 +447,10 @@ window.PPW = (function ($, _d, console){
             // enables the Facebook Buttons
             Facebook: true,
             // enables the g+ buttons
-            Google: true
+            Google: true,
+            // tries to fix any scrolling the browser does due to elements
+            // with the same id as the hash, in case the hash is just based on #
+            fixAnchorScroll: true
         },
         // a local reference to the $(document)
         $d= $(_d),
@@ -1320,6 +1323,9 @@ window.PPW = (function ($, _d, console){
         if(list){
             
             i= list.length-1;
+            
+            _removeAnimateCSSClasses();
+            
             do{
                 rx= new RegExp(list[i], 'i');
                 if(lang.match(rx)){
@@ -1426,8 +1432,10 @@ window.PPW = (function ($, _d, console){
      * @param SlideObject The slided that has just loaded.
      */
     var _slidePreloaderNext= function(loadedSlide){
+        
         var l= _settings.slides.length,
-            perc= 0, fn;
+            perc= 0, fn, curBodyStyle;
+            
         _conf.preloadedSlidesCounter++;
         
         perc= _conf.preloadedSlidesCounter * 100 / l;
@@ -1473,6 +1481,22 @@ window.PPW = (function ($, _d, console){
             
             // triggering the event to all the listeners
             _triggerEvent('onslidesloaded', _settings.slides);
+            
+            // TODO: add this to the documentation!
+            if(_settings.fixAnchorScroll && _d.getElementById(_l.hash.replace('#', '')) ){
+                $(_b).one('scroll', function(){
+                    // some browsers will try to scroll the page to the element
+                    // that has the same id as the slide...let's avoid it!
+                    curBodyStyle= $b.css('overflow');
+                    _b.style.overflow= 'auto';
+                    _b.scrollTop= 0;
+                    if(_b.scrollByPages)
+                        _b.scrollByPages(-100);
+                    _b.style.overflow= curBodyStyle;
+                })
+                
+            }
+            
             
             if(!_settings.useSplashScreen)
                 _startPresentation();
@@ -3257,14 +3281,17 @@ window.PPW = (function ($, _d, console){
      * Returns the index of the current slide based on the url.
      */
     var _getCurrentSlideFromURL= function(){
-        var h= _l.hash.replace(_settings.hashSeparator, '')||_settings.slides[0].id,
+        var h= _l.hash.replace(_settings.hashSeparator, '')||_settings.slides[0].idx,
             i= _settings.slides.length;
+            
         if(isNaN(h)){
             while(i--){
                 if(_settings.slides[i].id == h)
                     return i;
             };
+            h= 0;
         }
+        
         return h||0;
     };
     
@@ -3682,8 +3709,33 @@ window.PPW = (function ($, _d, console){
             if(anim.indexOf('out') >0 || anim.indexOf('Out') > 0)
                 _removeAnimateCSSClasses(el);
         };
+        var oEl= null,
+            elList= [];
         
         el= $(el);
+        // if any of the elements should not be animated because it is in another language
+        if(_conf.currentLang){
+            el.each(function(){
+                oEl= this;
+
+                if(oEl.className){
+                   if(
+                       oEl.className.match(/(^| )LANG\-/)
+                       &&
+                       !$(this).hasClass('LANG-'+_conf.currentLang)
+                     ){
+                       return;
+                   }else{
+                       elList.push(oEl);
+                   }
+               }
+            });
+            el= $(elList);
+        }
+        
+        
+        //if(el.className.match(/(^| )LANG\-/))
+        
         
         if(_conf.animations.indexOf(anim)>=0){
             if(settings){
