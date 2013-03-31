@@ -652,7 +652,7 @@ window.PPW = (function ($, _d, console){
         }
         
         o.slides= [];
-        slideList= $('section');
+        slideList= $('body>section');
         l= slideList.length-1;
         slideList.each(function(){
             
