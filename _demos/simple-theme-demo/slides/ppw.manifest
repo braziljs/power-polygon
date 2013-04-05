@@ -1,0 +1,45 @@
+{
+    "title": "Title of my demo1 presentation",
+    "PPWSrc": "../../ppw/",
+    "languages": ["PT", "EN"],
+    "defaultLanguage":  "EN",
+    slides: [
+        {
+                        type: 'opening',
+                        id: 'cover'
+                    },
+                    {
+                        type: 'content',
+                        id: 'paragraph'
+                    },
+                    {
+                        type: 'content',
+                        id: 'lists'
+                    },
+                    {
+                        type: 'section',
+                        id: 'heading'
+                    },
+                    {
+                        id: 'textAndImages'
+                    },
+                    {
+                        id: 'tables'
+                    },
+                    {
+                        type: 'content',
+                        id: 'sh',
+                        data: {
+                            info: "An object containing whatever we want",
+                            howToUse: "You can access it via $('#slideid').data('yourObjectKey')"
+                        }
+                    },
+                    {
+                        type: 'closing',
+                        id: 'closing',
+                        notes: [
+                            "The last slide, to thank and ask for questions"
+                        ]
+                    }
+    ],
+}
