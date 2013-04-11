@@ -2,25 +2,28 @@
 <html>
     <head>
         <title>Power Polygon - Advanced Remote Control</title>
-        
+
         <script src="/ppw/_scripts/jquery-1.8.2.min.js"></script>
+        <script src="/ppw/_tools/remote/hammer.js"></script>
         <script src="/socket.io/socket.io.js"></script>
         <script src="../control.js"></script>
-        
+
         <link type="text/css" href="style.css" rel="stylesheet" />
         <link type="text/css" href="/ppw/_styles/font-awesome.min.css" rel="stylesheet" />
-        
+
         <link type="image/x-icon" rel="shortcut icon" href="/ppw/_images/power-polygon-icon.png" />
-        
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-        
+
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+
     </head>
     <body>
         <iframe id="presentation-iframe" src=""></iframe>
         <canvas id="canvas"></canvas>
-        
+
+        <div id="currentSlideIdx">1</div>
         <div id="annotations-container"></div>
-        <nav id="buttons-container">
+
+        <nav id="buttons-container" >
             <ul class="nav">
                 <li id="btn-previous-slide">
                   <a href="javascript: void(0);">
@@ -28,12 +31,12 @@
                     <span class="screen-reader-text">Previous slide</span>
                   </a>
                 </li>
-                <li id="btn-annotations">
+                <!--<li id="btn-annotations">
                   <a href="javascript: void(0);">
                     <span class="btn-icon icon-tasks"></span>
                     <span class="screen-reader-text">Annotations</span>
                   </a>
-                </li>
+                </li>-->
                 <li id="btn-next-slide">
                     <a href="javascript: void(0);">
                     <span class="btn-icon icon-chevron-right"></span>
@@ -48,16 +51,32 @@
                 </li>
             </ul>
         </nav>​
-        
-        
+
+<!--<div id="btn-cursor" class="selected"><div></div></div>-->
         <div id="state-buttons-container">
-            <div id="btn-cursor" class="selected"><div></div></div>
+            <div id="btn-settings"><div></div></div>
             <div id="btn-spotlight"><div></div></div>
             <div id="btn-laserpoint"></div>
             <div id="btn-drawing"><div></div></div>
             <div id="btn-thumbs"><div></div></div>
         </div>
-        
-        
+
+        <div id="settings-container">
+            <h2>Settings</h2>
+            <input type="checkbox" id="sett-show-presentation" checked />
+            <label for="sett-show-presentation">Show presentation</label><br/>
+            <input type="checkbox" id="sett-show-controls" />
+            <label for="sett-show-controls">Show controls</label><br/>
+            <input type="checkbox" id="sett-show-notes" />
+            <label for="sett-show-notes">Show slide notes</label><br/>
+
+            <br/>
+            Profile<br/>
+            <select id="sett-profile">
+                <option value="none">none</option>
+            </select>
+
+        </div>
+
     </body>
 </html>

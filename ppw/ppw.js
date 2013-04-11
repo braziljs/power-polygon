@@ -1,23 +1,23 @@
 /**
  * The PowerPolygon library.
- * 
+ *
  * This file contains the JavaScript library correspondent to the PowerPolygon
  * basic functionality.
  * Read the full documentation at: http://github.com/braziljs/power-polygon
- * 
+ *
  * Under MIT Licence.
- * 
+ *
  * @dependencies jQuery
- * 
+ *
  * @author Felipe N. Moura <felipenmoura@gmail.com>
  * @namespace PPW
  * @scope Global
  *
  */
 window.PPW = (function ($, _d, console){
-    
+
     "use strict";
-    
+
     /**************************************************
      *            VALIDATING AND SETING UP            *
      **************************************************/
@@ -35,7 +35,7 @@ window.PPW = (function ($, _d, console){
      *
      * First of all, let's check if it has not been already loaded
      */
-    if (window.PPW) 
+    if (window.PPW)
         throw new Error("PowerPolygon framework already loaded!");
 
     /**
@@ -81,10 +81,10 @@ window.PPW = (function ($, _d, console){
 
                    if(typeof resources == 'string')
                        resources= [resources];
-                   var length = resources.length, 
+                   var length = resources.length,
                        handler = function() { counter++; },
                        deferreds = [],
-                       counter = 0, 
+                       counter = 0,
                        idx = 0;
 
                    for ( ; idx < length; idx++ ) {
@@ -99,10 +99,10 @@ window.PPW = (function ($, _d, console){
 
            };
     })($);
-    
+
     /**
      * Giving back the $.browser to the jquery lib.
-     * 
+     *
      * The jQuery 1.9.1 removed the browser object, so we add it back.
      */
     if(!$.browser){
@@ -138,9 +138,9 @@ window.PPW = (function ($, _d, console){
             jQuery.browser= $.browser= browser;
         })();
     }
-    
+
     /* END VALIDATING AND SETTING UP */
-    
+
     /**************************************************
      *                PRIVATE VARIABLES               *
      **************************************************/
@@ -150,22 +150,24 @@ window.PPW = (function ($, _d, console){
      // Variables starting with _ shoulr represent    //
      // these private variables                       //
      /*************************************************/
-    
+
     var _self = this,
         _version= '2.0.0',
         _tmp= {},
         // The list of addons that extended Power Polygon.
         _extended= {},
-        
+
         // internal configuration properties
         _conf= {
             loadSteps: 0,
             curLoaded: 0,
             showingCamera: false,
             showingMessage: false,
+            remoteControl: false,
             messagesQueue: [],
             preloadedSlidesCounter: 0,
             cameraLoaded: false,
+            isMobile: false,
             presentationTool: null,
             currentLang: 'en',
             profiles: {},
@@ -181,7 +183,7 @@ window.PPW = (function ($, _d, console){
             presentationStarted: false,
             inThumbsMode: false,
             defaultRemoteServer: location.protocol +'//'+ location.host, // TODO: create and release the service online
-            
+
             // a default css format
             prevStyle: {
                 margin: '0px',
@@ -192,7 +194,7 @@ window.PPW = (function ($, _d, console){
                 top: '0px',
                 left: '0px'
             },
-            
+
             // all the animation
             animations: [
                          // enphasys
@@ -266,7 +268,7 @@ window.PPW = (function ($, _d, console){
                 slideTitleSize: 40,
                 containerID: 'ppw-slides-container'
             },
-            
+
             // constant values and names for css classes and patterns
             cons: {
                 CLASS_SLIDE               : 'ppw-slide-element',
@@ -279,7 +281,7 @@ window.PPW = (function ($, _d, console){
                 CLASS_FULLSCREEN          : 'ppw-fullscreen',
                 FOCUSABLE_ELEMENT         : 'ppw-focusable',
                 CLICKABLE_ELEMENT         : 'ppw-clickable',
-                
+
                 /**
                  * used for the fsPattern settings
                  * %id    = slide identifier
@@ -296,7 +298,7 @@ window.PPW = (function ($, _d, console){
                 }
             }
         },
-        
+
         // all the templates to created elements and tools
         _templates= {
             // the help content
@@ -312,26 +314,26 @@ window.PPW = (function ($, _d, console){
                   ALT+Space: Show slides thumbnails<br/>\
                   : Applies zoom in and out<br/>\
                   F6, F7, F8, F9, F10: Custom",
-        
+
             // the loading element
-            loading: "<div id='ppw-lock-loading' style='position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; background-color: #f0f9f9; padding: 10px; font-family: Arial; z-index: 999999999;'>\
-                      <span>Loading Power Polygon</span><br/><div id='ppw-loadingbarParent'><div/><div id='ppw-loadingbar'><div/></div>",
-            
+            loading: "<div id='ppw-lock-loading' style='position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; background: #dadada url(/ppw/_images/ppw-gray-bg.png); padding: 10px; font-family: Arial; z-index: 999999999;'>\
+                            <div class='ppw-loadingbarContainer' style='width: 264px; margin: auto; text-align: center; margin-top: 60px;'><span>Loading Power Polygon</span><br/><div id='ppw-loadingbarParent'><div/><div id='ppw-loadingbar'><div/></div></div>",
+
             // content for the not found slides
             slideNotFound:  "<h4 style='font-size: 22px;'>Failed loading slide <span class='ppw-slide-fail'>{{slideid}}</span>!</h4>\
                             <div class='ppw-slide-fail-help' style='font-size:13px;'>Please verify the slide id.<br/>Power Polygon looks for the slide's content following these rules:<br/>\
                             <br/>* A section element on the page, with the given id:<br/>Eg.: &lt;section id='{{slideid}}'>Your content&lt;/section><br/>\
                             <br/>* A file in the fsPattern location.<br/>Currently looking at: <span class='ppw-slide-fail'>{{addr}}</span><br/><br/>\
                             The content could not be found in any of these expected places!</div>",
-        
+
             // the arrows element to go forward and backward
             arrows: "<div id='ppw-arrows-container' class='ppw-clickable'><div id='ppw-arrow-previous-slide' onclick='if(!PPW.isLocked()) PPW.goPrev();'><i class='icon-{{directionaliconsstyle}}-left'></i></div><div id='ppw-arrow-next-slide' onclick='if(!PPW.isLocked()) PPW.goNext();'><i class='icon-{{directionaliconsstyle}}-right'></i></div></div>",
-        
+
             // the search tool content
             searchTool: "<div id='ppw-search-container'><div style='float: left;'>Search into slides:</div>\
                          <div style='float: right;'><input type='search' id='ppw-search-slide' value='' placeholder='Search' />\
                          <div id='ppw-search-arrow-container' class='ppw-clickable'><div id='ppw-search-prev' class='ppw-clickable' title='Find in previous slides(shift+enter)'><i class='icon-{{directionaliconsstyle}}-left'></i></div><div id='ppw-search-next' class='ppw-clickable' title='Find in next slides(enter)'><i class='icon-{{directionaliconsstyle}}-right'></i></div></div></div><div id='ppw-search-found' class='ppw-clickable'></div></div>",
-            
+
             // the message box element itself
             messages: '<div id="ppw-message-box"  class="ppw-clickable ppw-platform">\
                         <div id="ppw-message-content" class="ppw-clickable"></div>\
@@ -339,7 +341,7 @@ window.PPW = (function ($, _d, console){
                             <input type="button" id="ppw-message-box-button" value="Close" />\
                         </div>\
                       </div>',
-        
+
             // camera/video placeholder element
             camera: '<div id="ppw-camera-tool" class="ppw-clickable">\
                         <video id="ppw-video-element" autoplay="autoplay" class="ppw-clickable"></video>\
@@ -347,7 +349,7 @@ window.PPW = (function ($, _d, console){
                             <img height="10" class="ppw-clickable" src="">\
                         </div>\
                       </div>',
-        
+
             // the top-left toolbar content
             toolBar: '<div id="ppw-toolbar-container" tabindex="0" class="ppw-platform {{clickableClass}}">\
                     <div id="ppw-toolbar" class="ppw-platform {{clickableClass}}">\
@@ -370,7 +372,7 @@ window.PPW = (function ($, _d, console){
                         </div>\
                     </div>\
                    </div>',
-            
+
             // the settings form content
             settings: "<form id='ppw-settings-form'>\
                     <h3>Settings</h3><br/>\
@@ -381,7 +383,7 @@ window.PPW = (function ($, _d, console){
                     <div id='ppw-languages-config'><label>Language: </label><select id='ppw-language-option'></select></div><br/>\
               </form>"
         },
-        
+
         // user defined settings...the following values come by default if the user did not set them
         _settings= {
             // wondering the talk is in /talks/talkname for example
@@ -425,7 +427,7 @@ window.PPW = (function ($, _d, console){
             // talk's profile
             profile: 'none',
             // removes any zooming or rotating effect on slide change.
-            fixTransformsOnSlideChange: true, 
+            fixTransformsOnSlideChange: true,
             // enables/disables the zoom effect when scrolling
             zoomOnScroll: true,
             // not working properly because no browser support 100% of this by now
@@ -463,10 +465,10 @@ window.PPW = (function ($, _d, console){
         _n= navigator,
         _h= history,
         _w= window;
-    
+
     /**
      * Available event listeners.
-     * 
+     *
      * These events are triggered by the _triggerEvent method.
      */
     var _listeners= {
@@ -501,8 +503,8 @@ window.PPW = (function ($, _d, console){
         F7_PRESSED              : [],
         F6_PRESSED              : []
     }
-    
-    
+
+
     /**************************************************
      *                PRIVATE METHODS                 *
      **************************************************/
@@ -511,12 +513,12 @@ window.PPW = (function ($, _d, console){
      // are used internally, or, when exposed, by the //
      // Power Polygon API                             //
      /*************************************************/
-    
+
     /**
      * Adds an event listener to PPW.
-     * 
+     *
      * Used by addons or external scripts, as well as internal methods calls.
-     * 
+     *
      * @param String The event identifier.
      * @param Function The function to be triggered by the event.
      */
@@ -531,16 +533,16 @@ window.PPW = (function ($, _d, console){
         evt.stopPropagation();
         return false;
     }
-    
+
     /**
      * Removes a listener from the list.
-     * 
+     *
      * @param String The event identifier.
      * @param Function The function to be removed.
      */
     var _removeListener= function(evt, fn){
         var i= 0, curEvt= null;
-        
+
         if(curEvt= _listeners[evt]){
             i= curEvt.length;
             do{
@@ -550,28 +552,28 @@ window.PPW = (function ($, _d, console){
             }while(i--);
         }
     };
-    
+
     /**
      * verifies if the value is a number or not.
-     * 
+     *
      * @param Mixed The variable to be evaluated.
      */
     var isNum= function(val){
         return !isNaN(val);
     }
-    
+
     /**
      * Triggers an event.
-     * 
+     *
      * Used only internaly.
-     * 
+     *
      * @param String Event identificator.
      * @param Mixed Arguments
      */
     var _triggerEvent= function(evt, args){
-        
+
         var i= 0, curEvt= null;
-        
+
         if(curEvt= _listeners[evt]){
             i= curEvt.length;
             try{
@@ -581,36 +583,36 @@ window.PPW = (function ($, _d, console){
                     }
                 }while(i--);
             }catch(e){
-                console.log("[PPW][Event Callback error]: ", e);
+                console.warn("[PPW][Event Callback error]: ", e.message, e);
             }
         }
     }
-    
+
     /**
      * Extends the PPW object.
-     * 
+     *
      * Used by addons to register themselves and then, to
      * be able to receive events and the presentation data.
-     * 
+     *
      * @param String The addon's identification
      * @param Object The configuration for the addon
-     * 
+     *
      */
     var _extend= function(id, conf){
         var prop= null;
-        
+
         _extended[id]= conf;
-        
+
         for(prop in conf){
             if(_listeners[prop] && typeof conf[prop] == 'function'){
                 _addListener(prop, conf[prop]);
             }
         }
     }
-    
+
     /**
      * Enables shortcuts for the function keys.
-     * 
+     *
      * The available function keys to be used are F6, F7, F8, F9 and F10.
      */
     var _enableFuncKeys= function(){
@@ -623,16 +625,16 @@ window.PPW = (function ($, _d, console){
             }
         }
     };
-    
+
     /**
      * Tries to auto generate a config object from the document structure.
-     * 
+     *
      * All the sections will be treated as slides.
      * The document title will be treated as he talk title.
      * First section will be the openning slide.
      * Last section will be the closing slide.
      * All the other sections will be of type "content".
-     * 
+     *
      * @param Object The given partial settings
      */
     var _autoGenerateConfig= function(conf){
@@ -646,58 +648,58 @@ window.PPW = (function ($, _d, console){
             i= 0,
             l= 0,
             slideList= [];
-        
+
         if(conf){
             o= $.extend(o, conf);
         }
-        
+
         o.slides= [];
         slideList= $('body>section');
         l= slideList.length-1;
         slideList.each(function(){
-            
+
             if(!this.id)
                 this.id= "slide-"+i;
-            
+
             o.slides.push({
                 type: (i===0)? 'opening': (i==l)? 'closing': 'content',
                 id: this.id
             });
             i++;
         });
-        
+
         return o;
     };
-    
+
     /**
      * Verifies whether the presentation is in printable version or not.
-     * 
+     *
      * The presentation is in printable version if it is running on another
      * windows, with the ppw-printing-version=true variable set on its url.
      */
     var _isInPrintableVersion= function(){
         return _l.href.indexOf('ppw-printing-version=true')>=0;
     }
-    
+
     /**
      * Method called by the user to define the presentation settings.
-     * 
+     *
      * @param Mixed The object with the settings information, or the address of the manifest.json file.
      */
     var _init= function(conf){
-        
+
         if(!$){
             return false;
         }
-        
+
         if(typeof conf != 'object'){
-            
+
             // conf was not sent
             if(!conf){
                 _init(_autoGenerateConfig());
                 return;
             }
-            
+
             // conf is a string, therefore, the address of the manifest
             $.ajax({
                 url: conf,
@@ -712,13 +714,13 @@ window.PPW = (function ($, _d, console){
             });
             return;
         }
-        
+
         // conf was sent, but with no slides
         if(!conf.slides){
             _init(_autoGenerateConfig(conf));
             return;
         }
-        
+
         $.extend(_settings, conf);
         _settings.canonic= _l.pathname
                              .replace(/(\?|\&).*/, '')
@@ -726,9 +728,9 @@ window.PPW = (function ($, _d, console){
                              .replace(/\ /ig, '-')
                              .split('/')
                              .pop();
-        
-        
-       /** 0/false: no messages 
+
+
+       /** 0/false: no messages
         *   1: errors
         *   2: errors and warnings
         *   3: only logs
@@ -757,40 +759,43 @@ window.PPW = (function ($, _d, console){
                 break;
             }
         }
-        
+
         if(_settings.shortcutsEnable && !_isInPrintableVersion()){
             _enableFuncKeys();
         }
-        
+
         _triggerEvent('onload', conf);
     };
-    
+
     /**
      * Sets one step ahead for the loading bar.
-     * 
+     *
      * This method is used internaly only, before the splash screen.
      */
-    var _setLoadingBarStatus= function(){
-        
+    var _setLoadingBarStatus= function(msg){
+
         _conf.curLoaded++;
         var perc= _conf.curLoaded * 100 / _conf.loadSteps;
-        
+
         $('#ppw-loadingbar').css({width: perc+'%'});
-        
+
+        if(msg)
+            console.log("[PPW] Loaded: ", msg);
+
         if(perc >= 100){
-            
+
             _triggerEvent('onthemeloaded', _settings.themeSettings);
-            
+
             if(_settings.preloadImages >> _settings.useSplashScreen){
-                
+
                 setTimeout(function(){
                     $('#ppw-lock-loading').find('span').eq(0).html('Loading images...');
-                    
+
                     _preloadSlides(function(){
                         _startPreLoadingImages($('#ppw-loadingbar').stop()
                                                                    .css('width', '1%'));
                     });
-                    
+
                 }, 400);
             }else{
                 if(_settings.useSplashScreen)
@@ -800,23 +805,23 @@ window.PPW = (function ($, _d, console){
             }
         }
     };
-    
+
     /**
      * Returns the value of the given param in the URL.
-     * @return Mixed Empty array, or 
+     * @return Mixed Empty array, or
      */
     var _querystring= function(key) {
-        
+
         var re=new RegExp('(?:\\?|&)'+key+'=(.*?)(?=&|$)','gi'),
             r=[], m;
-            
+
         while ((m=re.exec(_l.search)) != null) r.push(m[1]);
         return r.length? r[0]: false;
     }
 
     /**
      * Creates a path to a file in the PPWSrc folder.
-     * 
+     *
      * @param String Location of the file within the PPWSrc folder.
      */
     var _createPPWSrcPath= function(filepath){
@@ -851,10 +856,10 @@ window.PPW = (function ($, _d, console){
         }
         return PPWSrc.replace(/\/\//g, '/');
     }
-    
+
     /**
      * Loads an external script.
-     * 
+     *
      * @param String External script file.
      * @param Boolean Whether or not to add a loadStep.
      * @param Function Callback to be executed when the script is loaded.
@@ -865,10 +870,10 @@ window.PPW = (function ($, _d, console){
         }
         $.getScript(src, fn||function(){});
     };
-    
+
     /**
      * Loads an array of external script.
-     * 
+     *
      * @param Array External script files.
      * @param Boolean Whether or not to add a loadStep.
      * @param Function/String The string to be executed or a function callback
@@ -879,10 +884,10 @@ window.PPW = (function ($, _d, console){
             _loadScript(_createPPWSrcPath(scripts[i]), loadStep, fn);
         }
     }
-    
+
     /**
      * Loads external scripts of a theme.
-     * 
+     *
      * @param String The name of the theme.
      * @param Array External script files of the theme.
      * @param Boolean Whether or not to add a loadStep.
@@ -894,19 +899,21 @@ window.PPW = (function ($, _d, console){
             _loadScript(_createPPWSrcPath('/_themes/'+ theme+'/'+scripts[i]), loadStep, fn);
         }
     };
-    
+
     /**
      * Loads a css file to the head element of the page.
-     * 
+     *
      * @param String CSS file source.
      * @param Boolean Whether or not to add a loadStep.
      * @param Function/String The string to be executed or a function callback
      * @param Boolean Whether or not to bind the function callback
      */
     var _loadStyle= function(src, loadStep, fn, bind){
+
         if(loadStep){
             _conf.loadSteps++;
         }
+
         if(bind){
             $("head").append($("<link rel='stylesheet' href='"+src
                              +"' type='text/css' media='screen' />")
@@ -919,11 +926,31 @@ window.PPW = (function ($, _d, console){
                 onload: fn
             }).appendTo("head");
         }
+
+        if(_conf.isMobile){
+            // mobile devices do not trigger the load event from links :/
+            // this is the uggly workaround for that!
+            var img = _d.createElement('img');
+            img.onerror = function(){
+                try{
+                    if(bind){
+                        fn();
+                    }else{
+                        fn= new Function(fn);
+                        fn();
+                    }
+                }catch(e){
+                    console.warn("[PPW] Error executing callback!", fn, e.message, e);
+                };
+                img= null;
+            }
+            img.src = src;
+        }
     };
-    
+
     /**
      * Loads an array of css files to the head element of the page.
-     * 
+     *
      * @param Array CSS files.
      * @param Boolean Whether or not to add a loadStep.
      * @param Function/String The string to be executed or a function callback
@@ -934,10 +961,10 @@ window.PPW = (function ($, _d, console){
             _loadStyle(_createPPWSrcPath(styles[i]), loadStep, fn, false);
         }
     }
-    
+
     /**
      * Loads the css files of a theme to the head element of the page.
-     * 
+     *
      * @param String The name of the theme.
      * @param Array CSS files of the theme.
      * @param Boolean Whether or not to add a loadStep.
@@ -949,35 +976,35 @@ window.PPW = (function ($, _d, console){
             _loadStyle(_createPPWSrcPath('/_themes/'+theme+'/'+styles[i]), loadStep, fn, true);
         }
     }
-    
+
     /**
      * Loads the theme's files.
-     * 
+     *
      * This method loads the theme' manifes.json file, and then, its
      * dependencies.
      */
     var _loadTheme= function(){
-        
+
         var theme= null,
             transition= _querystring('transition'),
             directionalIconsStyle= _querystring('directionalIconsStyle');
-        
+
         if(typeof _settings.theme == 'string')
             _settings.theme= _settings.theme.replace(/ /g, '').split(',');
-        
+
         if(transition){
             _settings.transition= transition;
         }
-        
+
         if(_settings.transition)
             _settings.theme.push(_settings.transition);
-        
+
         if(directionalIconsStyle){
             _settings.directionalIconsStyle= directionalIconsStyle;
         }
-        
+
         _conf.loadSteps+= _settings.theme.length;
-        
+
         $(_settings.theme).each(function(){
             var theme= this.toString();
             $.getJSON(_createPPWSrcPath('/_themes/'+theme+'/manifest.json'), function(data, status){
@@ -992,53 +1019,56 @@ window.PPW = (function ($, _d, console){
                     dependencies= _conf.themeData.dependencies||[];
 
                     if(dependencies.css){
-                        _loadThemeStyles(theme, dependencies.css, true, function(){ _setLoadingBarStatus(); });
+                        _loadThemeStyles(theme, dependencies.css, true, function(){ _setLoadingBarStatus("theme dependencies(css)"); });
                     }
 
                     if(dependencies.js){
-                        _loadThemeScripts(theme, dependencies.js, true, function(data, status, xhr){ _setLoadingBarStatus(); });
+                        _loadThemeScripts(theme, dependencies.js, true, function(data, status, xhr){ _setLoadingBarStatus("theme dependencies(js)"); });
                     }
 
                 }else{
                     console.error("[PPW][Theme data] Could not load manifest.json! Theme: " + theme);
                 }
-                _setLoadingBarStatus();
+                _setLoadingBarStatus("theme");
             });
         });
     };
-    
+
     /**
      * Prepares the page to load the required files.
-     * 
+     *
      * This method adds the loading bar and then loads the required scrips and
      * styles.
      */
     var _preparePPW= function(){
-        
+
          $b.append(_templates.loading);
-         
+
          if(_settings.useArrows){
              $b.append(_templates.arrows.replace(/\{\{directionaliconsstyle\}\}/g, _settings.directionalIconsStyle));
          }
-         
+
          $('#ppw-loadingbarParent').css({
              width: '260px',
              height: '8px',
-             border: 'solid 1px black',
+             border: 'solid 1px white',
+             boxShadow: '0px 0px 4px black',
              background: 'white',
              orverflow: 'hidden'
          });
+
          $('#ppw-loadingbar').css({
              width: '1px',
              height: '100%',
-             background: '#f66'
+             //background: '#f66'
+             background: '#55f'
          });
-        
+
          var styles=["/_styles/ppw.css", "/_styles/animate.css", "/_styles/jquery-ui-1.8.23.custom.css", "/_styles/font-awesome.min.css"];
          _loadStyles(styles, true, "PPW.setLoadingBarStatus()", false);
          var scripts=["/_scripts/jquery-ui-1.8.23.custom.min.js"];
          _loadScripts(scripts, true, PPW.setLoadingBarStatus);
-         
+
          _tmp.lnk = _d.createElement('link');
          _tmp.lnk.type = 'image/x-icon';
          _tmp.lnk.rel = 'shortcut icon';
@@ -1047,7 +1077,7 @@ window.PPW = (function ($, _d, console){
          delete _tmp.lnk;
 
         _loadTheme();
-        
+
         if(!_isInPrintableVersion()){
             _bindEvents();
         }else{
@@ -1055,43 +1085,43 @@ window.PPW = (function ($, _d, console){
             $('#ppw-lock-loading').hide();
         }
     };
-    
+
     /**
      * Gets if a specified slide is valid for the current profile.
      */
     var _isValidProfile= function(slide){
-        
+
         if(!slide)
             return false;
-        
+
         if(!slide.profile || slide.profile == 'none'
            || !_settings.profile || _settings.profile == 'none')
            return slide;
-       
+
         if(slide.profile != _settings.profile)
             return false;
-            
+
         return slide;
     }
-    
+
     /**
      * Hides all the invalid slides for the current profile
      */
     var _setPresentationProfile= function(profile, onload){
-        
+
         var i= 0, l= _settings.slides.length,
             slide;
-        
+
         _conf.validSlides= [];
-        
+
         if(profile === false)
             profile= 'none';
         if(profile)
             _settings.profile= profile;
-        
+
         for(; i<l; i++){
             slide= _settings.slides[i];
-            
+
             if(_isValidProfile(slide)){
                 _conf.validSlides.push(slide);
                 $('#'+slide.id).parent().removeClass('ppw-slide-not-in-profile');
@@ -1099,71 +1129,80 @@ window.PPW = (function ($, _d, console){
                 $('#'+slide.id).parent().addClass('ppw-slide-not-in-profile');
             }
         }
-        
+
         if(!onload)
             _pushSetVariable('profile', profile);
-        
+
     };
-    
+
     /**
      * Gets the list of valid slides to the current profile.
-     * 
+     *
      */
     var _getValidSlides= function(){
         return _conf.validSlides;
     }
-    
+
     /**
      * Takes all the clonable elements and add them to slides, removing them
      * from their original escope.
-     * 
+     *
      * The HTML Element may also have two special classes: ppw-type-content or ppw-type-section
      * Each class defines the clonable element to be cloned only into slides
      * of that type.
      */
     var _applyClonableElements= function(){
-        
+
         $('.ppw-clonable').each(function(){
-            
+
             var _t= $(this),
                 clone= this,
                 containers= $('.ppw-slide-element'),
                 i= 0;
-            
+
             clone.id= clone.id||'ppw-clone';
-            
+
             // if slide type specified
             if(_t.hasClass('ppw-type-section')){
                 containers= $('.ppw-slide-type-section');
             }else if(_t.hasClass('ppw-type-content')){
                 containers= $('.ppw-slide-type-content');
             }
-            
+
             containers.each(function(){
+                var cont= $(this).find('.ppw-clonable-container');
+
+                if(!cont.length)
+                    cont= this;
+                else{
+                    cont= cont[0];
+                }
+
                 i++;
                 clone= clone.cloneNode(true);
                 clone.id= clone.id + '-' + i;
-                $(this).append(clone);
+
+                $(cont).append(clone);
             });
         }).remove();
-        
+
     };
-    
+
     /**
      * Adds the headers and footers to the slides.
-     * 
+     *
      * This method adds headers and footers to slides and sets their
      * behaviours and data.
-     * 
+     *
      * If the user has set the useGlobalFooter or useGlobalHeader on the
      * init method, then the footer/header will be global, instead of inside
      * all the slides.
      */
     var _applyHeaderFooter= function(){
-        
+
         var h= $('header'),
             f= $('footer');
-            
+
         if(h.length){
             h.addClass('ppw-header-element');
             if(_settings.useGlobalHeader){
@@ -1188,10 +1227,10 @@ window.PPW = (function ($, _d, console){
             }
         }
     }
-    
+
     /**
      * Verifies if the given element is inside a slide or not.
-     * 
+     *
      * @param HTMLElement The element to be verified.
      * @return Mixed The slide section element or false.
      */
@@ -1204,27 +1243,27 @@ window.PPW = (function ($, _d, console){
         else
             return false;
     }
-    
+
     /**
      * Replaces the var HTMLElements by the PPW variable corresponding to its innerHTML.
-     * 
+     *
      * The variables will be added to the <var> elements as their contents.
      * Global <var> elements(not inside any slide) will be updated automaticaly.
-     * 
+     *
      * The available variables are:
      * - slides.id
      * - slides.idx
      * - slides.number
      * - talk.title
      * - talk.length
-     * 
+     *
      * If a selector is given, it means it is a global element which should be
      * updated as the slides change.
-     * 
+     *
      * @param String|Null The selector, if not given, 'var' will be used.
      */
     var _applyTalkVariables= function(selector){
-        
+
         $(selector || 'var').each(function(){
             var controller= false, i= 0,
                 validSlides= _getValidSlides(),
@@ -1261,21 +1300,21 @@ window.PPW = (function ($, _d, console){
                     this.innerHTML= (new Date()).getMinutes();
                     break;
                 case 'slide.number':
-                    
+
                     $(validSlides).each(function(){
-                        
+
                         i++;
-                        
+
                         if((this.id === slide.id) >> controller){
                             controller= true;
                             return false;
                         }
                     });
-                    
+
                     // if was one of the valid slides
                     if(controller)
                         this.innerHTML= i;
-                    
+
                     if(!slideEl){
                         $(this).addClass('ppw-variable').data('ppw-variable', 'slide.number');
                     }
@@ -1295,37 +1334,37 @@ window.PPW = (function ($, _d, console){
             }
         });
     };
-    
+
     /**
      * Sets the language properties for the slides.
-     * 
+     *
      * This method hides any element with a class starting by LANG- that does
      * not end with(case insensitive regular expression match) the user's navigator
      * language.
-     * 
+     *
      * By the way, yes, LION stands for L10N(localization)
      * Also...case matters, when using for example en or EN.
      */
     var _setLION= function(language, onload){
-        
+
         var lang= language||_n.language,
             i= 0 || false,
             list= _settings.languages,
             rx= null,
             hL= null;
-        
+
         if(_conf.currentLang == lang){
             return;
         }
-        
+
         _conf.currentLang= lang;
-        
+
         if(list){
-            
+
             i= list.length-1;
-            
+
             _removeAnimateCSSClasses();
-            
+
             do{
                 rx= new RegExp(list[i], 'i');
                 if(lang.match(rx)){
@@ -1336,18 +1375,18 @@ window.PPW = (function ($, _d, console){
                 }
             }while(i--);
         }
-        
+
         _b.className= _b.className.replace(/LANG_[a-z]+( |$)/ig, '');
         PPW.language= lang;
         $b.addClass('LANG_'+lang);
-        
+
         if(!onload){
             _pushSetVariable('lang', lang);
         }
-        
+
         _triggerEvent('onlangchange');
     }
-    
+
     /**
      * Pushes the history state setting a variable to the URL.
      *
@@ -1364,10 +1403,10 @@ window.PPW = (function ($, _d, console){
         hL= hL+ ((hL.indexOf('?')>-1)? '&':'?') + id+'='+val +_l.hash;
         _h.pushState({}, val, hL);
     };
-    
+
     /**
      * Triggered when the last image is loaded.
-     * 
+     *
      * This method hides the first loading screen when the splash screen
      * is disabled, or hide the loading tool in the splash screen when the
      * images finished loading and the sattings have the property preloadImages
@@ -1386,17 +1425,17 @@ window.PPW = (function ($, _d, console){
 
         }, 1000);
     };
-    
+
     /**
      * Starts and manipulates the image preloading proccess.
-     * 
+     *
      * If the settings preloadImages is true, this method is called to load all
      * the images on slides.
-     * 
+     *
      * @param HTMLElement the loader element to received the percent(default is the splash screen's loader bar).
      */
     var _startPreLoadingImages= function(loadBar){
-        
+
         var imagesToPreload= $('#ppw-slides-container img'),
             imagesLength= imagesToPreload.length,
             loadedImages= 0,
@@ -1406,40 +1445,40 @@ window.PPW = (function ($, _d, console){
             onLoadFn= function(){
                 loadedImages++;
                 perc= loadedImages * 100 / imagesLength;
-                
+
                 loaderBar.stop().animate({width: perc+'%'}, 60, function(){
-                    
+
                     if(perc == 100 && loadedImages == imagesLength){
                         _imagesPreloadEnd();
                     }
                 });
             };
-        
+
         imagesToPreload.each(function(){
             tmpImg= new Image();
             tmpImg.onload= onLoadFn;
             tmpImg.src= this.src;
         });
-        
+
         if(!imagesLength){
             _imagesPreloadEnd();
         }
     };
-    
+
     /**
      * Advances one step in the slides preload bar.
-     * 
+     *
      * @param SlideObject The slided that has just loaded.
      */
     var _slidePreloaderNext= function(loadedSlide){
-        
+
         var l= _settings.slides.length,
             perc= 0, fn, curBodyStyle;
-            
+
         _conf.preloadedSlidesCounter++;
-        
+
         perc= _conf.preloadedSlidesCounter * 100 / l;
-        
+
         if(_conf.preloadedSlidesCounter === l){
             if(!_settings.preloadImages){
                 fn= function(){
@@ -1457,19 +1496,17 @@ window.PPW = (function ($, _d, console){
                 }
             }
         }
-        
+
         // for each loaded slide
         _triggerEvent('onslideloaded', loadedSlide);
-        
+
         if(perc == 100){
-            
+
             // when all the slides loaded
             _conf.slidesLoaded= true;
             _setPresentationProfile(_querystring('profile')||false, true);
             // set the current language to the loaded slide elements
             _setLION(_querystring('lang')||_settings.defaultLanguage||_n.language, true);
-            // setting the clonable elements
-            _applyClonableElements();
             // setting the header/footer elements
             _applyHeaderFooter();
             //apply presentation variables
@@ -1478,10 +1515,10 @@ window.PPW = (function ($, _d, console){
             _addListener('onslidechange', function(){
                 _applyTalkVariables('.ppw-variable');
             });
-            
+
             // triggering the event to all the listeners
             _triggerEvent('onslidesloaded', _settings.slides);
-            
+
             // TODO: add this to the documentation!
             if(_settings.fixAnchorScroll && _d.getElementById(_l.hash.replace('#', '')) ){
                 $(_b).one('scroll', function(){
@@ -1494,43 +1531,43 @@ window.PPW = (function ($, _d, console){
                         _b.scrollByPages(-100);
                     _b.style.overflow= curBodyStyle;
                 })
-                
+
             }
-            
-            
+
+
             if(!_settings.useSplashScreen)
                 _startPresentation();
-            
+
             if(_isInPrintableVersion()){
                 _preparePrintableVersion();
             }
-            
+
             $('.ppw-slide-container').click(function(evt){
                 if(_conf.inThumbsMode){
                     _goToSlide($(this).data('ppw-slide-ref'));
                     return _preventDefaultstopPropagation(evt);
                 }
             });
-        
+
             $('a').each(function(){
-                
+
                 var l= this.href? this.href.replace(_l.protocol+'//'+_l.host+_l.pathname, ''): '#';
-                
+
                 if(l.substring(0, 1) != '#' && l.substring(0, 11) != 'javascript:'){
                     if(!this.getAttribute('target')){
                         this.setAttribute('target', '_blank');
                     }
                 }
             })
-        
+
         }
-        
+
         $('#ppw-slides-loader-bar-loading-container>div').stop().animate({
             width: perc+'%'
         }, 100, fn);
-        
+
     };
-    
+
     /**
      * Prepares the presentation to be printed.
      */
@@ -1538,10 +1575,10 @@ window.PPW = (function ($, _d, console){
         var slides= _getValidSlides(),
             notVisible= [],
             tmp= null;
-        
+
         $('#ppw-splash-screen').hide();
         $('#ppw-toolbar-container').hide();
-        
+
         if(_settings.languages && _settings.languages.length){
             $(slides).each(function(){
                 tmp= $(this.el).find('*');
@@ -1550,38 +1587,38 @@ window.PPW = (function ($, _d, console){
             });
             _setLION(_conf.currentLang);
         }
-        
+
         $('#ppw-slides-container, .ppw-slide-container ').css({
             'width': '100%',
             'height': '100%',
             'margin':'auto'
         });
-        
+
         $b.addClass('printing-'+(_settings.slidesPerPage||1));
-        
+
         setTimeout(function(){
             _w.print();
             _w.close();
         }, 1000);
         return;
-        
+
         $b.removeClass('printing-'+(_settings.slidesPerPage||1));
         $('#ppw-toolbar-container').show();
         $(notVisible).each(function(){ $(this).hide(); });
     };
-    
+
     /**
      * Shows the list of slides as thumbnails.
      */
     var _showThumbs= function(){
-        
+
         var el= $("#ppw-slides-container");
-        
+
         if(!_conf.presentationStarted)
             return;
-        
+
         _triggerEvent('onbeforeshowthumbs');
-        
+
         _conf.prevStyle= {
             margin: el.css('margin'),
             padding: el.css('padding'),
@@ -1589,43 +1626,48 @@ window.PPW = (function ($, _d, console){
             height: el.css('height'),
             position: el.css('position'),
             top: el.css('top'),
-            left: el.css('left')
+            left: el.css('left'),
+            opacity: el.css('opacity')/*,
+            webkitTransform: el.css('webkitTransform'),
+            mozTransform: el.css('mozTransform'),
+            msTransform: el.css('msTransform'),
+            transform: el.css('Transform')*/
         };
         _tmp.scroll= [_b.scrollLeft, _b.scrollTop];
-        
+
         el.addClass('ppw-show-thumbs');
         $b.addClass("ppw-showing-thumb");
         _conf.inThumbsMode= true;
-        
+
         _triggerEvent('onshowthumbs');
     };
-    
+
     /**
      * Closes the thumbnails screen.
      */
     var _closeThumbnails= function(){
-        
+
         var el= $("#ppw-slides-container");
-        
-        
+
+
         el[0].scrollTop= _tmp.scroll[1];
         el[0].scrollLeft= _tmp.scroll[0];
-        
+
         _triggerEvent('onhidethumbs');
-         
+
         el.removeClass('ppw-show-thumbs');
         $b.removeClass("ppw-showing-thumb");
         _conf.inThumbsMode= false;
     };
-    
+
     /**
      * Verifies if the current event is native and should aways be normally executed.
-     * 
+     *
      * @param Event
      * @return Boolean
      */
     var _isNativeShortcut= function(evt){
-        
+
         var validKey= false;
         switch(evt.keyCode){
             case 82: // R
@@ -1639,22 +1681,22 @@ window.PPW = (function ($, _d, console){
                 validKey= true;
             break;
         }
-        
+
         // tab/F5/F11
         if(evt.keyCode == 9 || evt.keyCode == 116 || evt.keyCode == 122)
             return true;
-        
+
         // ctr/meta + shift + del/backspace
         if(evt.keyCode == 8 && evt.shiftKey && (evt.metaKey || evt.ctrlKey))
             return true;
-        
+
         // ctrl/meta + R/L/T/I
         if((evt.metaKey || evt.ctrlKey) && validKey)
             return true;
-        
+
         return false;
     };
-    
+
     /**
      * Binds the keyboard events to the presentation.
      */
@@ -1662,17 +1704,17 @@ window.PPW = (function ($, _d, console){
         var t= null,
             k= 0,
             mouseWheelFn= null;
-        
+
         /**
          * Keyboard events.
          */
         $d.bind('keydown', function(evt){
             var t= evt.target.tagName.toLowerCase(),
                 tmpEl= null;
-                
+
             if(_isNativeShortcut(evt))
                 return true;
-            
+
             // if the element is an input or has the ppw-focusable class
             // then no shortcut will be executed.
             if(_isEditableTarget(evt.target) &&
@@ -1682,12 +1724,12 @@ window.PPW = (function ($, _d, console){
               ){
                 return true;
               }
-            
+
             if(_isLocked(evt)){
                 console.warn("[PPW] User interaction(keydown) ignored because Power Polygon has been locked");
                 return false;
             }
-            
+
             switch(evt.keyCode){
                 case 112: // F1
                     _showHelp();
@@ -1701,19 +1743,19 @@ window.PPW = (function ($, _d, console){
                         return _preventDefaultstopPropagation(evt);
                     }
                     break;
-                    
+
                 case 33: // page up
                 case 38: // up
                 case 39: // right
                 case 13: // enter
                 case 32: // space
-                    
+
                     if(evt.keyCode == 32 /*space*/ && evt.altKey){
                         _closeMessage();
                         _showThumbs();
                         return _preventDefaultstopPropagation(evt);
                     }
-                    
+
                     if(_conf.presentationStarted && !_isEditableTarget(evt.target)){
                         _goNextSlide();
                         return _preventDefaultstopPropagation(evt);
@@ -1722,21 +1764,21 @@ window.PPW = (function ($, _d, console){
                         evt.target.click();
                     }
                     break;
-                    
+
                 case 35: // end
                     if(_conf.presentationStarted && !_isEditableTarget(evt.target)){
                         _goToSlide('last');
                         return _preventDefaultstopPropagation(evt);
                     }
                     break;
-                    
+
                 case 36: // home
                     if(_conf.presentationStarted && !_isEditableTarget(evt.target)){
                         _goToSlide(0);
                         return _preventDefaultstopPropagation(evt);
                     }
                     break;
-                    
+
                 case 18: // alt
                     if(_settings.shortcutsEnable
                         && _conf.presentationStarted
@@ -1745,15 +1787,15 @@ window.PPW = (function ($, _d, console){
                         return _preventDefaultstopPropagation(evt);
                     }
                     break;
-                
+
                 case 27: // esc
-                    
+
                     if($('#ppw-message-box').css('display') != 'none'){
-                        
+
                         if(_conf.showingMessage){
                             _closeMessage();
                         }
-                        
+
                         _pauseCamera();
                         _preventDefaultstopPropagation(evt);
                         if(_conf.currentZoom != 1){
@@ -1765,44 +1807,44 @@ window.PPW = (function ($, _d, console){
                         _goToSlide(_conf.currentSlide);
                     }
                     break;
-                    
+
                 case 70: // F
                     if(evt.altKey){
                         _showSearchBox(true);
                         return _preventDefaultstopPropagation(evt);
                     }
                     break;
-                    
+
                 case 80: // P
                     if(evt.altKey || evt.ctrlKey || evt.meta){
                         _print();
                         return _preventDefaultstopPropagation(evt);
                     }
                     break;
-                
+
                 default: {
-                        
+
                     if(_settings.shortcutsEnable){
                         if(evt.altKey && _conf.presentationStarted){
                             k= evt.keyCode - 48;
-                            
+
                             if(k>=0 && k<10){
                                 _d.getElementById('ppw-go-to-slide').value+= k;
                                 return _preventDefaultstopPropagation(evt);
                             }
                         }
                     }
-                    
+
                 }
             }
             return true;
         });
-        
+
         /*$d.bind('keypress', function(evt){
-            
+
             if(_isNativeShortcut(evt))
                 return true;
-            
+
             if(evt.altKey){
                 return _preventDefaultstopPropagation(evt);
             }
@@ -1818,22 +1860,22 @@ window.PPW = (function ($, _d, console){
                     break;
                 * /
             }
-            
+
             return true;
         });*/
-        
+
         $d.bind('keyup', function(evt){
-            
+
             var s= false;
-            
+
             if(_isNativeShortcut(evt))
                 return true;
-            
+
             if(_isLocked(evt)){
                 console.warn("[PPW] User interaction(keyup) ignored because Power Polygon has been locked");
                 return false;
             }
-            
+
             // Manages the gotoslide box and also function keys
             switch(evt.keyCode){
                 case 18: // alt
@@ -1850,42 +1892,42 @@ window.PPW = (function ($, _d, console){
                     }
                     return false;
                     break;
-                
+
                 case 80: // P
                     /*if(evt.altKey || evt.ctrlKey){
                         _print();
                         return _preventDefaultstopPropagation(evt);
                     }*/
                     break;
-                
+
                 case 117: // F6
                     s= _triggerEvent('F6_PRESSED');
                     if(!s){
                         return _preventDefaultstopPropagation(evt);
                     }
                     break;
-                    
+
                 case 118: // F7
                     s= _triggerEvent('F7_PRESSED');
                     if(!s){
                         return _preventDefaultstopPropagation(evt);
                     }
                     break;
-                    
+
                 case 119: // F8
                     s= _triggerEvent('F8_PRESSED');
                     if(!s){
                         return _preventDefaultstopPropagation(evt);
                     }
                     break;
-                    
+
                 case 120: // F9
                     s= _triggerEvent('F9_PRESSED');
                     if(!s){
                         return _preventDefaultstopPropagation(evt);
                     }
                     break;
-                    
+
                 case 121: // F10
                     s= _triggerEvent('F10_PRESSED');
                     if(!s){
@@ -1893,21 +1935,21 @@ window.PPW = (function ($, _d, console){
                     }
                     break;
             }
-            
+
             // when the user holds a key
             $d.bind('keypress', function(evt){
-                
+
                 if(_isNativeShortcut(evt))
                     return true;
-            
+
                 if(!evt.altKey)
                     return;
-                
+
                 if(_isLocked(evt)){
                     console.warn("[PPW] User interaction(keypress) ignored because Power Polygon has been locked");
                     return false;
                 }
-                
+
                 switch(evt.keyCode){
                     case 188: // ,(<)
                     case 65: // a
@@ -1925,47 +1967,47 @@ window.PPW = (function ($, _d, console){
             });
             return true;
         });
-        
+
         /**
          * History events(POP and HASHCHANGE).
          */
         _w.addEventListener('popstate', function(){
-            
+
         }, false);
-        
+
         _w.addEventListener('hashchange', function(){
             _goToSlide(_getCurrentSlideFromURL());
         }, false);
-        
+
         /**
          * Mouse events.
          */
-        $d.bind('click', function(evt){ 
-            
+        $d.bind('click', function(evt){
+
             if(_isLocked(evt)){
                 console.warn("[PPW] User interaction(click) ignored because Power Polygon has been locked");
                 return false;
             }
-            
+
             if(_conf.presentationStarted && !_isEditableTargetContent(evt.target)){
-                
+
                 if(!_settings.useArrows || (_settings.useArrows && !_settings.useOnlyArrows)){
                     if(!_conf.inThumbsMode)
                         _goNextSlide();
                 }
-                
+
                 return _preventDefaultstopPropagation(evt);
             }
             return true;
         });
-        
+
         // scrolling, used to apply zoom effects
         if(_settings.zoomOnScroll){
             mouseWheelFn= _mouseWheelZoom;
             $d.bind('DOMMouseScroll', mouseWheelFn);
             $d.bind('mousewheel', mouseWheelFn);
         }
-        
+
         /**
          * Online/Offline events
          */
@@ -1977,7 +2019,7 @@ window.PPW = (function ($, _d, console){
                 _showNotification("Your browser is back online");
             }, false);
         }
-        
+
         // Battery events, if supported
         if(_settings.showBatteryAlerts){
             if(_n.battery){
@@ -2001,7 +2043,7 @@ window.PPW = (function ($, _d, console){
                 });
             }
         }
-        
+
         // window events
         _w.addEventListener('blur', function(){
             if($('#ppw-message-box').css('display') != 'none'){
@@ -2009,30 +2051,30 @@ window.PPW = (function ($, _d, console){
                     _closeMessage();
                 }
             }
-            
+
         }, false);
-        
+
         _w.addEventListener('resize', function(e){
             _triggerEvent('onresize', {window: _w, event: e});
         });
-        
+
         _w.onbeforeunload= function(){
-            
+
             if(_conf.presentationTool)
                 _conf.presentationTool.close();
-            
+
             return null;
         };
-        
+
         /*$b.bind('selectstart', function(evt){
-            
+
             if(_isEditableTargetContent(evt.target))
                 return true;
-            
+
             return _preventDefaultstopPropagation(evt);
         });*/
     };
-    
+
     var _mouseWheelZoom= function(event){
 
             if(_isLocked(event)){
@@ -2050,22 +2092,6 @@ window.PPW = (function ($, _d, console){
                 posH= evt.offsetX, posV= evt.offsetY,
                 finalH= posH,//(centerH + ((centerH - posH)*-1)) * newZoom,
                 finalV= posV;
-            
-    // ONLY FOR A QUICK TEST -- REMOVE IT IF YOU SEE IT!
-    /*
-    if(!_d.getElementById('pointer-el-test')){
-    $b.append("<div id='pointer-el-test' style='position: absolute; left:0px; top:0px; width:10px; height:10px; background-color:red;z-index:99999999;'></div>");
-    }
-    var pointerTest= _d.getElementById('pointer-el-test');
-    container.appendChild(pointerTest);
-    alert(finalH)
-    $(pointerTest).css({
-    left: finalH+'px',
-    top: finalV+'px'
-    })
-    */
-    /////////////////////
-
 
     // todo: Find a better way of applying a zoom referencing the mouse position
     //console.log({posH: posH, centerH: centerH, finalH: finalH, newZoom: newZoom});
@@ -2082,17 +2108,17 @@ window.PPW = (function ($, _d, console){
             }
             */
        };
-    
+
     /**
      * Shows the help pannell
      */
     var _showHelp= function(){
         _showMessage(_templates.help);
     }
-    
+
     /**
      * Show a notification in the bottom of the page.
-     * 
+     *
      * @param String the message to be shown.
      */
     var _showNotification= function(msg){
@@ -2104,7 +2130,7 @@ window.PPW = (function ($, _d, console){
             }, 500);
         }
     };
-    
+
     /**
      * Closes the notification message.
      */
@@ -2114,13 +2140,13 @@ window.PPW = (function ($, _d, console){
             left: '-'+(el[0].offsetWidth+10)+'px'
         }, 300);
     };
-    
+
     /**
      * Returns true if the event dispatcher is editable.
-     * 
+     *
      * An editable element is a form element or any HTML element with the
      * editable  or clickacble classes, or with a tabindex set.
-     * 
+     *
      * @param HTMLElement The target element.
      */
     var _isEditableTarget= function(target){
@@ -2140,16 +2166,16 @@ window.PPW = (function ($, _d, console){
         }
         return false;
     }
-    
+
     /**
      * Returns if the targeted element is a child of an editable element.
-     * 
+     *
      * An editable element is a form element or any HTML element with the
      * editable  or clickacble classes, or with a tabindex set.
-     * 
+     *
      * This method verifies all the parent elements up to the body element,
      * if any of them is editable, it returns true.
-     * 
+     *
      * @param HTMLElement The target element.
      */
     var _isEditableTargetContent= function(target){
@@ -2161,32 +2187,32 @@ window.PPW = (function ($, _d, console){
         }
         return false;
     }
-    
+
     /**
      * Creates the URL to each external slide.
-     * 
+     *
      * External slides' URLs should follow the fsPattern, defined by the user.
      * This method returns the prepared URL following that pattern.
-     * 
+     *
      * @param String The slide identifier.
      * @param Integer The slide index in the list of slides.
      * @return string URL.
      */
     var _getSlideURL= function(id, idx){
-        
+
         return _settings.fsPattern
                         .replace(/\%id/gi, id)
                         .replace(/\%num/gi, idx)
                             + (!_settings.slidesCache? ('?noCache='+(new Date()).getTime()) : '');
     }
-    
+
     /**
      * Preloads the slides before the presentation.
-     * 
+     *
      * If the slide is not present in the document, it loades it via ajax.
      * After loading each slide, it puts its content into a new section and
      * tries to execute its JavaScript
-     * 
+     *
      */
     var _preloadSlides= function(fn){
         var slides= _settings.slides,
@@ -2197,36 +2223,36 @@ window.PPW = (function ($, _d, console){
             tt= '',
             k= null,
             container= _settings.slidesContainer;
-        
+
         if(!container.id){
             container.id= _conf.defaults.containerID;
             _b.appendChild(container);
         }
-        
+
         if(fn && typeof fn == 'function'){
             _addListener('onslidesloaded', fn);
         }
-        
+
         if(!l){
             console.error("[PPW] Error: no slides found!");
             $('#ppw-slides-loader-bar').html("<div style='color: red;text-align:center;'><br/>No slides found!!</div>");
             return false;
         }
-        
+
         for(; i<l; i++){
             el= $('section#'+slides[i].id);
-            
+
             if(i === 0)
                 slides[i].first= true;
             if(i==l-1)
                 slides[i].last= true;
-            
+
             slides[i].actions= [];
             if(!el.length){ // should load it from ajax
                 nEl= $("<div id='ppw-slide-container-"+slides[i].id+"' class='ppw-slide-container'><section id='"+slides[i].id+"'></section></div>");
                 //nEl.id= slides[i].id;
                 container.appendChild(nEl[0]);
-                
+
                 $.ajax(
                     {
                         url: _getSlideURL(slides[i].id, i),
@@ -2234,7 +2260,7 @@ window.PPW = (function ($, _d, console){
                                     return function(data, status, xhr){
                                                 var el= _d.getElementById(slide.id),
                                                     tt= null;
-                                                    
+
                                                 el.innerHTML= data;
                                                 _settings.slides[i].el= el;
                                                 tt= $(el).find('h1, h2, h3, h4, h5, h6')[0];
@@ -2242,9 +2268,9 @@ window.PPW = (function ($, _d, console){
                                                 _settings.slides[i].title= tt;
                                                 _settings.slides[i].index= i+1;
                                                 _settings.slides[i].errors= 0;
-                                                
+
                                                 $(el).find("script").each(function(i, scr){
-                                                    
+
                                                     var f= new Function("PPW.slideIterator= this; "+scr.textContent);
 
                                                     try{
@@ -2258,18 +2284,18 @@ window.PPW = (function ($, _d, console){
                                 })(slides[i], i),
                         error: (function(slide, i){
                             return function(){
-                                
+
                                 var el= _d.getElementById(slide.id),
                                     addr= _settings.fsPattern.replace(/\%id/g, slide.id);
-                                
+
                                 _settings.slides[i].el= el;
                                 _settings.slides[i].title= tt;
                                 _settings.slides[i].index= i+1;
                                 _settings.slides[i].errors= 1;
-                                
+
                                 $(el).addClass('ppw-slide-not-found')
                                      .html(_templates.slideNotFound.replace(/\{\{slideid\}\}/g, slide.id).replace('{{addr}}', addr, 'g'));
-                                
+
                                 console.error("[PPW][Slide loading]: Slide not found!", slide);
                                 _slidePreloaderNext();
                             }
@@ -2277,19 +2303,19 @@ window.PPW = (function ($, _d, console){
                     });
                 el= $('section#'+slides[i].id);
             }else{ // the slide content is already on the DOM
-                
+
                 _settings.slides[i].el= el[0];
                 tt= el.find('h1, h2, h3, h4, h5, h6')[0];
                 tt= tt? tt.innerHTML: el[0].textContent.substring(0, _conf.defaults.slideTitleSize);
                 _settings.slides[i].title= tt;
                 _settings.slides[i].index= i+1;
-                
+
                 $(container).append("<div id='ppw-slide-container-"+slides[i].id+"' class='ppw-slide-container'></div>");
-                
+
                 $('#ppw-slide-container-'+slides[i].id).append(el[0]);
-                
+
                 $(el).find("script").each(function(count, scr){
-                    
+
                     var f= new Function("PPW.slideIterator= this; "+scr.textContent);
 
                     try{
@@ -2298,24 +2324,24 @@ window.PPW = (function ($, _d, console){
                         console.error("[PPW][Script loaded from slide] There was an error on a script, loaded in one of your slides!", e)
                     }
                 });
-                
+
                 _slidePreloaderNext(_settings.slides[i]);
             }
-            
+
             $("#ppw-slide-container-"+slides[i].id).data('ppw-slide-ref', slides[i]);
-            
+
             if(slides[i].profile){
                 _conf.profiles[slides[i].profile]= true;
             }
             if(_settings.profile)
                 _conf.profiles[_settings.profile]= true;
-            
+
             // adding extra information and methods to each slide
             slides[i].actionIdx= 0;
             slides[i].addAction= function(act){
                 _addAction(act, this);
             };
-            
+
             // adding the classes for the slides
             el.addClass(_conf.cons.CLASS_SLIDE + " ppw-slide-type-" + (slides[i].type||_conf.defaults.slideType));
             if(slides[i].className){
@@ -2327,60 +2353,63 @@ window.PPW = (function ($, _d, console){
                 }
             }
         }
+
+        // setting the clonable elements
+        _applyClonableElements();
     };
-    
+
     /**
      * Opens the go-to-slide component.
      */
     var _showGoToComponent= function(useEnter){
-        
+
         var el= null, fn,
             msg= "Go to slide number <input style='margin: auto;' type='integer' id='ppw-go-to-slide' maxlength=3 value='' /><input type=button id=ppw-go-to-button value=Go>";
-        
+
         fn= function(){
             var i= $('#ppw-go-to-slide').val();
-            
+
             if(i && i.replace(/ /g, '') != '' && !isNaN(i)){
                 _goToSlide(_getValidSlides()[parseInt(i, 10) -1]);
                 _closeMessage();
             }
         };
-        
+
         if(_conf.showingMessage)
             return false;
-        
+
         _showMessage(msg, fn, true, false, true);
-        
+
         el= _d.querySelector('#ppw-go-to-slide');
         _d.getElementById('ppw-go-to-button').addEventListener('click', _closeMessage);
-        
+
         el.addEventListener('keyup', function(evt){
             if(evt && evt.keyCode && evt.keyCode == 13)
                 fn();
         }, false);
-        
+
         if(!useEnter)
             el.focus();
     };
-    
+
     /**
      * Searchs for a string in the slides.
-     * 
+     *
      * This method goes to the previous or next slide which contains the
      * searched term.
      */
     var _searchIntoSlides= function(direction, str){
-        
+
         var slidesToSearchInto= [],
             i= 0, l= 0,
             slide= null,
             goTo= 0;
-        
+
         if(str == '' || !str.toLowerCase)
             return false;
-        
+
         str= str.toLowerCase();
-        
+
         if(!direction || direction == 'next'){
             slidesToSearchInto= _settings.slides.slice(_conf.currentSlide+1);
             l = slidesToSearchInto.length;
@@ -2397,7 +2426,7 @@ window.PPW = (function ($, _d, console){
         }else{ // previous slides
             slidesToSearchInto= _settings.slides.slice(0, _conf.currentSlide);
             i= slidesToSearchInto.length-1;
-            
+
             do{
                 if(!slidesToSearchInto[i])
                     break;
@@ -2410,39 +2439,39 @@ window.PPW = (function ($, _d, console){
         }
         return false;
     }
-    
+
     /**
      * Prepares the presentation to be printed.
-     * 
+     *
      * You can use this feature to save the presentation as pdf, for example.
      */
     var _print= function(){
-        
+
         var printW= window.open(_l.origin + _l.pathname+'?ppw-printing-version=true');
         return;
     };
-    
+
     /**
      * Shows the searchbox.
-     * 
+     *
      * This search goes to the slide where the searched term is found.
-     * 
+     *
      * @param Boolean Force the search box to replace the current alert message.
      */
     var _showSearchBox= function(force){
         var content= _templates.searchTool.replace(/\{\{directionaliconsstyle\}\}/g, _settings.directionalIconsStyle),
             el= null;
-        
+
         if(_conf.showingMessage && !force)
             return false;
-        
+
         if(_conf.showingMessage){
             $('#ppw-message-content').html(content);
         }else{
             _showMessage(content);
         }
         _unlock();
-        
+
         el= _d.getElementById('ppw-search-slide');
         setTimeout(function(){_d.getElementById('ppw-search-slide').focus();}, 100);
         el.addEventListener('keyup', function(evt){
@@ -2457,7 +2486,7 @@ window.PPW = (function ($, _d, console){
                 }
             }
         }, false);
-        
+
         $('#ppw-search-prev').bind('click', function(){
             var ret= _searchIntoSlides('prev', _d.getElementById('ppw-search-slide').value),
                 msg= 'Not found in previous slides!';
@@ -2474,12 +2503,12 @@ window.PPW = (function ($, _d, console){
             }
             _d.getElementById('ppw-search-found').innerHTML= msg;
         });
-        
+
     };
-    
+
     /**
      * Creates the splash screen.
-     * 
+     *
      * This screen ofers access to useful tools before the presentation begins.
      * This method is always called, but if the settings define that no splash
      * screen should be used, it will not create the splash screen itself, although
@@ -2488,40 +2517,40 @@ window.PPW = (function ($, _d, console){
      */
     var _createSplashScreen= function(){
         _conf.loadSteps++;
-        
+
         _b= _d.body;
         $b= $(_b);
-        
+
         _preparePPW();
-        
+
         if(_isInPrintableVersion()){
             $b.addClass('printing-1');
             _preloadSlides();
             return true;
         }
-        
+
         // Adding the social buttons to the page.
         $b.append('<div id="fb-root"></div>');
         // adding the messages container
         $b.append(_templates.messages);
         // adding the camera container
         $b.append(_templates.camera);
-        
+
         // adding the svg blur effect, to be able to apply blur on firefox as well.
         $b.append('<svg id="ppw-svg-image-blur">\
                         <filter id="blur-effect-1">\
                             <feGaussianBlur stdDeviation="1" />\
                         </filter>\
                    </svg>');
-        
+
         // adding the toolbar
         if(_settings.useToolBar && !_querystring('remote-controller')){
-            
-            var x= _templates.toolBar
+
+            var tpl= _templates.toolBar
                                 .replace(/\{\{clickableClass\}\}/g, _conf.cons.CLICKABLE_ELEMENT)
                                 .replace(/\{\{likeSrc\}\}/g, _l.protocol+'//'+(_l.host == 'localhost'? 'powerpolygon.com': _l.host)+''+_l.pathname);
-            $b.append(x);
-                                
+            $b.append(tpl);
+
             // setting images to the icons on the toolbar and their behaviour
             $('#ppw-goto-icon').attr('src', _createPPWSrcPath('/_images/goto.png'))
                                .addClass(_conf.cons.CLICKABLE_ELEMENT)
@@ -2557,11 +2586,11 @@ window.PPW = (function ($, _d, console){
 
         // adding the splash screen if enabled
         if(_settings.useSplashScreen){
-            
+
             $.get(_createPPWSrcPath("/_tools/splash-screen.html"), {}, function(data){
 
                 _d.body.innerHTML+= data;
-                _setLoadingBarStatus();
+                _setLoadingBarStatus("splash screen");
 
                 $('#ppw-goFullScreen-trigger').click(_enterFullScreen);
                 $('#ppw-testResolution-trigger').click(_testResolution);
@@ -2569,31 +2598,31 @@ window.PPW = (function ($, _d, console){
                 $('#ppw-testCamera-trigger').click(PPW.toggleCamera);
                 $('#ppw-testConnection-trigger').click(_testConnection);
                 $('#ppw-talk-title').html(_settings.title);
-                
+
                 $('.ppw-menu-start-icon').click(_startPresentation);
                 $('.ppw-notification-close-button').click(_closeNotification);
-                
+
                 $('#ppw-slides-loader-bar').stop().animate({
                     marginTop: '0px'
                 }, 500, _preloadSlides);
-                
+
                 _conf.screenSize= _conf.screenSize||$("#ppw-resolution-test-element")[0];
-                
+
                 _addListener('onresize', function(obj){
                     if(_conf.testingResolution){
                         _updateScreenSizes();
                     }
                 });
-                
+
                 _triggerEvent('onsplashscreen', _d.getElementById('ppw-addons-container'));
-               
+
             });
         }else{
-            _setLoadingBarStatus();
+            _setLoadingBarStatus("splash screen not used");
         }
-        
-        if(_n.onLine && _settings.Facebook){
-            
+
+        if(_n.onLine && _settings.Facebook && !_conf.remoteControl){
+
             // applying Facebook Buttons
             (function(d, s, id) {
                 var js, fjs = d.getElementsByTagName(s)[0];
@@ -2602,16 +2631,16 @@ window.PPW = (function ($, _d, console){
                 js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=281929191903584";
                 fjs.parentNode.insertBefore(js, fjs);
             }(_d, 'script', 'facebook-jssdk'));
-            
+
         }
-            
-        if(_n.onLine && _settings.Google){
+
+        if(_n.onLine && _settings.Google && !_conf.remoteControl){
             // applying the g+ buttons
             _loadScript('https://apis.google.com/js/plusone.js');
         }
-        
+
     };
-    
+
     var _updateScreenSizes= function(){
         _d.getElementById('ppw-resolution-sizes').innerHTML= _conf.screenSize.offsetWidth + ' X ' + _conf.screenSize.offsetHeight;
     };
@@ -2620,29 +2649,29 @@ window.PPW = (function ($, _d, console){
      */
     var _biggerFonts= function(){
         _conf.fontSize+= 10;
-        
+
         _d.getElementById('ppw-slides-container').style.fontSize= _conf.fontSize+"%";
-        
+
         if(_conf.testingResolution){
             _d.getElementById('ppw-resolution-test-element').style.fontSize= _conf.fontSize+"%";
         }
     };
-    
+
     /**
      * Set the font sizes 10% smaller.
      */
     var _smallerFonts= function(){
         _conf.fontSize-= 10;
         _d.getElementById('ppw-slides-container').style.fontSize= _conf.fontSize+"%";
-        
+
         if(_conf.testingResolution){
             _d.getElementById('ppw-resolution-test-element').style.fontSize= _conf.fontSize+"%";
         }
     };
-    
+
     /**
      * Shows the resolution tool.
-     * 
+     *
      * This tool allows the user to see the boundings of the presentation,
      * as well as check on colors and font sizes.
      */
@@ -2657,15 +2686,15 @@ window.PPW = (function ($, _d, console){
             _conf.testingResolution= false;
         });
     };
-    
+
     /**
      * Tries to enter in fullscreen mode.
-     * 
+     *
      * Triggers the event onfullscreen, passing the status: true if ok,
      * false if could not request the fullscreen on the browser.
      */
     var _enterFullScreen= function(){
-    
+
         var fn= null,
             status= true;
         if($b.hasClass(_conf.cons.CLASS_FULLSCREEN)){
@@ -2693,10 +2722,10 @@ window.PPW = (function ($, _d, console){
             _triggerEvent('onfullscreen', status);
         }
     }
-    
+
     /**
      * Shows the next queued message.
-     * 
+     *
      * @return Boolean True if there was a queued message, false otherwise.
      */
     var _showNextMessage= function(){
@@ -2710,10 +2739,10 @@ window.PPW = (function ($, _d, console){
             return false;
         }
     };
-    
+
     /**
      * Show a message in a floating box in the center of the screen.
-     * 
+     *
      * @param String The message to be shown.
      * @param Function A callback to be executed once the message is closed.
      * @param Boolean (default false) Hides the 'close' button.
@@ -2721,35 +2750,35 @@ window.PPW = (function ($, _d, console){
      * @return Boolean True if showed the message, false if it was queued.
      */
     var _showMessage= function(msg, fn, hideButton, type, notLocked){
-        
+
         var box= $('#ppw-message-box'),
             func= null;
-        
+
         if(_conf.showingMessage){
             _conf.messagesQueue.push({msg: msg, fn: fn, hideButton: hideButton, type: type});
             return false;
         }
-        
+
         PPW.unlock();
-        
+
         $('#ppw-message-content').html(msg);
-        
+
         if(hideButton){
             $('#ppw-message-box-button').hide();
         }else{
             if(!notLocked)
                 PPW.lock($('#ppw-message-box-button').show()[0]);
         }
-        
+
         PPW.animate(box, 'fadeInDown', {
             duration: '300ms',
             delay: '0s'
         });
-        
+
         box.css({
             marginLeft: -(box[0].offsetWidth/2)+'px'
         });
-        
+
         if(!type){
             box.removeClass('warning').removeClass('error');
         }else{
@@ -2757,9 +2786,9 @@ window.PPW = (function ($, _d, console){
                 box.addClass(type);
             }
         }
-        
+
         _conf.showingMessage= true;
-        
+
         func= function(){
             if(fn && typeof fn == 'function'){
                 try{
@@ -2769,20 +2798,20 @@ window.PPW = (function ($, _d, console){
                 }
             }
         }
-        
+
         box.data('closeCallback', func)
-        
+
         $('#ppw-message-box-button').one('click', _closeMessage);
         setTimeout(function(){
             _d.getElementById('ppw-message-box-button').focus();
         }, 100);
-        
+
         return true;
     };
-    
+
     /**
      * Shows a message of type warning.
-     * 
+     *
      * @param String The message to be shown.
      * @param Function A callback to be executed once the message is closed.
      * @param Boolean (default false) Hides the 'close' button.
@@ -2790,10 +2819,10 @@ window.PPW = (function ($, _d, console){
     var _showWarning= function(msg, fn, hideButton){
         _showMessage(msg, fn, hideButton, 'warning');
     };
-    
+
     /**
      * Shows a message of type error.
-     * 
+     *
      * @param String The message to be shown.
      * @param Function A callback to be executed once the message is closed.
      * @param Boolean (default false) Hides the 'close' button.
@@ -2801,60 +2830,60 @@ window.PPW = (function ($, _d, console){
     var _showError= function(msg, fn, hideButton){
         _showMessage(msg, fn, hideButton, 'error');
     };
-    
+
     /**
      * Closes the message box.
      */
     var _closeMessage= function(){
-        
+
         var box= $('#ppw-message-box'),
             fn= box.data('closeCallback');
-        
+
         PPW.animate(box, 'fadeOutUp', {
                 duration: '300ms',
                 onstart: function(){
-                    
+
                 },
                 onend: function(){
-                    
+
                     _conf.showingMessage= false;
-                    
+
                     if(!_showNextMessage()){
                         PPW.unlock();
                         _b.focus();
                     }
-                    
+
                     $('#ppw-message-box').hide().removeClass('ppw-anim-visible');
-                    
+
                     if(fn && typeof fn == 'function')
                         fn();
                 }
         });
     };
-    
+
     /**
      * Initializes and shows the camera.
-     * 
+     *
      * This mathod askes for permition to use the camera, shows it ans enable
      * the binding events to it(such as gestures and clicks)
      */
     var _startCamera= function(){
-        
+
         var video = _d.querySelector('#ppw-video-element'),
             el= $('#ppw-camera-tool');
-                
+
         if(!_conf.cameraLoaded){
             _w.URL = _w.URL || _w.webkitURL;
             _n.getUserMedia  = _n.getUserMedia || _n.webkitGetUserMedia ||
                                _n.mozGetUserMedia || _n.msGetUserMedia;
 
             if (_n.getUserMedia) {
-                
+
                 _n.getUserMedia({audio: false, video: true}, function(stream){
-                  
+
                   var streamData= stream;
                   PPW.cameraStream= stream;
-                  
+
                   try{
                       streamData= _w.URL.createObjectURL(stream);
                       video.src = streamData;
@@ -2865,17 +2894,17 @@ window.PPW = (function ($, _d, console){
                       video.mozSrcObject = stream;
                       video.play();
                   }
-                  
+
                   _conf.cameraLoaded= true;
-                  
+
                   _conf.video= video;
                   _conf.stream= stream;
-                  
+
                   _triggerEvent('onshowcamera', {
                       "video": _conf.video,
                       "device": _conf.stream
                   });
-                  
+
                   el.draggable()
                     .resizable({
                         handles: "se, sw, ne, nw, n, e, s, w"
@@ -2914,10 +2943,10 @@ window.PPW = (function ($, _d, console){
                         left: _b.offsetWidth - el[0].offsetWidth-10,
                         top: 0-el[0].offsetHeight
                     }).animate({top: '0px'}, 500);
-                    
+
                     _conf.showingCamera= true;
                     $('#ppw-camera-hide-trigger').bind('click', _pauseCamera);
-                    
+
                 }, function(data){
                     console.error("[PPW Error]: Could now open the camera! User did not allow it!", data);
                     return false;
@@ -2929,14 +2958,14 @@ window.PPW = (function ($, _d, console){
             }
         }else{
             _d.querySelector('#ppw-video-element').play();
-            
+
             if(el[0].offsetTop <0){
                 el.css({
                             left: _b.offsetWidth - el[0].offsetWidth-10,
                             top: 0-el[0].offsetHeight
                        }).animate({top: '0px'}, 500);
             }
-            
+
             if(_conf.video && _conf.stream){
                 _triggerEvent('onshowcamera', {
                     "video": _conf.video,
@@ -2946,14 +2975,14 @@ window.PPW = (function ($, _d, console){
             _conf.showingCamera= true;
         }
     };
-    
+
     /**
      * Pauses the camera and hides it.
      */
     var _pauseCamera= function(){
-        
+
         var el= null;
-        
+
         if(_conf.cameraLoaded){
             el= $('#ppw-camera-tool');
             _d.querySelector('#ppw-video-element').pause();
@@ -2964,12 +2993,12 @@ window.PPW = (function ($, _d, console){
         }
         _triggerEvent('onhidecamera');
     };
-    
+
     /**
      * Plays an audio so the speaker can test the sound.
      */
     var _testAudio= function(){
-        
+
         /*var el= _d.getElementById('ppw-audioTestElement');
         if(!el){
             $b.append("<audio id='ppw-audioTestElement' autoplay='autoplay' loop='loop' controls='controls'>\
@@ -2981,7 +3010,7 @@ window.PPW = (function ($, _d, console){
         //el.play();
         _showMessage("Playing audio<br/><div style='background: url("+_createPPWSrcPath('/_images/animated-wave-sound.gif')+") 0px -37px no-repeat; position: relative; width: 220px; height: 30px; margin: auto; background-size: 248px 108px; border-left: solid 1px #fcc; border-right: solid 1px #fcc;' onclick='var audio = document.getElementById(\"ppw-audioTestElement\"); var t = \"Stopped\";  if(audio.paused) { audio.play(); t = \"Playing\" } else { audio.pause(); }; console.log(\"[PPW] Currently \" + t); '/><div id='ppw-audioPlaceHolder'></div>",
                      function(){
-                         
+
                          var el= _d.getElementById('ppw-audioTestElement'),
                             audio= new Audio(el);
                          //el.volume= 0;
@@ -2993,10 +3022,10 @@ window.PPW = (function ($, _d, console){
                                 <source src='"+_createPPWSrcPath('/_audios/water.ogg')+"'/>\
                                </audio>");
     };
-    
+
     /**
      * Opens the presentation tool.
-     * 
+     *
      * This tool shows the current slide and its notes, as well as the next
      * slide and its notes.
      * Also, the time remaning/lapsed and the shortcut keys.
@@ -3005,7 +3034,7 @@ window.PPW = (function ($, _d, console){
         var toolSrc= _createPPWSrcPath('/_tools/presentation-tool.html'),
             toolName= 'ppw-Presentation-tool',
             toolProps= "width=780,height=520,left=40,top=10";
-        
+
         if(!_conf.presentationTool || !_conf.presentationTool.focus){
             _conf.presentationTool= _w.open(toolSrc,
                                                 toolName,
@@ -3020,10 +3049,10 @@ window.PPW = (function ($, _d, console){
             _conf.presentationTool.focus();
         }
     };
-    
+
     /**
      * Triggers the very specific event to the Presentation Tool.
-     * 
+     *
      * This method triggers the event that defines the load of the Presentation
      * Tool, leting addons to know that, and also offering access to its
      * document.
@@ -3031,7 +3060,7 @@ window.PPW = (function ($, _d, console){
     var _triggerPresentationToolLoadEvent= function(win){
         _triggerEvent('onpresentationtoolloaded', win);
     };
-    
+
     /**
      * Verifies if the browser is online or not.
      */
@@ -3041,10 +3070,10 @@ window.PPW = (function ($, _d, console){
         else
             _showMessage("There is a problem with the internet connection! Or your browser does not support the onLine API");
     };
-    
+
     /**
      * Shows the current settings for the talk, with some options.
-     * 
+     *
      * This method triggers two events that can be used by addons to add
      * their own settings to this showbox.
      */
@@ -3056,7 +3085,7 @@ window.PPW = (function ($, _d, console){
             l= 0,
             fn= function(){
                 var parsed= "";
-                
+
                 _triggerEvent('onclosesettings');
                 _settings.shortcutsEnable= _d.getElementById('ppw-shortcutsEnable').checked? true: false;
                 _settings.duration= parseInt(_d.getElementById('ppw-talk-duration').value, 10)||_conf.defaults.duration;
@@ -3066,14 +3095,14 @@ window.PPW = (function ($, _d, console){
                 });
                 _settings.alertAt= parsed;
             }
-            
+
         msg= _templates.settings
                        .replace('{{shortcuts}}', _settings.shortcutsEnable? 'checked=checked': '')
                        .replace('{{duration}}', _settings.duration)
                        .replace('{{alerts}}', _settings.alertAt);
-            
+
         _showMessage(msg, fn, false, false, true);
-        
+
         if(_conf.profiles){
             list= Object.keys(_conf.profiles);
             l= list.length;
@@ -3081,7 +3110,7 @@ window.PPW = (function ($, _d, console){
             for(; i<l; i++){
                 msg+= "<option value='"+list[i]+"'>"+list[i]+"</option>";
             }
-            
+
             $('#ppw-profile-option').html(msg)
                                     .attr('value', (_settings.profile && _settings.profile != 'none'? _settings.profile: 'none'))
                                     .bind('change', function(){
@@ -3091,7 +3120,7 @@ window.PPW = (function ($, _d, console){
         }else{
             $('#ppw-profile-config').hide();
         }
-        
+
         if(!_settings.languages || !_settings.languages.length){
             $('#ppw-languages-config').hide();
         }else{
@@ -3101,18 +3130,18 @@ window.PPW = (function ($, _d, console){
             for(i=0; i<l; i++){
                 msg+= "<option value='"+list[i]+"'>"+list[i]+"</option>";
             }
-            
+
             $('#ppw-language-option').html(msg)
                                      .attr('value', _conf.currentLang)
                                      .bind('change', function(){
                                         _setLION(this.value);
                                      });
-            
+
         }
-        
+
         _triggerEvent('onopensettings', _settings);
     };
-    
+
     /**************************************************
      *               PRESENTATION CORE                *
      **************************************************/
@@ -3122,31 +3151,31 @@ window.PPW = (function ($, _d, console){
      // These methods are private, but may be exposed //
      // by the APY.                                   //
      /*************************************************/
-    
+
     /**
      * Starts the presentation itself.
      */
     var _startPresentation= function(evt){
-        
+
         var el= _d.querySelector('.ppw-menu-start-icon'),
             first, act;
-        
+
         if(!_conf.slidesLoaded)
             return;
-        
+
         $('#ppw-splash-screen-container').animate({
             marginTop: '-460px'
         }, 200, function(){
             $('#ppw-splash-screen').fadeOut();
         });
-        
+
         _settings.presentationStarted= _conf.presentationStarted= (new Date()).getTime();
         _goToSlide(_getCurrentSlideFromURL());
         if(el)
             el.blur();
-        
+
         _triggerEvent('onstart', _conf.currentSlide);
-        
+
         // in case the first opened slide has a timming/auto action, it should be triggered
         first= _getCurrentSlide();
         if(first && first.actions.length && first.actions[0].timing){
@@ -3157,22 +3186,22 @@ window.PPW = (function ($, _d, console){
                 setTimeout(act.does, act.timing)
             }
         }
-        
+
         if(evt){
             evt.preventDefault();
             return false;
         }
     };
-    
+
     /**
      * Function called when an specific slide is entered.
      */
     var _onSlideEnter= function(fn){
-        
+
         var slideRef= PPW.slideIterator;
         if(!slideRef || !slideRef.actions)
             return false; // it probably is not loaded yet...will be called again when loaded
-        
+
         if(fn && typeof fn == "function"){
             slideRef.onSlideEnter= function(){
                 try{
@@ -3182,18 +3211,18 @@ window.PPW = (function ($, _d, console){
                 }
             }
         }
-        
+
     };
-    
+
     /**
      * Function called when an specific slide is exited.
      */
     var _onSlideExit= function(fn){
-        
+
         var slideRef= PPW.slideIterator;
         if(!slideRef || !slideRef.actions)
             return false; // it probably is not loaded yet...will be called again when loaded
-        
+
         if(fn && typeof fn == "function"){
             slideRef.onSlideExit= function(){
                 try{
@@ -3204,16 +3233,16 @@ window.PPW = (function ($, _d, console){
             }
         }
     };
-    
+
     /**
      * Function called when an specific slide does something(executes an action).
      */
     var _onSlideDoes= function(fn){
-        
+
         var slideRef= PPW.slideIterator;
         if(!slideRef || !slideRef.actions)
             return false; // it probably is not loaded yet...will be called again when loaded
-        
+
         if(fn && typeof fn == "function"){
             slideRef.onSlideDoes= function(){
                 try{
@@ -3224,16 +3253,16 @@ window.PPW = (function ($, _d, console){
             }
         }
     };
-    
+
     /**
      * Function called when an specific slide undo something(executes an action).
      */
     var _onSlideUndo= function(fn){
-        
+
         var slideRef= PPW.slideIterator;
         if(!slideRef || !slideRef.actions)
             return false; // it probably is not loaded yet...will be called again when loaded
-        
+
         if(fn && typeof fn == "function"){
             slideRef.onSlideUndo= function(){
                 try{
@@ -3244,16 +3273,16 @@ window.PPW = (function ($, _d, console){
             }
         }
     };
-    
+
     /**
      * Adds an action to each speficied slide.
      */
     var _addAction= function(action, slide){
-        
+
         var slideRef= slide||PPW.slideIterator;
         if(!slideRef || !slideRef.actions)
             return false; // it probably is not loaded yet...will be called again when loaded
-        
+
         if(typeof action == 'function'){
             slideRef.actions.push({
                 timing: 'click',
@@ -3268,7 +3297,7 @@ window.PPW = (function ($, _d, console){
         }
         return true;
     };
-    
+
     /**************************************************
      *                 SLIDE METHODS                  *
      **************************************************/
@@ -3276,14 +3305,14 @@ window.PPW = (function ($, _d, console){
      // This method is private, but can be exposed    //
      // by the API, afterwards.                       //
      /*************************************************/
-    
+
     /**
      * Returns the index of the current slide based on the url.
      */
     var _getCurrentSlideFromURL= function(){
         var h= _l.hash.replace(_settings.hashSeparator, '')||_settings.slides[0].idx,
             i= _settings.slides.length;
-            
+
         if(isNaN(h)){
             while(i--){
                 if(_settings.slides[i].id == h)
@@ -3291,32 +3320,32 @@ window.PPW = (function ($, _d, console){
             };
             h= 0;
         }
-        
+
         return h||0;
     };
-    
-    
+
+
     /**
      * Gets the previously profile valid slide.
-     * 
+     *
      * If a slide is given, it returns the closest previous valid slide in
      * relation to that slide.
      */
     var _getPrevValidSlide= function(slide){
-        
-        
+
+
         var idx= 0,
             l= _settings.slides.length;
-        
+
         slide= typeof slide == 'object'? slide: _getCurrentSlide();
         idx= slide.index-2;
-        
+
         if(idx<0){
             return _getCurrentSlide();
         }
-        
+
         slide= _settings.slides[idx];
-        
+
         while(!_isValidProfile(slide)){
             if(idx<0){
                 slide= _getCurrentSlide();
@@ -3326,23 +3355,23 @@ window.PPW = (function ($, _d, console){
         }
         return slide;
     }
-    
+
     /**
      * Gets the next profile valid slide.
-     * 
+     *
      * If a slide is given, it returns the next closest valid slide in
      * relation to that slide.
      */
     var _getNextValidSlide= function(slide){
-        
+
         var idx= 0,
             l= _settings.slides.length;
-        
+
         slide= typeof slide == 'object'? slide: _getCurrentSlide();
         idx= slide.index;
-        
+
         slide= _settings.slides[idx];
-        
+
         while(slide && !_isValidProfile(slide)){
             if(idx>=l){
                 slide= _getCurrentSlide();
@@ -3352,31 +3381,31 @@ window.PPW = (function ($, _d, console){
         }
         return slide;
     };
-    
-    
-     
-    
+
+
+
+
     /**
      * Go to the previous slide.
-     * 
+     *
      * If the current slide has actions executed, it executes the undo method of
      * the last executed action, instead of actually going to the previous slide.
      */
     var _goPreviousSlide= function(){
-        
+
         var slide= _getCurrentSlide(),
             fn= null;
-        
+
         if(slide.actionIdx > 0){
-            
+
             if(slide._timer){
                 _w.clearTimeout(slide._timer);
                 slide._timer= false;
             }
-            
+
             slide.actionIdx--;
             fn= slide.actions[slide.actionIdx].undo;
-            
+
             if(fn && typeof fn == 'function'){
                 try{
                     fn(slide);
@@ -3394,24 +3423,24 @@ window.PPW = (function ($, _d, console){
             _goToSlide(_getPrevValidSlide(), 'prev');
         }
     };
-    
+
     /**
      * Go to the next slide.
-     * 
+     *
      * If the current slide has actions yet to be executed, it executes its does
      * method.
      */
     var _goNextSlide= function(){
-        
+
         var slide= _getCurrentSlide(),
             fn= null,
             nextAction= null;
-        
+
         if(slide._timer){
             _w.clearTimeout(slide._timer);
             slide._timer= false;
         }
-        
+
         if(slide.actionIdx < slide.actions.length){
             // still has actions to execute.
             //try{
@@ -3420,13 +3449,13 @@ window.PPW = (function ($, _d, console){
                 //console.error("[PPW][Slide action error] There was an error trying to execute an action of the current slide:", slide, e);
             //};
             slide.actionIdx++;
-            
+
             /*if(slide.onSlideDoes){
                 slide.onSlideDoes(slide);
             }*/
-            
+
             nextAction= slide.actions[slide.actionIdx];
-            
+
             if(nextAction && nextAction.timing != 'click'){
                 if(nextAction.timing == 'auto' || slide._timer){
                     _goNextSlide();
@@ -3444,33 +3473,33 @@ window.PPW = (function ($, _d, console){
             _goToSlide(_getNextValidSlide(), 'next');
         }
     };
-    
+
     /**
      * Go to a specific slide by index.
-     * 
+     *
      * @param Int The slide number.
      * @param Boolean Flag used internaly to prevent actions or finish the talk.
      */
     var _goToSlide= function(idx, prevent){
-        
+
         var url= '',
             previousSlide= _getCurrentSlide(),
             slide= null,
             curSlide= null;
-        
+
         if(!_conf.presentationStarted)
             return false;
-        
+
         if(_settings.fixTransformsOnSlideChange){
             _resetViewport();
         }
-        
+
         // let' clean the previos timeout, if any
         if(previousSlide._timer){
             _w.clearTimeout(previousSlide._timer);
             previousSlide._timer= false;
         }
-        
+
         if(previousSlide.last && prevent == 'next'){
             _triggerEvent('onfinish');
             return false;
@@ -3478,7 +3507,7 @@ window.PPW = (function ($, _d, console){
         if(previousSlide.first && prevent == 'prev'){
             return false;
         }
-        
+
         if(_getValidSlides().length == 0){
             _triggerEvent('onfinish');
             console.error("[PPW] Invalid slides definition: There are no valid slides to show!");
@@ -3486,13 +3515,13 @@ window.PPW = (function ($, _d, console){
         }
 
         if(isNum(idx)){
-            
+
             slide= _settings.slides[_conf.currentSlide];
-            
+
             // if it is negative or not valid, goes to the first slide
             if(idx < 0)
                 idx= 0;
-            
+
             if(!_isValidProfile(_settings.slides[idx])){
                 if(prevent == 'prev'){
                     _goPreviousSlide();
@@ -3501,7 +3530,7 @@ window.PPW = (function ($, _d, console){
                 }
                 return false;
             }
-            
+
         }else{
             if(!idx || !idx.index){
                 idx= _getValidSlides();
@@ -3510,25 +3539,25 @@ window.PPW = (function ($, _d, console){
             slide= idx;
             idx= slide.index-1;
         }
-        
+
         _conf.currentSlide= idx;
         curSlide= _settings.slides[_conf.currentSlide];
-        
+
         if(!curSlide){
             _triggerEvent('onfinish');
             return false;
         }
-        
+
         // closing the thumbs
         if(_conf.inThumbsMode){
             _closeThumbnails();
         }
-        
+
         if(_settings.friendlyURL !== false)
             _setHistoryStateTo(idx);
-        
+
         _setSlideClasses(idx);
-        
+
         // triggers the events
         if(_settings.slides[_conf.currentSlide].onSlideEnter){
             _settings.slides[_conf.currentSlide].onSlideEnter();
@@ -3536,7 +3565,7 @@ window.PPW = (function ($, _d, console){
         if(previousSlide.onSlideExit && previousSlide != curSlide){
             previousSlide.onSlideExit();
         }
-        
+
         if(!prevent){
             _triggerEvent('ongoto', {
                 previous: previousSlide,
@@ -3555,32 +3584,32 @@ window.PPW = (function ($, _d, console){
                 });
             }
         }
-        
+
         if(curSlide.first){
             $('#ppw-arrow-previous-slide').hide();
         }else{
             $('#ppw-arrow-previous-slide').show();
         }
-        
+
         if(curSlide.last){
             $('#ppw-arrow-next-slide').hide();
         }else{
             $('#ppw-arrow-next-slide').show();
         }
-        
+
         // if the slide is of a different type
         if(previousSlide && previousSlide.type != curSlide.type)
             _triggerEvent('onslidetypechange', {
                 previous: previousSlide,
                 current: curSlide
             });
-        
+
         // default event for slidechange
         _triggerEvent('onslidechange', {
             previous: previousSlide,
             current: curSlide
         });
-        
+
         // if the slide has actions and the first one has a timing definition
         if(curSlide.actions[curSlide.actionIdx] && curSlide.actions[curSlide.actionIdx].timing != 'click'){
             if(curSlide.actions[curSlide.actionIdx].timing == 'auto'){
@@ -3592,39 +3621,39 @@ window.PPW = (function ($, _d, console){
             }
         }
     };
-    
+
     /**
      * Sets the history state.
-     * 
+     *
      * Adds the current slide identifier to the history.
      * Also changes it in the address bar.
      */
     var _setHistoryStateTo= function(idx){
-        
+
         idx= !_settings.friendlyURL || _settings.friendlyURL == 'num'?
                 idx:
                 _settings.slides[idx].id;
-            
+
         if(_l.hash != _settings.hashSeparator+idx){
             _h.pushState({}, idx, _settings.hashSeparator+idx);
             _d.title= idx;
         }
-        
+
     };
-    
+
     /**
      * Sets the classes for the slides.
-     * 
+     *
      * This method applies the correct css classes to each slide(defined as
      * section html elements in DOM).
      */
     var _setSlideClasses= function(idx){
-        
+
         var id= 0;
-        
+
         if(!idx)
             idx= _conf.currentSlide;
-        
+
         // setting the active slide class
         $(_d.querySelector("."+_conf.cons.CLASS_ACTIVE_SLIDE))
             .removeClass(_conf.cons.CLASS_ACTIVE_SLIDE);
@@ -3632,86 +3661,98 @@ window.PPW = (function ($, _d, console){
             .removeClass(_conf.cons.CLASS_ACTIVE_SLIDE_CONT);
         $('#'+_settings.slides[idx].id).addClass(_conf.cons.CLASS_ACTIVE_SLIDE);
         $('#'+_settings.slides[idx].id).parent().addClass(_conf.cons.CLASS_ACTIVE_SLIDE_CONT);
-        
+
         // setting the previous slide class
         $(_d.querySelector("."+_conf.cons.CLASS_PREVIOUS_SLIDE))
             .removeClass(_conf.cons.CLASS_PREVIOUS_SLIDE);
         $(_d.querySelector("."+_conf.cons.CLASS_PREVIOUS_SLIDE_CONT))
             .removeClass(_conf.cons.CLASS_PREVIOUS_SLIDE_CONT);
-            
+
         id= idx;
         do{
             id--;
         }while(_settings.slides[id] && !_isValidProfile(_settings.slides[id]));
-        
+
         if(_settings.slides[id]){
             $('#'+_settings.slides[id].id).addClass(_conf.cons.CLASS_PREVIOUS_SLIDE);
             $('#'+_settings.slides[id].id).parent().addClass(_conf.cons.CLASS_PREVIOUS_SLIDE_CONT);
         }
-        
-        
+
+
         // setting the next slide class
         $(_d.querySelector("."+_conf.cons.CLASS_NEXT_SLIDE))
             .removeClass(_conf.cons.CLASS_NEXT_SLIDE);
         $(_d.querySelector("."+_conf.cons.CLASS_NEXT_SLIDE_CONT))
             .removeClass(_conf.cons.CLASS_NEXT_SLIDE_CONT);
-        
+
         id= idx;
         do{
             id++;
         }while(_settings.slides[id] && !_isValidProfile(_settings.slides[id]));
-        
+
         if(_settings.slides[id]){
             $('#'+_settings.slides[id].id).addClass(_conf.cons.CLASS_NEXT_SLIDE);
             $('#'+_settings.slides[id].id).parent().addClass(_conf.cons.CLASS_NEXT_SLIDE_CONT);
         }
     };
-    
+
     /**
      * Removes the CSS classes used by the animate method.
      */
     var _removeAnimateCSSClasses= function(el){
-        
+
         if(!el){
             el= $(_getCurrentSlide().el).find('.animated');
         }else{
             el= $(el);
         }
-        
+
         $(el).each(function(){
             this.className= this.className.replace(/ppw\-anim\-([a-zA-z0-9\-_]+)( |$)/g, '')
                                           .replace('animated', '');
         });
-        
+
         return el;
     }
-    
+
     /**
      * Animates elements using the animate.css library.
-     * 
+     *
      * These animations are purely CSS3.
      * The user has more control of animations when using the jquery.animate
      * method.
-     * 
+     *
      * @param Element The element to be animater.
      * @param String The animation name.
      * @param Object Settings[optional]
      */
     var _animate= function(el, anim, settings){
-        
+
+        var wasLocked= PPW.isLocked();
+
         var onEnd= function(event){
-            
+
+            settings= settings||{};
+            settings.onend= settings.onend|| settings.onEnd || false;
+
             if(settings.onend && typeof settings.onend == 'function'){
                 try{
                     settings.onend(event, el, anim);
-                }catch(e){};
+                }catch(e){
+                    console.error("[PPW] Error: Callback failed to be executed in the end of the animation");
+                };
             }
-            if(anim.indexOf('out') >0 || anim.indexOf('Out') > 0)
+
+            if(anim.indexOf('out') > 0 || anim.indexOf('Out') > 0){
                 _removeAnimateCSSClasses(el);
+                el.hide();
+            }
+            if(!wasLocked)
+                PPW.unlock();
         };
         var oEl= null,
             elList= [];
-        
+
         el= $(el);
         // if any of the elements should not be animated because it is in another language
         if(_conf.currentLang){
@@ -3732,11 +3773,7 @@ window.PPW = (function ($, _d, console){
             });
             el= $(elList);
         }
-        
-        
-        //if(el.className.match(/(^| )LANG\-/))
-        
-        
+        PPW.lock();
         if(_conf.animations.indexOf(anim)>=0){
             if(settings){
                 if(settings.duration){
@@ -3776,25 +3813,30 @@ window.PPW = (function ($, _d, console){
                     el.one('animationstart', settings.onstart);
                 }
                 //if(settings.onend && typeof settings.onend == 'function'){
-                el.one('webkitAnimationEnd', onEnd);
-                el.one('mozAnimationEnd', onEnd);
-                el.one('msAnimationEnd', onEnd);
-                el.one('oAnimationEnd', onEnd);
-                el.one('animationend', onEnd);
+
                 //}
             }
-            
+            el.one('webkitAnimationEnd', onEnd);
+            el.one('mozAnimationEnd', onEnd);
+            el.one('msAnimationEnd', onEnd);
+            el.one('oAnimationEnd', onEnd);
+            el.one('animationend', onEnd);
+
             _removeAnimateCSSClasses(el[0]);
-            
+
+            if(anim.indexOf('in') > 0 || anim.indexOf('In') > 0){
+                el.show();
+            }
+
             el.removeClass(anim).addClass('animated ppw-anim-visible ppw-anim-'+
                                            anim);
-            
+
         }else{
             throw new Error("Invalid animation "+anim);
             return false;
         }
     };
-    
+
     /**
      * Resets the coordinates, zoom and rotate effects currently applied.
      */
@@ -3804,20 +3846,20 @@ window.PPW = (function ($, _d, console){
             _conf.currentZoom= 1;
         }
     }
-    
+
     /**
      * Viewports(zoom and rotate) to a coordinate or element.
-     * 
+     *
      * This method goes to a specific coordinate and amplifies it the given
      * times.
-     * 
+     *
      * The object can combine properties to apply both rotation effect and zoom.
-     * 
+     *
      * @param Object An object that may contain: zoom, target, left, top, rotate
      * @return PPW.
      **/
     var _viewport= function(data){
-        
+
         var vendor= $.browser.webkit? '-webkit-':
                         $.browser.mozilla? '-moz-':
                             '',
@@ -3830,11 +3872,11 @@ window.PPW = (function ($, _d, console){
             sentTarget= false,
             container= _settings.applyZoomTo || $('.ppw-active-slide-element-container').eq(0),
             l, t, w, h, hCenter, vCenter, hLimit, vLimit;
-        
+
         // only applies the effects if the presentation has started and it is not in thumbs view mode.
         if(!_conf.presentationStarted || _conf.inThumbsMode)
             return false;
-        
+
         useObjectConfig= true;
 
         if(data.left || data.left === 0)
@@ -3852,39 +3894,39 @@ window.PPW = (function ($, _d, console){
         }
 
         data.times= data.zoom||2;
-        
+
         if(sentTarget){
             data.left= target[0].offsetLeft + target[0].offsetWidth/2;
             data.top= target[0].offsetTop + target[0].offsetHeight/2;
         }
-        
+
         data.times= ((data.times||1));
         if(data.times <= 0) data.times= 0.1;
         if(data.times > _conf.zoomMax) data.times= _conf.zoomMax;
-        
+
         l= target[0].offsetLeft;
         t= target[0].offsetTop;
         w= target[0].offsetWidth;
         h= target[0].offsetHeight;
         hCenter= l/2 + w/2;
         vCenter= t/2 + h/2;
-        
+
         if(data.left < 0) data.left= 0;
         if(data.top < 0) data.top= 0;
-        
+
         data.left= (data.left == undefined || data.left === false)? hCenter: parseInt(data.left, 10);
         data.top = (data.top == undefined || data.top === false)? vCenter: parseInt(data.top, 10);
-        
+
         hLimit= l+w - (l*data.times)/2;
         vLimit= t+h - (t*data.times)/2;
-            
+
         if(data.left >= hLimit){
             data.left= hLimit;
         }
         if(data.top >= vLimit){
             data.top= vLimit;
         }
-        
+
         if(!curTransform || curTransform == 'none'){
             curTransform= '';
         }else{
@@ -3898,27 +3940,27 @@ window.PPW = (function ($, _d, console){
         }
         if(!mx)
             mx= matrix;
-        
+
         mx[0]= mx[3]= data.times;
-        
+
         if(data.rotate != undefined){
             mx[1]= mx[2] = 0;
             curTransform= curTransform.replace(/rotate\(([0-9\,\.\- ]+)\)/g, '');
             curTransform+= " rotate("+data.rotate+"deg)";
             _conf.currentRotate= data.rotate;
         }
-        
+
         curTransform+= " matrix(" + mx.join(', ')+") ";
         container.css(vendor+'transform-origin', data.left+'px '+data.top+'px');
         container.css(vendor+'transform', curTransform);
         _conf.currentZoom= data.times;
         return PPW;
     };
-    
-    
+
+
     /**
      * Applies a zoom effect, incrementing the current zoom by the given value.
-     * 
+     *
      * @param Real The multiplier which will be incremented to the current zoom.
      * @param Int The left coordinate for the center of the effect.
      * @param Int The right coordinate for the center of the effect.
@@ -3928,49 +3970,49 @@ window.PPW = (function ($, _d, console){
         _conf.currentZoom+= by;
         _viewport({zoom: _conf.currentZoom, left: left, top: top, rotate: rotate});
     }
-    
+
     /**
      * Rotate the canvas.
-     * 
+     *
      * Notice that, this rotate method will probably reset any applied zoom.
      * If you want to both zoom and rotate, use the viewport method with its fourth
      * parameter.
-     * 
+     *
      * @param Real Degrees to rotate.
      * @return PPW.
      **/
     var _rotate= function(deg){
-        
+
         var vendor= $.browser.webkit? '-webkit-':
                         $.browser.mozilla? '-moz-':
                             '',
             curTransform= $b.css(vendor+'transform'),
             to= $b.css(vendor+'transform-origin');
-        
+
         if(!_conf.presentationStarted)
             return false;
-        
+
         if(!to || to.replace(/0px| /g, '') == ''){
             $b.css(vendor+'transform-origin', '50% 50%');
         }
-        
+
         if(curTransform && curTransform != 'none' && curTransform.indexOf('rotate') > -1){
             curTransform= curTransform.replace(/rotate\(.+\)/i, 'rotate('+deg+')');
         }else{
             curTransform+= ' rotate('+deg+'deg)';
         }
-        
+
         $b.css(vendor+'transform', curTransform);
-        
+
         return PPW;
     };
 
     /**
      * Locks the user controls.
-     * 
+     *
      * If an HTML element is given, only this element allows the user interacion
      * such as click or keyboard events.
-     * 
+     *
      * @param HTMLElement
      */
     var _lock= function(allowedElement){
@@ -3983,20 +4025,20 @@ window.PPW = (function ($, _d, console){
 
     /**
      * Verifies if the platform is locked according to the refered event.
-     * 
+     *
      * Power Polygon may be locked, but allowing events for one specified element,
      * if that element is the target of the given event, it should be triggered.
-     * 
+     *
      * Link elements(with the tag A) will be accepted even when locked.
      */
     var _isLocked= function(evt){
-        
+
         if(!evt)
             return true;
-        
+
         if(!_conf.locked)
             return false;
-        
+
         if(_conf.locked !== true){
             return evt.target != _conf.locked;
         }else{
@@ -4005,27 +4047,27 @@ window.PPW = (function ($, _d, console){
             return true;
         }
     }
-    
-    
+
+
     /**
      * Tries to enable the remote control to the talk.
      */
     var _enableRemote= function(){
         PPW.remote.connect();
     };
-    
+
     var _initRemoteService= function(){
-        
+
         var srv= _settings.remote.server||_conf.defaultRemoteServer;
-        
+
         if(!_settings.remote)
             return false;
-        //alert('going')
+
         if(!PPW.remote.server){
             $('#ppw-remote-io-script').remove();
-            
+
             $("head").append("<script src='"+srv+"/ppw/_tools/remote/server.js' id='ppw-remote-io-script'></script>");
-            
+
             // in 3 seconds, verify again for the status
             setTimeout(_initRemoteService, 3000);
         }else{
@@ -4043,7 +4085,7 @@ window.PPW = (function ($, _d, console){
         console.log("[PPW] Unlocked user interaction");
         _triggerEvent('onunlock');
     };
-    
+
     /**************************************************
      *                GETTERS/SETTERS                 *
      **************************************************/
@@ -4056,60 +4098,63 @@ window.PPW = (function ($, _d, console){
      /*************************************************/
     /**
      * Returns the list os slide objects.
-     * 
+     *
      * @return Array The array list of all the Slide objects.
      */
     var _getSlides= function(){
         return _settings.slides;
     };
-    
+
     /**
      * Retrieves the current slide object.
-     * 
+     *
      * @return SlideElement
      */
     var _getCurrentSlide= function(){
         return _settings.slides[_conf.currentSlide];
     };
-    
+
     /**
      * Returns the array with the "alert at" times.
-     * 
+     *
      * @return Array
      */
     var _getAlertAtTimes= function(){
         return _settings.alertAt;
     };
-    
+
     /**
      * Returns the timestamp when the presentation started, or false.
-     * 
+     *
      * @return Boolean Whether the presentation has started or not.
      */
     var _getStartedAt= function(){
         return _conf.presentationStarted;
     };
-    
+
     /**
      * Returns properties from the given settings.
-     * 
+     *
      * @param The key to be retrieved.
      * @return Mixed
      **/
     var _get= function(key){
+        if(key == 'profiles'){
+            return _conf.profiles;
+        }
         return _settings[key]||false;
     };
-    
+
     /**
      * Sets properties on settings.
-     * 
+     *
      * @param String The key to be set.
      * @param Mixed The value to be set.
      */
     var _set= function(key, value){
         _settings[key]= value;
     };
-    
+
     /**************************************************
      *                  CONSTRUCTOR                   *
      **************************************************/
@@ -4119,33 +4164,40 @@ window.PPW = (function ($, _d, console){
      // variables and status.                         //
      /*************************************************/
     var _constructor= function(){
-        
+
         // let's create some global useful variables
         _w.auto= 'auto';
         _w.click= 'click';
         _w.global= 'global';
         _w._p= _w.P= PPW;
-        
+
         if(_querystring('remote-controller')){
+            _conf.remoteControl= true;
             _settings.Facebook= false;
             _settings.Google= false;
+            $(document.body).addClass('remote-controller');
             top.ppwFrame= _w.PPW;
         }
-        
+
+        var isMobile= false;
+        (function(a){if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(a)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0,4))) isMobile= true})(navigator.userAgent||navigator.vendor||window.opera);
+        _conf.isMobile= isMobile;
+
+
         _createSplashScreen();
-        
+
         if(!_isInPrintableVersion()){
             _conf.currentSlide= _getCurrentSlideFromURL();
             _goToSlide(_conf.currentSlide);
         }else{
             _goToSlide(0);
         }
-        
+
         _initRemoteService();
     };
-    
+
     _addListener('onload', _constructor)
-    
+
     /**************************************************
      *                 PUBLIC OBJECT                  *
      **************************************************/
@@ -4209,6 +4261,7 @@ window.PPW = (function ($, _d, console){
         getStartedAt                    : _getStartedAt,
         getNextSlide                    : _getNextValidSlide,
         getPrevSlide                    : _getPrevValidSlide,
+        setProfile                      : _setPresentationProfile,
         lock                            : _lock,
         unlock                          : _unlock,
         isLocked                        : function(){return _conf.locked;},
@@ -4217,5 +4270,5 @@ window.PPW = (function ($, _d, console){
         Facebook                        : true,
         Google                          : true
     };
-    
+
 })(window.jQuery, document, window.console);

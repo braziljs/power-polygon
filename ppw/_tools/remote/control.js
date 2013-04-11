@@ -1,19 +1,23 @@
 $(document).ready(function(){
-    
+
     var presentationIframe= $('#presentation-iframe'),
         version= presentationIframe[0]? 'full': 'basic',
         presentation= null,
         notesContainer= null,
         showingNotes= false,
+        showingControls= false,
         socketServer= false,
         _currentInteractionState= false,
         _mouseInteractionEnabled= false,
         _socket= null,
         talkId= null,
+        _defaultNoNotesStr= "<ul><li>No notes for the current slide</li></ul>",
         _hiddenControls= false,
-        _swipeStart= [],
-        _b= document.body;
-        
+        _loadedPpwFrame= false,
+        //_swipeStart= [],
+        _b= document.body,
+        $b= $(_b);
+
     var getParameterByName= function (name){
         name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
         var regexS = "[\\?&]" + name + "=([^&#]*)";
@@ -24,19 +28,19 @@ $(document).ready(function(){
         else
           return decodeURIComponent(results[1].replace(/\+/g, " "));
     }
-    
+
     var _getCurrentNotes= function(){
-        
+
         var notes= ppwFrame().getCurrentSlide().notes,
             str= "<ul>";
-            
+
         $(notes).each(function(){
             str+= "<li>"+this+"</li>";
         });
-        
+
         return str+"</ul>";
     }
-    
+
     // go next
     var _goNext= function(){
 
@@ -78,54 +82,87 @@ $(document).ready(function(){
             }
         });
     }
-    
-    var _bindEvents= function(){
-        
-        // annotations
-        $('#btn-annotations').click(function(){
-            
-            var notes= [],
-                str= "",
-                h= 0,
-                btn= $('#btn-annotations a');
-                
-            notesContainer= notesContainer||$('#annotations-container');
-            
-            if(!showingNotes){
-                if(version == 'full'){
-                    if(ppwFrame().get('presentationStarted')){
-                        str= _getCurrentNotes();
-                    }
-                }
-                h= (document.body.clientHeight - btn[0].offsetHeight - 10)+'px';
 
-                if(str == '')
-                    str= "<ul><li>No notes for the current slide</li></ul>";
-                    
-                notesContainer.html(str);
-                notesContainer.css('height', h);
-                btn.css('bottom', h);
-                showingNotes= true;
-            }else{
-                h= 0;
-                notesContainer.css('height', h);
-                btn.css('bottom', h);
-                showingNotes= false;
+    var _showNotes= function(){
+
+        var str= "",
+            h= document.body.clientHeight - 8 + 'px';
+
+        notesContainer= notesContainer||$('#annotations-container');
+
+        if(version == 'full'){
+            if(ppwFrame().get('presentationStarted')){
+                str= _getCurrentNotes();
             }
+        }
+
+        if(!str || str == '<ul></ul>')
+            str= _defaultNoNotesStr;
+
+        notesContainer.html(str);
+        notesContainer.css('height', h);
+        showingNotes= true;
+        $('#sett-show-notes').attr('checked', 'checked');
+
+    };
+
+    var _hideNotes= function(){
+
+        notesContainer= notesContainer||$('#annotations-container');
+
+        notesContainer.css('height', 0);
+        showingNotes= false;
+        $('#sett-show-notes').removeAttr('checked');
+
+    };
+
+    var _bindProfiles= function(){
+
+        var profiles= ppwFrame().get('profiles'),
+            options= "",
+            selected= "";
+
+        profiles['none']= true;
+        profiles= Object.keys(profiles);
+
+        $(profiles).each(function(){
+
+            selected= this == 'none'? 'selected': '';
+            options+= "<option value='"+this+"' "+selected+">"+
+                            this+
+                      "</option>";
         });
-        
-        
+
+        $('#sett-profile').html(options)
+                          .bind('change', function(){
+            // TODO: sent via socket
+            //alert(this.value);
+            ppwFrame().setProfile(this.value);
+        });
+    };
+
+    var _bindEvents= function(){
+
         $(document.body).attr('unselectable', 'on')
                         .css('user-select', 'none')
                         .on('selectstart', false);
-        
+
         if(version == 'full'){
-            
+
             // let's start listening to other events
+            ppwFrame().addListener('onslidesloaded', function(){
+                _bindProfiles();
+            });
+
             ppwFrame().addListener('onslidechange', function(){
-                
+
+                var str= _getCurrentNotes(),
+                    idx= ppwFrame().getCurrentSlide().index;
+
                 if(showingNotes){
-                    notesContainer.html(_getCurrentNotes());
+                    if(!str || str == '<ul></ul>')
+                        str= _defaultNoNotesStr;
+                    notesContainer.html(str);
                 }
                 if(_currentInteractionState == 'thumbs'){
                     _currentInteractionState= false;
@@ -136,17 +173,46 @@ $(document).ready(function(){
                             curSlide: ppwFrame().getCurrentSlide().index-1
                         }
                     });
-                    _showControls();
+                    //_showControls();
                 }
+                $('#currentSlideIdx').html(idx).css('fontSize', document.body.offsetHeight+'px');
             });
-            
-            syncSlide= ppwFrame().getCurrentSlide().index-1;
+
+            var syncSlide= ppwFrame().getCurrentSlide().index-1;
         }
-        
+
+        $('#sett-show-presentation').click(function(){
+            if(!this.checked){
+                var iF= $('#presentation-iframe')[0];
+                if(iF.contentWindow){
+                    $(this).data('previous-src', iF.contentWindow.location.href);
+                    iF.style.display= 'none';
+                }
+            }else{
+                $('#presentation-iframe').show();
+            }
+        });
+
+        $('#sett-show-controls').click(function(){
+            if(this.checked){
+                _showControls();
+            }else{
+                _hideControls();
+            }
+        });
+
+        $('#sett-show-notes').click(function(){
+            if(this.checked){
+                _showNotes();
+            }else{
+                _hideNotes();
+            }
+        });
+
         $('#btn-next-slide').click(_goNext);
-        
+
         $('#btn-previous-slide').click(_goPrev);
-        
+
         // toggle camera
         $('#btn-toggle-camera').click(function(){
             /*if(version == 'full'){
@@ -160,32 +226,59 @@ $(document).ready(function(){
                 data: null
             });
         });
-        
+
         if(version == 'full'){
-            
-            $('#btn-cursor').click(function(){
-                _setInteractionState(false);
-                _setCurrentStateButton(this);
+
+            $('#btn-settings').click(function(){
+                var s= 'settings';
+                if(_currentInteractionState == s){
+                    _clearStateButtons();
+                    _hideOptions();
+                }else{
+                    _setInteractionState(s);
+                    _setCurrentStateButton(this);
+                    _showOptions();
+                }
             });
             $('#btn-spotlight').click(function(){
-                _setInteractionState('spotlight');
-                _setCurrentStateButton(this);
+                var s= 'spotlight';
+                if(_currentInteractionState == s){
+                    _clearStateButtons();
+                }else{
+                    _setInteractionState(s);
+                    _setCurrentStateButton(this);
+                }
             });
             $('#btn-laserpoint').click(function(){
-                _setInteractionState('laserpoint');
-                _setCurrentStateButton(this);
+
+                var s= 'laserpoint';
+
+                if(_currentInteractionState == s){
+                    _clearStateButtons();
+                }else{
+                    _setInteractionState(s);
+                    _setCurrentStateButton(this);
+                }
             });
             $('#btn-drawing').click(function(){
-                _setInteractionState('drawing');
-                _setCurrentStateButton(this);
+
+                var s= 'drawing';
+
+                if(_currentInteractionState == s){
+                    _clearStateButtons();
+                }else{
+                    _setInteractionState(s);
+                    _setCurrentStateButton(this);
+                }
             });
+
             $('#btn-thumbs').click(function(){
-                
+
                 if(ppwFrame() && ppwFrame().get('presentationStarted')){
                     ppwFrame().showThumbs();
                     _hideControls(true);
                 }
-                
+
             }).on('mousedown', function(){
                 _setCurrentStateButton(this);
                 $(_b).one('mouseup', function(){
@@ -193,7 +286,7 @@ $(document).ready(function(){
                     _setCurrentStateButton($('#btn-cursor'));
                 });
             });
-            
+
             $(document.body).bind('mousemove', _movingAround);
             $($(document.body)).bind('mousedown', function(evt){
                 if(evt.target.parentNode &&
@@ -213,7 +306,7 @@ $(document).ready(function(){
             });
             $(document.body).bind('touchmove', _movingAround);
             $(document.body).bind('touchend', _movingAroundEnd);
-            
+
         }else{
             $('#basic-pointer').bind('mousedown', function(){
                 $(document.body).bind('mousemove', _dragBasicPointer);
@@ -255,76 +348,98 @@ $(document).ready(function(){
                 });
             });
         }
-        
-        $(document.body).bind("touchstart", function(event){
-            var touches = event.originalEvent.touches;
-            
-            if(touches.length == 2 && !_swipeStart.length){
-                
-                _swipeStart= [touches[0].pageX, touches[0].pageY];
-                
-                $(document.body).bind("touchmove", _swiping);
-            }
+
+
+        var $b= $(document.body).hammer();
+        $b.on('pinchout', function(){
+            _hideControls();
+            return false;
         });
-        
-        $(document).bind("touchmove", function(event){
-            event.preventDefault();
+        $b.on('pinchin', function(){
+            _showControls();
+            return false;
         });
-        
-    };
-    
-    var _swiping= function(event){
-        
-        /*
-        var touch = event.originalEvent.changedTouches[0],
-            x= touch.pageX;
-        
-        if(!_swipeStart.length)
-            return;
-        // swiping left
-        
-        if(x > _swipeStart[0]){
-            $(document.body).unbind("touchmove", _swiping);
-            _goPrev();
-            _swipeStart= [];
-        }else if(x < _swipeStart[0]){
-            $(document.body).unbind("touchmove", _swiping);
-            _swipeStart= [];
+        $b.on('swipeleft', function(){
             _goNext();
-        }
-        */
+            return false;
+        });
+        $b.on('swiperight', function(){
+            _goPrev();
+            return false;
+        });
+        $b.on('swipeup', function(){
+            _showNotes();
+            return false;
+        });
+        $b.on('swipedown', function(){
+            _hideNotes();
+            return false;
+        });
+        $b.on('hold', function(){
+            //_showOptions();
+        });
     };
-    
+
+    $(document.body).bind("touchmove", function(event){
+        event.preventDefault();
+    });
+
+    var _showOptions= function(){
+        $b.addClass('showing-settings');
+    };
+
+    var _hideOptions= function(){
+        $b.removeClass('showing-settings');
+    };
+
+    var _showControls= function(){
+        $(document.body).addClass('showing-controls');
+        showingControls= true;
+        $('#sett-show-controls').attr('checked', 'checked');
+        _hideNotes();
+        return false;
+    };
+
+    var _hideControls= function(canvasToo){
+
+        $(document.body).removeClass('showing-controls');
+        setTimeout(function(){
+            showingControls= false;
+        }, 200);
+        $('#sett-show-controls').removeAttr('checked');
+        return;
+    };
+
     var _dragBasicPointer= function(evt){
-        
+
         var x, y, touch;
 
         _hideControls();
-        
+
         if(touch = evt.originalEvent.changedTouches){ // is a touch event
             evt.preventDefault();
-            
+
             if(touch.length>1)
                 return;
-            
+
             touch= touch[0];
 
             x= touch.pageX - 10;
             y= touch.pageY - 10;
-            
+
         }else{ // is a click event
             x= evt.clientX - 10;
             y= evt.clientY - 10;
         }
-        
+
         $('#basic-pointer').css({
             left: x+'px',
             top: y+'px'
         });
-        
+
         x= _pxToPerc(x, true);
         y= _pxToPerc(y, false);
-        
+
         _broadcast({
             act: 'laserpoint',
             talk: presentation,
@@ -335,13 +450,13 @@ $(document).ready(function(){
         });
         return false;
     };
-    
+
     var _pxToPerc= function(px, x){
         return (px * 100) / _b[x? 'clientWidth': 'clientHeight'];
     }
-    
+
     var _movingAroundEnd= function(){
-        
+
         _broadcast({
             act: 'interactionEnd',
             talk: presentation,
@@ -351,41 +466,41 @@ $(document).ready(function(){
             }
         });
         ppwFrame().hideCanvas(function(){
-            _showControls();
+            //_showControls();
         });
     };
-    
+
     var _movingAround= function(evt){
-        
+
         var x= 0,
             y= 0,
             touch= null;
 
         if(touch = evt.originalEvent.changedTouches){ // is a touch event
-            
+
             if(touch.length>1)
                 return;
-            
+
             touch= touch[0];
 
             x= touch.pageX;
             y= touch.pageY;
-            
+
         }else{ // is a click event
-            
+
             if(!_mouseInteractionEnabled) // if is not pressed
                 return;
-            
+
             x= evt.clientX;
             y= evt.clientY;
         }
-        
+
         x= _pxToPerc(x, true);
         y= _pxToPerc(y, false);
-        
-        
+
+
         if(_currentInteractionState){
-            
+
             _broadcast({
                 act: _currentInteractionState,
                 talk: presentation,
@@ -394,7 +509,7 @@ $(document).ready(function(){
                     y: y
                 }
             });
-            
+
             _hideControls();
             ppwFrame().drawOnCanvas({
                 x: x,
@@ -402,56 +517,33 @@ $(document).ready(function(){
                 type: _currentInteractionState
             });
         }
-        
+
     }
-    
-    var _hideControls= function(canvasToo){
-        
-        var els= '#buttons-container, \
-                  #annotations-container,\
-                  #state-buttons-container';
-        if(canvasToo)
-            els+= ', #canvas';
-        
-        _hiddenControls= true;
-        
-        $(els).fadeOut('fast');
-    };
-    
-    
-    var _showControls= function(canvasToo){
-        
-        var els= '#buttons-container, \
-                  #annotations-container,\
-                  #canvas,\
-                  #state-buttons-container';
-        
-        _hiddenControls= false;
-        
-        $(els).fadeIn('fast');
-    };
-    
+
     var _setInteractionState= function(s){
         _currentInteractionState= s;
     };
-    
+
     var _setCurrentStateButton= function(el){
-        _clearStateButtons();
+        _clearStateButtons(true);
         $(el).addClass('selected')
     };
-    
-    var _clearStateButtons= function(){
+
+    var _clearStateButtons= function(keep){
         $('#state-buttons-container div').removeClass('selected');
+        if(!keep)
+            _currentInteractionState= null;
     };
-    
+
     var _broadcast= function(obj){
         _socket.emit('remote-control-send', obj);
     };
-    
+
     var ppwFrame= function(){
-        return version == 'full'? presentationIframe[0].contentWindow.PPW: false;
+        _loadedPpwFrame= presentationIframe[0].contentWindow.PPW||_loadedPpwFrame;
+        return version == 'full'? _loadedPpwFrame: false;
     }
-    
+
     var _waitForPPW= function(){
         if(ppwFrame()){
             _bindEvents();
@@ -459,7 +551,7 @@ $(document).ready(function(){
             setTimeout(_waitForPPW, 1500);
         }
     }
-    
+
     var _init= function(){
         _socket= io.connect(socketServer);
         _socket.emit('listening', talkId);
@@ -468,27 +560,28 @@ $(document).ready(function(){
         }else{
             _bindEvents();
         }
+        //_hideControls();
     }
-    
+
     presentation= getParameterByName('p');
     talkId= presentation.replace(/\/$/, '').split('/').pop();
-    
+
     if(version == 'full'){
-        
+
         //socketServer= location.protocol+'//'+location.host;//+'/'+presentation;
         socketServer= '/'+presentation;
-        
+
         if(!presentation){
             return false;
         }
         //alert('?')
         presentationIframe.attr('src', '/'+presentation+'?remote-controller=true');
-        
+
         //presentationIframe.attr('src', 'http://www.google.com/');
     }else{
         $('#btn-annotations').hide();
     }
     _init();
-    
-    
+
+
 });

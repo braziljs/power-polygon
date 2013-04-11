@@ -1,4 +1,4 @@
-/* 
+/*
     Document   : ppw
     Created on : Sep 20, 2012
     Author     : Felipe N. Moura <felipenmoura@gmail.com>
@@ -15,7 +15,7 @@
     top: 0px;
     width: 100%;
     height: 100%;
-    
+
     page-break-after: always;
     page-break-inside: avoid;
 }
@@ -25,7 +25,7 @@
         margin: 0px !IMPORTANT;
         padding: 0px !IMPORTANT;
     }
-    
+
     /* 1(ONE) slide per page */
     body.printing-1{
         overflow: auto !IMPORTANT;
@@ -35,7 +35,7 @@
     /*body.printing-1 *{
         background: white !IMPORTANT;
     }*/
-    
+
     .printing-1 .ppw-slides-container{
         width: 100% !IMPORTANT;
         height: 100% !IMPORTANT;
@@ -44,14 +44,14 @@
         width: 100% !IMPORTANT;
         height: 100% !IMPORTANT;
     }
-    
+
     .printing-1 .ppw-slide-container:not(.ppw-slide-not-in-profile){
         display: block !IMPORTANT;
         width: 100% !IMPORTANT;
         height: 100% !IMPORTANT;
         overflow: hidden !IMPORTANT;
         margin: 0px !IMPORTANT;
-        
+
         page-break-after: always;
         page-break-inside: avoid;
     }
@@ -70,14 +70,14 @@
         border: none !IMPORTANT;
         /*background: white !IMPORTANT;*/
     }
-    
+
     @media screen{
         .printing-1 .ppw-slide-container:not(.ppw-slide-not-in-profile),
         .printing-1 .ppw-slide-container:not(.ppw-slide-not-in-profile) section{
             border-bottom: dashed 2px gray !IMPORTANT;
         }
     }
-    
+
     /* 4(FOUR) slides per page */
     body.printing-4{
         overflow: auto !IMPORTANT;
@@ -111,7 +111,7 @@
         border: solid 1px black !IMPORTANT;
     }
     .printing-4 .ppw-slide-container:not(.ppw-slide-not-in-profile) section{
-        
+
         -webkit-transform-origin: 0px 0px;
         -webkit-transform: scale(0.3);
         -moz-transform-origin: 0px 0px;
@@ -151,7 +151,7 @@
 
 
 @media screen{
-    html, body { 
+    html, body {
         height: 100%;
         width: 100%;
         overflow: hidden;
@@ -184,7 +184,7 @@
 #ppw-splash-screen-container{
     border-bottom: solid 1px #666666;
     width: 100%;
-    
+
     margin: auto;
     position: relative;
     top: 0px;
@@ -223,24 +223,24 @@
     margin-bottom: 8px;
     box-shadow: 0px 0px 20px gray;
     text-shadow: 0px 0px 2px black;
-    
+
     float: left;
     border-radius: 7px;
     cursor: pointer;
-    
+
     -webkit-transition: all 200ms linear;
     -moz-transition: all 200ms linear;
     transition: all 200ms linear;
 }
 .ppw-menu-help-icon{
-    
+
     -webkit-background-origin: border-box;
     -moz-background-origin: border;
     background-origin: border-box;
     background: url(../_images/help-icon.png) no-repeat -50px 0px, -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(255, 255, 255, .15)), to(rgba(0, 0, 0, .25))), -webkit-gradient(linear, left top, right bottom, color-stop(0, rgba(255, 255, 255, 0)), color-stop(0.5, rgba(255, 255, 255, .15)), color-stop(0.501, rgba(255, 255, 255, 0)), color-stop(1, rgba(255, 255, 255, 0)));
     background: url(../_images/help-icon.png) no-repeat -50px 0px, -moz-linear-gradient(top, rgba(255, 255, 255, .15), rgba(0, 0, 0, .25)), -moz-linear-gradient(left top, rgba(255, 255, 255, 0), rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0));
     background: url(../_images/help-icon.png) no-repeat -50px 0px, linear-gradient(top, rgba(255, 255, 255, .15), rgba(0, 0, 0, .25)), linear-gradient(left top, rgba(255, 255, 255, 0), rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0));
-    
+
     color: white;
     font-size: 40px;
     font-weight: bold;
@@ -255,14 +255,14 @@
 }
 
 .ppw-menu-start-icon{
-    
+
     -webkit-background-origin: border-box;
     -moz-background-origin: border;
     background-origin: border-box;
     background: url(../_images/start-icon.png) no-repeat -40px 0px, -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(255, 255, 255, .15)), to(rgba(0, 0, 0, .25))), -webkit-gradient(linear, left top, right bottom, color-stop(0, rgba(255, 255, 255, 0)), color-stop(0.5, rgba(255, 255, 255, .15)), color-stop(0.501, rgba(255, 255, 255, 0)), color-stop(1, rgba(255, 255, 255, 0)));
     background: url(../_images/start-icon.png) no-repeat -40px 0px, -moz-linear-gradient(top, rgba(255, 255, 255, .15), rgba(0, 0, 0, .25)), -moz-linear-gradient(left top, rgba(255, 255, 255, 0), rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0));
     background: url(../_images/start-icon.png) no-repeat -40px 0px, linear-gradient(top, rgba(255, 255, 255, .15), rgba(0, 0, 0, .25)), linear-gradient(left top, rgba(255, 255, 255, 0), rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0));
-    
+
     color: white;
     font-size: 24px;
     font-weight: bold;
@@ -278,14 +278,14 @@
 
 
 .ppw-menu-open-icon{
-    
+
     -webkit-background-origin: border-box;
     -moz-background-origin: border;
     background-origin: border-box;
     background: url(../_images/tools-icon.png) no-repeat -90px 0px, -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(255, 255, 255, .15)), to(rgba(0, 0, 0, .25))), -webkit-gradient(linear, left top, right bottom, color-stop(0, rgba(255, 255, 255, 0)), color-stop(0.5, rgba(255, 255, 255, .15)), color-stop(0.501, rgba(255, 255, 255, 0)), color-stop(1, rgba(255, 255, 255, 0)));
     background: url(../_images/tools-icon.png) no-repeat -90px 0px, -moz-linear-gradient(top, rgba(255, 255, 255, .15), rgba(0, 0, 0, .25)), -moz-linear-gradient(left top, rgba(255, 255, 255, 0), rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0));
     background: url(../_images/tools-icon.png) no-repeat -90px 0px, linear-gradient(top, rgba(255, 255, 255, .15), rgba(0, 0, 0, .25)), linear-gradient(left top, rgba(255, 255, 255, 0), rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0));
-    
+
     color: white;
     font-size: 30px;
     font-weight: bold;
@@ -301,7 +301,7 @@
 
 .ppw-menu-conf-icon{
     background: url(../_images/config-icon.jpg) no-repeat -20px -10px #fff;
-    
+
     color: black;
     font-size: 30px;
     font-weight: bold;
@@ -318,7 +318,7 @@
 #ppw-arrows-container{
     position: absolute;
     z-index: 99999992;
-    
+
     width: 100%;
     height: 0px;
     bottom: 6px;
@@ -341,7 +341,7 @@
     margin-top: -60px;
     cursor: pointer;
     opacity: 0.4;
-    
+
     -webkit-transition: all 500ms linear;
     -moz-transition: all 500ms linear;
     -ms-transition: all 500ms linear;
@@ -364,7 +364,7 @@
     margin-top: -60px;
     cursor: pointer;
     opacity: 0.4;
-    
+
     -webkit-transition: all 500ms linear;
     -moz-transition: all 500ms linear;
     -ms-transition: all 500ms linear;
@@ -411,8 +411,8 @@
     min-height: 40px;
     min-width: 400px;
     max-width: 500px;
-    
-    
+
+
     /*
     border: solid 4px black;
     border-style: double;
@@ -423,7 +423,7 @@
     background-color: rgba(255, 255, 255, 0.9);
     display: none;
     padding: 6px 20px 6px 20px;
-    
+
     box-sizing: border-box;
     -moz-box-sizing: border-box;
 }
@@ -587,7 +587,7 @@
     padding: 10px;
     border: solid 1px gray;
     border-radius: 0px 0px 12px 12px;
-    
+
     margin-top: -61px;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -631,10 +631,10 @@
     min-width: 52px;
     min-height: 28px;
     padding: 5px;
-    
+
     box-sizing: border-box;
     -moz-box-sizing: border-box;
-    
+
     font-family: sans-serif, Arial, Tahoma;
     background: -webkit-gradient(linear, left top, left bottom, from(rgba(90, 90, 90, 0.7)), to(rgba(0, 0, 0, 0.7)));
     background: -moz-linear-gradient(to bottom, rgba(90, 90, 90, 0.7), rgba(0, 0, 0, 0.7));
@@ -691,9 +691,9 @@
     /*height: 206px;*/
     width: 36px;
     box-shadow: 0px 0px 10px gray;
-    
+
     border-radius: 0 0 7px 0;
-    
+
     /*background-color: white;*/
     background: rgb(206,220,231); /* Old browsers */
     background: -moz-linear-gradient(left, rgba(206,220,231,1) 1%, rgba(173,183,188,1) 83%); /* FF3.6+ */
@@ -740,11 +740,11 @@
     box-shadow: 0px 0px 9px 2px gray;
     padding-left: 10px;
     box-sizing: border-box;
-    
+
     width: 195px;
     height: 30px;
     white-space: nowrap;
-    
+
     background: rgb(255,255,255); /* Old browsers */
     background: -moz-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(229,229,229,1) 100%); /* FF3.6+ */
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,1)), color-stop(100%,rgba(229,229,229,1))); /* Chrome,Safari4+ */
@@ -825,11 +825,11 @@
 .ppw-slide-container{
     width: 100%;
     height: 100%;
-    
-    
+
+
     page-break-after: always;
     page-break-inside: avoid;
-    
+
     /*-webkit-transition: all 500ms linear;
     -moz-transition: all 500ms linear;
     -ms-transition: all 500ms linear;
@@ -845,8 +845,8 @@
     margin: 10px !IMPORTANT;
     display: block !IMPORTANT;
     opacity: 1 !IMPORTANT;
-    
-    
+
+
     /*-webkit-transition: all 500ms linear;
     -moz-transition: all 500ms linear;
     -ms-transition: all 500ms linear;
@@ -857,6 +857,7 @@
 .ppw-show-thumbs{
     width: 100% !IMPORTANT;
     height: 100% !IMPORTANT;
+    opacity: 1 !IMPORTANT;
     /*background-color: #777 !IMPORTANT;*/
     background: url(../_images/splash-screen-bg.jpg);
     background-size: 100% 100%;
@@ -865,6 +866,11 @@
     left: 0px !IMPORTANT;
     top: 0px !IMPORTANT;
     margin: 0px !IMPORTANT;
+
+    /*-webkit-transform: none !IMPORTANT;
+    -moz-transform: none !IMPORTANT;
+    -ms-transform: none !IMPORTANT;
+    transform: none !IMPORTANT;*/
 }
 .ppw-show-thumbs div:not(.ppw-slide-not-in-profile) section{
     position: relative !IMPORTANT;
@@ -875,12 +881,12 @@
     border: solid 1px black !IMPORTANT;
     overflow: hidden !IMPORTANT;
     border-radius: 0px !IMPORTANT;
-    
+
     opacity: 1 !IMPORTANT;
-    
+
     width: 860px !IMPORTANT;
     height: 600px !IMPORTANT;
-    
+
     -webkit-transform-origin: 0px 0px !IMPORTANT;
     -webkit-transform: scale(0.3) translate(0px) scale(1) rotate(0deg) !IMPORTANT;
     -moz-transform-origin: 0px 0px !IMPORTANT;
@@ -1044,4 +1050,44 @@ body, .ppw-active-slide-element-container{
     top: 0px;
     z-index: 99999999;
     display: none;
+}
+
+BODY.remote-controller .ppw-loadingbarContainer{
+    /*width: 260px;
+    text-align: center;
+    marging-top: -30px;
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    margin-left: -130px;
+    marging-top: -30px;*/
+}
+.remote-controller *{
+    -webkit-animation: none !important;
+    -webkit-transition: none !important;
+    -moz-animation: none !important;
+    -moz-transition: none !important;
+    -ms-animation: none !important;
+    -ms-transition: none !important;
+    animation: none !important;
+    transition: none !important;
+}
+.remote-controller .ppw-slide-element,
+.remote-controller .ppw-slide-container,
+.remote-controller #ppw-slides-container{
+    position: absolute !important;
+    left: 0px !important;
+    top: 0px !important;
+    width: 100% !important;
+    height: 100% !important;
+    display: none;
+    opacity: none !important;
+    -webkit-transform: none !important;
+    -moz-transform: none !important;
+    -ms-transform: none !important;
+    transform: none !important;
+}
+.remote-controller .ppw-active-slide-element-container section,
+.remote-controller #ppw-slides-container{
+    display: block !important;
 }

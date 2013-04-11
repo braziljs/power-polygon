@@ -95,7 +95,7 @@ body{
 }
 
 /* if it is a small mobile device, it will not support full remote control */
-@media screen and (max-width: 799px){
+@media screen and (max-width: 460px){
     .talk-butons a:nth-child(2){
         position: absolute;
         left: -9000px;
