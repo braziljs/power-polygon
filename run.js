@@ -41,7 +41,7 @@ app.use(express.session({
  * Useful services to work with the API
  */
 Services= (function(){
-    
+
     var listDir= function(path){
         var files= fs.readdirSync(path);
 
@@ -56,20 +56,20 @@ Services= (function(){
         }while(i--);
         return list;
     };
-    
+
     var deliver= function(url, req, res){
-        
+
         url= url.replace(/(\/\..*)|(\?.*)|(\#.*)/ig, '');
         if(url[url.length-1] == '/')
             url+= 'index.html';
-        
+
         fs.readFile(__dirname+url, function(err, data){
-            
+
             if (err) {
                 res.writeHead(500);
                 return res.end('Error loading: ' + __dirname + url);
             }
-        
+
             if(url.match(/\.js(\?|$)/i)){
                 res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
             }
@@ -91,26 +91,31 @@ Services= (function(){
             if(url.match(/\.gif$/i)){
                 res.setHeader('Content-Type', 'image/gif');
             }
-            
+
             res.writeHead(200);
+
+            // fixing a bug in nodejs, for empty files(explodes the gzip module!)
+            if(!data || !data.length)
+                data= "// Empty file!";
+
             res.end(data);
-            
+
         });
     };
-    
+
     var _logoff= function(req, res){
         var data= { status: 'done' };
         req.session.destroy();
         res.writeHead(200);
         res.end(JSON.stringify(data));
     };
-    
+
     var _isLogged= function(req){
         return req.session.auth? true: false;
     };
-    
+
     var _login= function(req, res){
-        
+
         var token= req.body.token,
             qr= "SELECT userid,\
                         username,\
@@ -119,24 +124,24 @@ Services= (function(){
                   WHERE usertoken= ?",
             auth= false,
             data= {};
-        
+
         // if already logged
         if(_isLogged(req)){
             res.writeHead(200);
             res.end(JSON.stringify({auth: true, status: 200}));
             return;
         }
-        
+
         db.serialize(function(){
             db.each(qr, token, function(err, row){
                 auth= row.usertoken;
                 return false;
             }, function(){
-                
+
                 if(auth){
                     data.auth= true;
                     data.status= 200;
-                    
+
                     req.session.token= token;
                     req.session.auth= true;
                 }else{
@@ -144,16 +149,16 @@ Services= (function(){
                     data.status= 200;
                     data.auth= false;
                 }
-                
+
                 res.writeHead(200);
                 res.end(JSON.stringify(data));
             });
         });
-        
+
     };
-    
+
     var _socketsEvents= function (socket) {
-        
+
         socket.on('listening', function (talk) {
             console.log("someone joined =================== "+talk);
             socket.set('watchingTo', talk);
@@ -167,15 +172,15 @@ Services= (function(){
                       .emit('control-command', data);
             });
         });
-        
-        
+
+
     }
-    
+
     var _init= function(){
-        
+
         var url= "",
             root= '/ppw/_tools/remote/index.html';
-            
+
         app.get('/run.js', function(req, res){
             url= root;
             deliver(url, req, res);
@@ -187,14 +192,14 @@ Services= (function(){
 
         // API - get
         app.get('/api/:command', function(req, res){
-            
+
             var data= {
                 demos: [],
                 talks: [],
                 errors: [],
                 auth: _isLogged(req)
             }
-            
+
             res.setHeader('Content-Type', 'text/json; charset=utf-8');
             switch(req.params.command){
                 case "verifylogin":{
@@ -221,22 +226,22 @@ Services= (function(){
             }
             res.end(JSON.stringify(data));
         });
-        
+
         // API - post
         app.post('/api/:command', function(req, res){
-            
+
             var postData= req.body;
             res.setHeader('Content-Type', 'text/json; charset=utf-8');
-            
+
             if(req.params.command == 'auth'){
                 _login(req, res);
                 return;
             }
-            
+
             if(!_isLogged(req, res)){
                 return false;
             }
-            
+
             /*switch(req.params.command){
                 case "broadcast":{
                     postData;
@@ -247,7 +252,7 @@ Services= (function(){
             }*/
             //res.end(JSON.stringify(data));
         });
-        
+
         // filtering only authenticated users
         app.get(/^\/ppw\/_tools\/remote\/(basic|full)\/.*/, function(req, res){
             if(_isLogged(req, res))
@@ -256,35 +261,35 @@ Services= (function(){
                 res.redirect('/');
             }
         });
-        
+
         // File deliveries
         app.get(/^\/ppw\/.*/, function(req, res){
             deliver(req.url, req, res);
         });
-        
+
         app.get(/^\/talks\/.*/, function(req, res){
             deliver(req.url, req, res);
         });
-        
+
         app.get(/^\/_demos\/.*/, function(req, res){
             deliver(req.url, req, res);
         });
-        
-    
+
+
         // listeners
-        
+
         server= app.listen(serverConf.port);
         io= require('socket.io').listen(server);
         io.sockets.on('connection', _socketsEvents);
-        
+
         // just announcing the server initialization...
         console.log('[PPW] Listening on '+ server.address().port);
         if(_token)
             console.log('[PPW] Your token is ' + _token);
-        
+
         console.log();
     };
-    
+
     return {
         init: _init,
         listDir: listDir
@@ -321,24 +326,24 @@ var getToken= function(fn, repeat){
 
 /**
  * Verifies wether the database exists or not.
- * 
+ *
  * In case it does not exist, it is created with its tables.
  */
 var verifyDB= function(){
-    
+
     var stats = null;
     try{
         stats= fs.lstatSync(serverConf.dbsrc);
     }catch(e){}
-    
+
     db= new sqlite3.Database(serverConf.dbsrc);
-    
+
     // DATABASE does not exist
     if(!stats){
-        
+
         // must create the database
         db.serialize(function(){
-                
+
             // TABLE SERVERCONFIG
             db.run("CREATE TABLE serverconfig (confid INTEGER, usedefaultuser INTEGER, defaultuser TEXT)");
             var stmt = db.prepare("INSERT INTO serverconfig VALUES (?, ?, ?)");
@@ -355,7 +360,7 @@ var verifyDB= function(){
             });
         });
     }else{
-        
+
         // database exists, let's verify the server config
         db.each("SELECT confid, usedefaultuser, defaultuser  FROM serverconfig", function(err, row) {
             if(err){
@@ -369,7 +374,7 @@ var verifyDB= function(){
                     stmt.run(serverConf.usedefaultuser, serverConf.defaultuser);
                     stmt.finalize();
                 }
-                
+
                 if(process.argv.indexOf('renew') >= 0 ){
                     getToken(function(token){
                         var stmt = db.prepare("UPDATE userdata SET usertoken=? where username=?");

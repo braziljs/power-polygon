@@ -677,10 +677,13 @@
 }
 
 @media screen and (max-width: 799px){
-    #ppw-toolbar-container{
+    /*#ppw-toolbar-container{
         -webkit-transform: scale(3);
         -moz-transform: scale(3);
         transform: scale(3);
+    }*/
+    #ppw-toolbox-icon, #ppw-ct-print{
+        display: none;
     }
 }
 
@@ -741,7 +744,8 @@
     padding-left: 10px;
     box-sizing: border-box;
 
-    width: 195px;
+    padding-right: 4px;
+    /*width: 195px;*/
     height: 30px;
     white-space: nowrap;
 
@@ -752,6 +756,21 @@
     background: -o-linear-gradient(top, rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%); /* Opera 11.10+ */
     background: -ms-linear-gradient(top, rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%); /* IE10+ */
     background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%); /* W3C */
+}
+
+.ppw-fb-only{
+    width: 160px;
+}
+.ppw-fb-only #ppw-presentation-social-buttons{
+    width: 62px;
+}
+.ppw-gp-only{
+    width: 144px;
+}
+.ppw-gp-only #ppw-presentation-social-buttons{
+    width: 40px;
+    margin-top: -4px;
+    margin-right: 4px;
 }
 
 #ppw-toolbar-container:hover, #ppw-toolbar-container:active{

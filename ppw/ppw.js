@@ -317,7 +317,7 @@ window.PPW = (function ($, _d, console){
 
             // the loading element
             loading: "<div id='ppw-lock-loading' style='position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; background: #dadada url(/ppw/_images/ppw-gray-bg.png); padding: 10px; font-family: Arial; z-index: 999999999;'>\
-                            <div class='ppw-loadingbarContainer' style='width: 264px; margin: auto; text-align: center; margin-top: 60px;'><span>Loading Power Polygon</span><br/><div id='ppw-loadingbarParent'><div/><div id='ppw-loadingbar'><div/></div></div>",
+                            <div class='ppw-loadingbarContainer' style='width: 264px; margin: auto; text-align: center; margin-top: 60px; font-family: sans-serif, arial, tahoma !important; font-size: 16px !important;'><span>Loading Power Polygon</span><br/><div id='ppw-loadingbarParent'><div/><div id='ppw-loadingbar'><div/></div></div>",
 
             // content for the not found slides
             slideNotFound:  "<h4 style='font-size: 22px;'>Failed loading slide <span class='ppw-slide-fail'>{{slideid}}</span>!</h4>\
@@ -2624,22 +2624,35 @@ window.PPW = (function ($, _d, console){
             _setLoadingBarStatus("splash screen not used");
         }
 
-        if(_n.onLine && _settings.Facebook && !_conf.remoteControl){
+        if(_n.onLine && !_conf.remoteControl){
 
-            // applying Facebook Buttons
-            (function(d, s, id) {
-                var js, fjs = d.getElementsByTagName(s)[0];
-                if (d.getElementById(id)) return;
-                js = d.createElement(s); js.id = id;
-                js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=281929191903584";
-                fjs.parentNode.insertBefore(js, fjs);
-            }(_d, 'script', 'facebook-jssdk'));
+            if(_settings.Facebook){
+                // applying Facebook Buttons
+                (function(d, s, id) {
+                    var js, fjs = d.getElementsByTagName(s)[0];
+                    if (d.getElementById(id)) return;
+                    js = d.createElement(s); js.id = id;
+                    js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=281929191903584";
+                    fjs.parentNode.insertBefore(js, fjs);
+                }(_d, 'script', 'facebook-jssdk'));
+            }
+            if(_settings.Google){
+                // applying the g+ buttons
+                _loadScript('https://apis.google.com/js/plusone.js');
+            }
 
-        }
+            if(_settings.Facebook >> _settings.Google){
+                $('#ppw-content-toolbar').addClass('ppw-fb-only');
+                //$('#ppw-content-toolbar').css('width', '160px');
+                //$('#ppw-presentation-social-buttons').css('width', '62px');
+            }
+            if(_settings.Google >> _settings.Facebook){
+                $('#ppw-content-toolbar').addClass('ppw-gp-only');
+            }
+            if(_settings.Facebook && _settings.Google){
+                $('#ppw-content-toolbar').css('width', '200px');
+            }
 
-        if(_n.onLine && _settings.Google && !_conf.remoteControl){
-            // applying the g+ buttons
-            _loadScript('https://apis.google.com/js/plusone.js');
         }
 
     };
