@@ -777,6 +777,9 @@ window.PPW = (function ($, _d, console){
         _conf.curLoaded++;
         var perc= _conf.curLoaded * 100 / _conf.loadSteps;
 
+        if(perc >= 100)
+            perc= 100;
+
         $('#ppw-loadingbar').css({width: perc+'%'});
 
         if(msg)

@@ -14,7 +14,6 @@ $(document).ready(function(){
         _defaultNoNotesStr= "<ul><li>No notes for the current slide</li></ul>",
         _hiddenControls= false,
         _loadedPpwFrame= false,
-        //_swipeStart= [],
         _b= document.body,
         $b= $(_b);
 
@@ -135,9 +134,14 @@ $(document).ready(function(){
 
         $('#sett-profile').html(options)
                           .bind('change', function(){
-            // TODO: sent via socket
-            //alert(this.value);
             ppwFrame().setProfile(this.value);
+            _broadcast({
+                act: 'changeProfile',
+                talk: presentation,
+                data: {
+                    profile: this.value
+                }
+            });
         });
     };
 
@@ -173,6 +177,7 @@ $(document).ready(function(){
                             curSlide: ppwFrame().getCurrentSlide().index-1
                         }
                     });
+                    $('#buttons-container').show();
                     //_showControls();
                 }
                 $('#currentSlideIdx').html(idx).css('fontSize', document.body.offsetHeight+'px');
@@ -215,11 +220,6 @@ $(document).ready(function(){
 
         // toggle camera
         $('#btn-toggle-camera').click(function(){
-            /*if(version == 'full'){
-                if(ppwFrame().get('presentationStarted')){
-                    //ppwFrame().toggleCamera();
-                }
-            }*/
             _broadcast({
                 act: 'toggleCamera',
                 talk: presentation,
@@ -292,8 +292,6 @@ $(document).ready(function(){
                 if(evt.target.parentNode &&
                         (
                             evt.target.parentNode.id == 'buttons-container'
-                                ||
-                            evt.target.id == 'canvas'
                         )
                   )
                     _mouseInteractionEnabled= true;
@@ -327,8 +325,12 @@ $(document).ready(function(){
                     });
                 });
             });
+
             $('#basic-pointer').bind('touchstart', function(evt){
-                evt.preventDefault();
+                if(_currentInteractionState != 'thumbs'){
+                    evt.preventDefault();
+                }
+
                 $(document.body).bind('touchmove', _dragBasicPointer);
                 $(document.body).one('touchend', function(){
                     $(document.body).unbind('touchmove', _dragBasicPointer);
@@ -360,19 +362,23 @@ $(document).ready(function(){
             return false;
         });
         $b.on('swipeleft', function(){
-            _goNext();
+            if(!_currentInteractionState)
+                _goNext();
             return false;
         });
         $b.on('swiperight', function(){
-            _goPrev();
+            if(!_currentInteractionState)
+                _goPrev();
             return false;
         });
         $b.on('swipeup', function(){
-            _showNotes();
+            if(!_currentInteractionState)
+                _showNotes();
             return false;
         });
         $b.on('swipedown', function(){
-            _hideNotes();
+            if(!_currentInteractionState)
+                _hideNotes();
             return false;
         });
         $b.on('hold', function(){
@@ -381,7 +387,11 @@ $(document).ready(function(){
     };
 
     $(document.body).bind("touchmove", function(event){
-        event.preventDefault();
+        if(_currentInteractionState != 'thumbs'){
+            if(_currentInteractionState != 'thumbs'){
+                event.preventDefault();
+            }
+        }
     });
 
     var _showOptions= function(){
@@ -400,13 +410,16 @@ $(document).ready(function(){
         return false;
     };
 
-    var _hideControls= function(canvasToo){
+    var _hideControls= function(hideAll){
 
         $(document.body).removeClass('showing-controls');
         setTimeout(function(){
             showingControls= false;
         }, 200);
         $('#sett-show-controls').removeAttr('checked');
+        if(hideAll){
+            $('#buttons-container').hide();
+        }
         return;
     };
 
@@ -457,6 +470,9 @@ $(document).ready(function(){
 
     var _movingAroundEnd= function(){
 
+        if(!_currentInteractionState)
+            return;
+
         _broadcast({
             act: 'interactionEnd',
             talk: presentation,
@@ -466,7 +482,6 @@ $(document).ready(function(){
             }
         });
         ppwFrame().hideCanvas(function(){
-            //_showControls();
         });
     };
 
@@ -478,8 +493,8 @@ $(document).ready(function(){
 
         if(touch = evt.originalEvent.changedTouches){ // is a touch event
 
-            if(touch.length>1)
-                return;
+            if(touch.length > 1)
+                return true;
 
             touch= touch[0];
 
@@ -526,7 +541,8 @@ $(document).ready(function(){
 
     var _setCurrentStateButton= function(el){
         _clearStateButtons(true);
-        $(el).addClass('selected')
+        $(el).addClass('selected');
+        _hideControls();
     };
 
     var _clearStateButtons= function(keep){
@@ -553,14 +569,15 @@ $(document).ready(function(){
     }
 
     var _init= function(){
+
         _socket= io.connect(socketServer);
         _socket.emit('listening', talkId);
+
         if(version == 'full'){
             _waitForPPW();
         }else{
             _bindEvents();
         }
-        //_hideControls();
     }
 
     presentation= getParameterByName('p');
@@ -568,16 +585,14 @@ $(document).ready(function(){
 
     if(version == 'full'){
 
-        //socketServer= location.protocol+'//'+location.host;//+'/'+presentation;
-        socketServer= '/'+presentation;
+        socketServer= location.protocol+'//'+location.host;//+'/'+presentation;
+        //socketServer= '/'+presentation;
 
         if(!presentation){
             return false;
         }
-        //alert('?')
         presentationIframe.attr('src', '/'+presentation+'?remote-controller=true');
 
-        //presentationIframe.attr('src', 'http://www.google.com/');
     }else{
         $('#btn-annotations').hide();
     }

@@ -94,8 +94,12 @@ body{
     background-image: url(../../_images/remote-control-basic.png);
 }
 
+.talk-butons a:nth-child(3){
+    position: absolute;
+    left: -9000px;
+}
 /* if it is a small mobile device, it will not support full remote control */
-@media screen and (max-width: 460px){
+/*@media screen and (max-width: 460px){
     .talk-butons a:nth-child(2){
         position: absolute;
         left: -9000px;
@@ -104,7 +108,7 @@ body{
         float: none;
         width: 100%;
     }
-}
+}*/
 
 #unlock-interface, #re-lock-interface{
     background-color: #e0e0e0;

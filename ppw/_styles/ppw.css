@@ -1052,17 +1052,17 @@ body, .ppw-active-slide-element-container{
     display: none;
 }
 
-BODY.remote-controller .ppw-loadingbarContainer{
-    /*width: 260px;
+/*BODY.remote-controller .ppw-loadingbarContainer{
+    width: 260px;
     text-align: center;
     marging-top: -30px;
     position: absolute;
     top: 20%;
     left: 50%;
     margin-left: -130px;
-    marging-top: -30px;*/
-}
-.remote-controller *{
+    marging-top: -30px;
+}*/
+.remote-controller:not(.ppw-showing-thumb) *{
     -webkit-animation: none !important;
     -webkit-transition: none !important;
     -moz-animation: none !important;
@@ -1072,9 +1072,9 @@ BODY.remote-controller .ppw-loadingbarContainer{
     animation: none !important;
     transition: none !important;
 }
-.remote-controller .ppw-slide-element,
-.remote-controller .ppw-slide-container,
-.remote-controller #ppw-slides-container{
+.remote-controller:not(.ppw-showing-thumb) .ppw-slide-element,
+.remote-controller:not(.ppw-showing-thumb) .ppw-slide-container,
+.remote-controller:not(.ppw-showing-thumb) #ppw-slides-container{
     position: absolute !important;
     left: 0px !important;
     top: 0px !important;
@@ -1087,7 +1087,7 @@ BODY.remote-controller .ppw-loadingbarContainer{
     -ms-transform: none !important;
     transform: none !important;
 }
-.remote-controller .ppw-active-slide-element-container section,
-.remote-controller #ppw-slides-container{
+.remote-controller:not(.ppw-showing-thumb) .ppw-active-slide-element-container section,
+.remote-controller:not(.ppw-showing-thumb) #ppw-slides-container{
     display: block !important;
 }
