@@ -1,7 +1,7 @@
 $(document).ready(function(){
-    
+
     var talks= null;
-    
+
     // screen interactions
     var unlockButtons= function(){
         $('.talk-butons a').css('display', 'inline-block');
@@ -20,16 +20,18 @@ $(document).ready(function(){
             }
             setTimeout(function(){
                 $('#opening').fadeOut();
-                document.body.style.overflow= 'auto';
+                //$('.body-container').show();
+                $(document.body).addClass('loaded');
+                //document.body.style.overflow= 'auto';
             }, 600);
         }, 'json');
     };
-    
+
     var buildListElement= function(name, demo){
-        
+
         var oName= name;
             name= demo? '_demos/'+name: 'talks/'+name;
-        
+
         var str= "<li>"+oName+"\
                       <div class='talk-butons'>\
                          <a href='"+name+"/' title='Open presentation'></a>\
@@ -39,7 +41,7 @@ $(document).ready(function(){
                   </li>";
         return str;
     }
-    
+
     var buildLists= function(callback){
         // mounting the screen
         $.get('/api/getDemosList/', null, function(o){
@@ -47,13 +49,13 @@ $(document).ready(function(){
             // building the list of demos
             var ul= $('#demosList'),
                 str= '';
-                
+
             $(o.demos).each(function(){
                 str+= buildListElement(this, true);
             });
             // TODO: analize what to do with this list...maybe, replace it by a tutorial!
             ul.html(str);
-            
+
             // building the list of talks
             $.get('/api/getTalksList/', null, function(o){
 
@@ -66,15 +68,15 @@ $(document).ready(function(){
                 });
                 ul.html(str);
                 talks= o.talks;
-                
+
                 callback();
 
             }, 'json');
-            
+
         }, 'json');
 
     };
-    
+
     var bindEvents= function(){
         /*$('#createNewTalk-btn').click(function(){
             var talktt= prompt("Talk name");
@@ -105,14 +107,14 @@ $(document).ready(function(){
                 lockButtons();
             }, 'json');
         });
-        
+
     };
-    
+
     /* THE CONSTRUCTOR */
     var _constructor= function(){
         bindEvents();
         buildLists(verifySession);
     }
-    
+
     _constructor();
 });

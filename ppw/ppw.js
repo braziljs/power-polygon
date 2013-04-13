@@ -4190,6 +4190,7 @@ window.PPW = (function ($, _d, console){
         if(_querystring('remote-controller')){
             _conf.remoteControl= true;
             _settings.Facebook= false;
+            _settings.useArrows= false;
             _settings.Google= false;
             $(document.body).addClass('remote-controller');
             top.ppwFrame= _w.PPW;

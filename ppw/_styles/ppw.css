@@ -1071,16 +1071,10 @@ body, .ppw-active-slide-element-container{
     display: none;
 }
 
-/*BODY.remote-controller .ppw-loadingbarContainer{
-    width: 260px;
-    text-align: center;
-    marging-top: -30px;
-    position: absolute;
-    top: 20%;
-    left: 50%;
-    margin-left: -130px;
-    marging-top: -30px;
-}*/
+BODY.remote-controller iframe{
+    visibility: hidden;
+}
+
 .remote-controller:not(.ppw-showing-thumb) *{
     -webkit-animation: none !important;
     -webkit-transition: none !important;
