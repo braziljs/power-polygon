@@ -302,7 +302,7 @@
                     $= _$;
                     ppw= _ppw;
                     slides= _slides;
-                    
+
                     $(d.head).append("<link href='../"+ppw.get('PPWSrc')+"/_styles/font-awesome.min.css' rel='stylesheet' type='text/css'/>");
                     $(d.body).prepend("<div id='header'><span id='previous-slide-trigger' title='Go to the previous slide'><i class='icon-chevron-left'></i></span>PPW: <span id='ppw-slide-title'>...</span><span id='next-slide-trigger' title='Go to the next slide'><i class='icon-chevron-right'></i></span></div>");
 
@@ -379,7 +379,7 @@
                                 evt.stopPropagation();
                                 return false;
                                 break;
-                    
+
                             case 36: // home
                                 ppw.goToSlide(0);
                                 evt.preventDefault();
@@ -499,6 +499,9 @@
 
             window.onresize= PresentationTool.adjustScreen;
             window.onload= function(){
+                window.resizeTo(screen.width-4, screen.height);
+                window.top= 0;
+                window.left= 2;
                 PresentationTool.adjustScreen();
                 PresentationTool.triggerPresentationToolLoadEvent();
             }

@@ -274,18 +274,19 @@ $(document).ready(function(){
 
             $('#btn-thumbs').click(function(){
 
+                _setInteractionState('thumbs');
                 if(ppwFrame() && ppwFrame().get('presentationStarted')){
                     ppwFrame().showThumbs();
                     _hideControls(true);
                 }
 
-            }).on('mousedown', function(){
+            });/*.on('mousedown', function(){
                 _setCurrentStateButton(this);
                 $(_b).one('mouseup', function(){
                     _setInteractionState('thumbs');
                     _setCurrentStateButton($('#btn-cursor'));
                 });
-            });
+            });*/
 
             $(document.body).bind('mousemove', _movingAround);
             $($(document.body)).bind('mousedown', function(evt){
@@ -327,9 +328,10 @@ $(document).ready(function(){
             });
 
             $('#basic-pointer').bind('touchstart', function(evt){
-                if(_currentInteractionState != 'thumbs'){
+
+                //if(_currentInteractionState != 'thumbs'){
                     evt.preventDefault();
-                }
+                //}
 
                 $(document.body).bind('touchmove', _dragBasicPointer);
                 $(document.body).one('touchend', function(){
@@ -351,14 +353,19 @@ $(document).ready(function(){
             });
         }
 
+        var fontSizes= $('.font-sizes span');
+        fontSizes.eq(0).bind('click', ppwFrame().smallerFonts);
+        fontSizes.eq(1).bind('click', ppwFrame().biggerFonts);
 
         var $b= $(document.body).hammer();
-        $b.on('pinchout', function(){
+        $b.on('pinchout', function(ev){
             _hideControls();
+            ev.gesture.stopDetect()
             return false;
         });
-        $b.on('pinchin', function(){
+        $b.on('pinchin', function(ev){
             _showControls();
+            ev.gesture.stopDetect()
             return false;
         });
         $b.on('swipeleft', function(){
@@ -384,21 +391,30 @@ $(document).ready(function(){
         $b.on('hold', function(){
             //_showOptions();
         });
+        $b.on('doubletap', function(ev){
+            ev.stopPropagation()
+            ev.preventDefault()
+            ev.gesture.stopPropagation()
+            ev.gesture.preventDefault()
+            return false;
+        });
     };
 
     $(document.body).bind("touchmove", function(event){
-        if(_currentInteractionState != 'thumbs'){
-            if(_currentInteractionState != 'thumbs'){
-                event.preventDefault();
-            }
-        }
+        //if(_currentInteractionState != 'thumbs'){
+        //if(event.target.id != 'settings-container')
+        //if(!showingControls)
+            event.preventDefault();
+        //}
     });
 
     var _showOptions= function(){
+        //$('#settings-container').show();
         $b.addClass('showing-settings');
     };
 
     var _hideOptions= function(){
+        //$('#settings-container').hide();
         $b.removeClass('showing-settings');
     };
 

@@ -169,7 +169,8 @@
     z-index: 99999995;
     /*background: url(../_images/ppw-gray-bg.png);*/
     /*background: url(../_images/splash-screen-bg-3.png);*/
-    background: url(../_images/splash-screen-bg.jpg);
+    /*background: url(../_images/splash-screen-bg.jpg);*/
+    background: url(../_images/ppw-gray-bg.png);
     background-size: 100% 100%;
     /*background: url(http://www.hannytech.com/wallpapers/walls/3d__abstract_wallpaper_85-normal.jpg);*/
     height: 100%;
@@ -189,7 +190,17 @@
     position: relative;
     top: 0px;
     /*background: url(../_images/top-bg.jpg);*/
-    background-color: rgba(250, 250, 250, 0.5);
+    /*background-color: rgba(250, 250, 250, 0.5);*/
+
+background: -moz-linear-gradient(-45deg, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 100%);
+background: -webkit-gradient(linear, left top, right bottom, color-stop(0%,rgba(0,0,0,0.65)), color-stop(100%,rgba(0,0,0,0)));
+background: -webkit-linear-gradient(-45deg, rgba(0,0,0,0.65) 0%,rgba(0,0,0,0) 100%);
+background: -o-linear-gradient(-45deg, rgba(0,0,0,0.65) 0%,rgba(0,0,0,0) 100%);
+background: -ms-linear-gradient(-45deg, rgba(0,0,0,0.65) 0%,rgba(0,0,0,0) 100%);
+background: linear-gradient(135deg, rgba(0,0,0,0.65) 0%,rgba(0,0,0,0) 100%);
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a6000000', endColorstr='#00000000',GradientType=1 );
+
+
     box-shadow: 0px 16px 70px #333;
 }
 
@@ -878,8 +889,8 @@
     height: 100% !IMPORTANT;
     opacity: 1 !IMPORTANT;
     /*background-color: #777 !IMPORTANT;*/
-    background: url(../_images/splash-screen-bg.jpg);
-    background-size: 100% 100%;
+    background: url(../_images/ppw-gray-bg.png);
+    /*background-size: 100% 100%;*/
     overflow-y: auto !IMPORTANT;
     position: absolute !IMPORTANT;
     left: 0px !IMPORTANT;

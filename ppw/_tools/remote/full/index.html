@@ -16,7 +16,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
 
     </head>
-    <body>
+    <body scroll="no" onscroll="return false">
         <iframe id="presentation-iframe" src=""></iframe>
         <!--<canvas id="canvas"></canvas>-->
 
@@ -63,18 +63,30 @@
 
         <div id="settings-container">
             <h2>Settings</h2>
-            <input type="checkbox" id="sett-show-presentation" checked />
-            <label for="sett-show-presentation">Show presentation</label><br/>
-            <input type="checkbox" id="sett-show-controls" />
-            <label for="sett-show-controls">Show controls</label><br/>
-            <input type="checkbox" id="sett-show-notes" />
-            <label for="sett-show-notes">Show slide notes</label><br/>
+            <h4>Features</h4>
+            <div class="indent">
+                <input type="checkbox" id="sett-show-presentation" checked />
+                <label for="sett-show-presentation">Show presentation</label><br/>
+                <input type="checkbox" id="sett-show-controls" />
+                <label for="sett-show-controls">Show controls</label><br/>
+                <input type="checkbox" id="sett-show-notes" />
+                <label for="sett-show-notes">Show slide notes</label><br/>
+            </div>
 
-            <br/>
-            Profile<br/>
-            <select id="sett-profile">
-                <option value="none">none</option>
-            </select>
+            <h4>Profile</h4>
+            <div class="indent">
+                <select id="sett-profile">
+                    <option value="none">none</option>
+                </select><br/>
+            </div>
+            <h4>Font size</h4>
+            <div class="indent">
+                <div class="font-sizes">
+                    <span>A</span>|<span>A</span>
+                </div>
+            </div>
+
+            <a class="go-back" href="/">< back to the list</a>
 
         </div>
 
