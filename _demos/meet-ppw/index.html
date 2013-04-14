@@ -3,11 +3,11 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Presentation Demo</title>
-        
+
         <!-- REQUIRED -->
         <!--<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>-->
         <script>window.jQuery || document.write('<script src="../../ppw/_scripts/jquery-1.8.2.min.js"><\/script>')</script>
-        
+
         <script src="../../ppw/ppw.js"></script>
         <!-- ADDONS -->
         <!--<script src="../../ppw/_addons/remote-control/ppw-remote-control.js"></script>-->
@@ -15,27 +15,27 @@
         <script src="../../ppw/_addons/social/social.js"></script>
         <script src="../../ppw/_addons/caniuse/caniuse.js"></script>
         <script src="../../ppw/_addons/forkme/forkme.js"></script>
-        
+
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
         <!-- -->
     </head>
     <body>
-        
-        <!-- 
+
+        <!--
             Adding elements to all slides or to some types of slides
             use also: ppw-type-content or ppw-type-section to add the elements only to those slides
         -->
         <div class="ppw-clonable" style="position: absolute; bottom: 0px; right: 0px; width: 400px; padding: 4px; background-color: green;">This element was automatically cloned into all the slides! because it had the class ppw-clonable</div>
-        
+
         <!-- Headers and Footers -->
         <header>This is  the header!</header>
         <footer>and this is the fooooooter :)</footer>
-        
+
         <!-- variables -->
         <div style="position: absolute; right: -1px; top: -1px; z-index: 999999;background-color: yellow; padding: 4px; border: solid 1px black;">
             PPW tag Variables: <var>slide.id</var> - <var>slide.idx</var> - <var>slide.number</var> - <var>talk.title</var> - <var>talk.length</var>
         </div>
-        
+
         <div id="redarrow"
             style="position: absolute;
                    top: 0px;
@@ -47,10 +47,10 @@
            <span class="LANG-EN">Bring your mouse here</span>
            <span class="LANG-PT">Posicione seu mouse aqui</span>
        </div>
-        
-        
+
+
         <section id="closing" style="padding: 0px !IMPORTANT;">
-            
+
             <style type="text/css">
                 #getInTouch{
                     text-align: center;
@@ -68,7 +68,7 @@
                     top: -60px;
                 }
             </style>
-            
+
             <div style="background: url(slides/closing-images/question_mark.png);
                         background-size: 100% 100%;
                         height: 100%;
@@ -82,7 +82,7 @@
                     <span class="LANG-PT">Perguntas?</span>
                 </div>
                 <a href="https://github.com/braziljs/power-polygon"><img style="position: absolute; top: 0; right: 0; border: 0;" src="slides/closing-images/forkme.png" alt="Fork me on GitHub"></a>
-                
+
                 <div id="getInTouch">
                     <a href="http://github.com/braziljs/power-polygon/" target="_blank" >
                         <img src="slides/closing-images/github.png" title="Follow me on Github!"/></a>
@@ -98,11 +98,11 @@
                         </span>
                     </div>
                 </div>
-                
+
             </div>
-            
+
             <script>
-                
+
                 PPW.addAction({
                     timing: 1000,
                     does: function(){
@@ -112,21 +112,21 @@
                         PPW.animate('#getInTouch', 'fadeOut');
                     }
                 });
-                
+
                 PPW.onSlideEnter(function(slide){
                     console.log("Have just entered in the slide ending! ;)", slide)
                 });
             </script>
-            
+
         </section>
-        
+
         <script>
             window.PPW.init({
-                
+
                 /**************************************************
                 *  BASIC CONFIGURATION (most of it, is optional)  *
                 **************************************************/
-               
+
                 // the talk's title
                 title: "Title of my demo1 presentation",
                 // the list of authors and their information
@@ -150,14 +150,14 @@
                 // preload the images
                 preloadImages: true,
                 //useSplashScreen: false,
-                
+
                 /**
                  * Defines the pattern to be used to load external slides.
                  * The default is SLIDE_ID_DIR, found in cons.fs.
                  * Also can be a string defining the pattern, where:
                  *    %id    = slide identifier
                  *    %num   = slide number
-                 *  
+                 *
                  * For example, if your slides a and b are in a directory called
                  * slides, and the slide file is always index.html, the pattern
                  * is as follows:
@@ -170,7 +170,7 @@
                 showOfflineAlerts: true,
                 // should allow cache for external slides? (default true)
                 slidesCache: false,
-                
+
                 /**
                  * Defines the profile for your presentation.
                  * ** When not set, every slide will be shown.
@@ -180,47 +180,47 @@
                  * default: 'none'
                  */
                 profile: 'shorter',
-                
+
                 /**
                  *
                  */
                 languages: ['PT', 'EN'],
                 defaultLanguage: 'EN',
-                
+
                 /**************************************************
                 *  PRESENTATION DATA                              *
                 **************************************************/
-               
+
                 // optional...you can simply say what is the transition you want
                 // using the theme property of this settings
                 //transition: 'trans-slider',
                 //transition: 'trans-fall',
                 //transition: 'trans-zooming',
-                //transition: 'trans-fall-n-roll',
+                transition: 'trans-fall-n-roll',
                 //transition: 'trans-cut',
-                transition: 'trans-fade-1',
-                
+                //transition: 'trans-fade-1',
+
                 // the theme to be used (default: default)
                 // this can be an array of a list of themes separated by comma, although,
                 // be careful loading more than one theme, once they may be concurring
                 // on some rules!
                 theme: "thm-default",
                 //theme: "default",
-                
+
                 // special settings for a theme(changes according to the choosen theme and is not required)
                 themeSettings: {
                     shTheme: 'sh_bright'
                 },
-                
+
                 // only for the social addon
                 social: {
                     //alertTime: 4000,
                     sodialSearch: '#braziljs OR @felipenmoura'
 
                 },
-                
+
                 useGlobalHeader: true,
-                
+
                 // the expected duration in minutes in minutes (default 50)
                 duration: 60,
                 // When in minutes, the speaker should be alerted(default: 30, 40)
@@ -284,7 +284,7 @@
                         ]
                     }
                 ],
-                
+
                 // KEYBOARD SHORTCUTS(optional)
                 shortcuts: {
                     'F6': function(){
@@ -303,7 +303,7 @@
                         alert('F10 was pressed!!!');
                     }
                 },
-                
+
                 remote: {
                     autoConnect: false,
                     //server: 'http://127.0.0.1:81',

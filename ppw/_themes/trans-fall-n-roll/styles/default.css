@@ -1,13 +1,17 @@
 .ppw-slide-element{
-    display: none;
+    display: block;
 }
 .ppw-active-slide-element{
-    /*display: block;*/
+    display: block;
+}
+.ppw-active-slide-element-container{
+    z-index: 9 !important;
+    opacity: 1;
 }
 
 /**/
 .ppw-previous-slide-element{
- 
+
 }
 .ppw-next-slide-element{
 
@@ -26,6 +30,7 @@ body{
     top: 0;
     left: 0;
     right: 0;
+    z-index: 1;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
 }
