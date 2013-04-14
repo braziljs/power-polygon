@@ -1,0 +1,11 @@
+{
+    "name": "trans-page-felipenmoura",
+    "dependencies": {
+        "css": [
+            "styles/default.css"
+        ],
+        "js": [
+            "scripts/default.js"
+        ]
+    }
+}
