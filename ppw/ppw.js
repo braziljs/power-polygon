@@ -3654,8 +3654,16 @@ window.PPW = (function ($, _d, console){
             _h.pushState({}, idx, _settings.hashSeparator+idx);
             _d.title= idx;
         }
-
     };
+
+    /**
+     * Public method to push a given string to the url/history
+     */
+    var _pushState= function(state){
+        if(_l.hash != _settings.hashSeparator+state){
+            _h.pushState({}, state, _settings.hashSeparator+state);
+        }
+    }
 
     /**
      * Sets the classes for the slides.
@@ -4287,7 +4295,8 @@ window.PPW = (function ($, _d, console){
         get                             : _get,
         set                             : _set,
         Facebook                        : true,
-        Google                          : true
+        Google                          : true,
+        pushState                       : _pushState
     };
 
 })(window.jQuery, document, window.console);
