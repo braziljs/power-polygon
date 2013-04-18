@@ -327,7 +327,7 @@ window.PPW = (function ($, _d, console){
                             The content could not be found in any of these expected places!</div>",
 
             // the arrows element to go forward and backward
-            arrows: "<div id='ppw-arrows-container' class='ppw-clickable'><div id='ppw-arrow-previous-slide' onclick='if(!PPW.isLocked()) PPW.goPrev();'><i class='icon-{{directionaliconsstyle}}-left'></i></div><div id='ppw-arrow-next-slide' onclick='if(!PPW.isLocked()) PPW.goNext();'><i class='icon-{{directionaliconsstyle}}-right'></i></div></div>",
+            arrows: "<div id='ppw-arrows-container' class='ppw-clickable'><div id='ppw-arrow-previous-slide' onmousedown='if(!PPW.isLocked()) PPW.goPrev();'><i class='icon-{{directionaliconsstyle}}-left'></i></div><div id='ppw-arrow-next-slide' onmousedown='if(!PPW.isLocked()) PPW.goNext();'><i class='icon-{{directionaliconsstyle}}-right'></i></div></div>",
 
             // the search tool content
             searchTool: "<div id='ppw-search-container'><div style='float: left;'>Search into slides:</div>\
@@ -833,10 +833,10 @@ window.PPW = (function ($, _d, console){
             var parentpath= '../';
             var ppw= 'ppw.js';
             var src= null;
-            var styles= _d.getElementsByTagName('script');
-            var l= styles.length;
+            var scripts= _d.getElementsByTagName('script');
+            var l= scripts.length;
             for(var i=0;i<l;i++){
-                src=styles[i].src.split('/');
+                src= scripts[i].src.split('/');
                 if(src.pop() == ppw){
                     break;
                 }
@@ -1038,6 +1038,20 @@ window.PPW = (function ($, _d, console){
     };
 
     /**
+     * Shows the next and previous arrow buttons.
+     */
+    var _showArrows= function(){
+        $('#ppw-arrow-previous-slide, #ppw-arrow-next-slide').show();
+    }
+
+    /**
+     * Hides the next and previous arrow buttons.
+     */
+    var _hideArrows= function(){
+        $('#ppw-arrow-previous-slide, #ppw-arrow-next-slide').hide();
+    }
+
+    /**
      * Prepares the page to load the required files.
      *
      * This method adds the loading bar and then loads the required scrips and
@@ -1046,9 +1060,12 @@ window.PPW = (function ($, _d, console){
     var _preparePPW= function(){
 
          $b.append(_templates.loading);
+         $b.append(_templates.arrows.replace(/\{\{directionaliconsstyle\}\}/g, _settings.directionalIconsStyle));
 
          if(_settings.useArrows){
-             $b.append(_templates.arrows.replace(/\{\{directionaliconsstyle\}\}/g, _settings.directionalIconsStyle));
+            _showArrows();
+         }else{
+             _hideArrows();
          }
 
          $('#ppw-loadingbarParent').css({
@@ -2049,13 +2066,21 @@ window.PPW = (function ($, _d, console){
 
         // window events
         _w.addEventListener('blur', function(){
+
             if($('#ppw-message-box').css('display') != 'none'){
                 if(_d.getElementById('ppw-message-box-button').style.display == 'none'){
                     _closeMessage();
                 }
             }
 
+            _showArrows();
         }, false);
+        _w.addEventListener('focus', function(){
+            if(!_settings.useArrows){
+                //_hideArrows();
+                setTimeout(_hideArrows, 200);
+            }
+        });
 
         _w.addEventListener('resize', function(e){
             _triggerEvent('onresize', {window: _w, event: e});
@@ -2316,9 +2341,9 @@ window.PPW = (function ($, _d, console){
                 $(container).append("<div id='ppw-slide-container-"+slides[i].id+"' class='ppw-slide-container'></div>");
 
                 $('#ppw-slide-container-'+slides[i].id).append(el[0]);
-
+//console.log("<<<<", $(el).find("script").length)
                 $(el).find("script").each(function(count, scr){
-
+//console.log(">>>>>", slides[i], i)
                     var f= new Function("PPW.slideIterator= this; "+scr.textContent);
 
                     try{
@@ -3215,6 +3240,7 @@ window.PPW = (function ($, _d, console){
     var _onSlideEnter= function(fn){
 
         var slideRef= PPW.slideIterator;
+
         if(!slideRef || !slideRef.actions)
             return false; // it probably is not loaded yet...will be called again when loaded
 
@@ -3601,16 +3627,18 @@ window.PPW = (function ($, _d, console){
             }
         }
 
-        if(curSlide.first){
-            $('#ppw-arrow-previous-slide').hide();
-        }else{
-            $('#ppw-arrow-previous-slide').show();
-        }
+        if(_settings.useArrows){
+            if(curSlide.first){
+                $('#ppw-arrow-previous-slide').hide();
+            }else{
+                $('#ppw-arrow-previous-slide').show();
+            }
 
-        if(curSlide.last){
-            $('#ppw-arrow-next-slide').hide();
-        }else{
-            $('#ppw-arrow-next-slide').show();
+            if(curSlide.last){
+                $('#ppw-arrow-next-slide').hide();
+            }else{
+                $('#ppw-arrow-next-slide').show();
+            }
         }
 
         // if the slide is of a different type
@@ -3771,8 +3799,8 @@ window.PPW = (function ($, _d, console){
                 _removeAnimateCSSClasses(el);
                 el.hide();
             }
-            if(!wasLocked)
-                PPW.unlock();
+            //if(wasLocked)
+                //PPW.unlock();
         };
         var oEl= null,
             elList= [];
@@ -3781,6 +3809,7 @@ window.PPW = (function ($, _d, console){
         // if any of the elements should not be animated because it is in another language
         if(_conf.currentLang){
             el.each(function(){
+
                 oEl= this;
 
                 if(oEl.className){
@@ -3793,12 +3822,15 @@ window.PPW = (function ($, _d, console){
                    }else{
                        elList.push(oEl);
                    }
+               }else{
+                   elList.push(oEl);
                }
             });
             el= $(elList);
         }
-        PPW.lock();
-        if(_conf.animations.indexOf(anim)>=0){
+
+        //PPW.lock();
+        if(_conf.animations.indexOf(anim) >= 0){
             if(settings){
                 if(settings.duration){
                     el.css({
@@ -3836,9 +3868,6 @@ window.PPW = (function ($, _d, console){
                     el.one('oAnimationStart', settings.onstart);
                     el.one('animationstart', settings.onstart);
                 }
-                //if(settings.onend && typeof settings.onend == 'function'){
-
-                //}
             }
             el.one('webkitAnimationEnd', onEnd);
             el.one('mozAnimationEnd', onEnd);

@@ -22,6 +22,7 @@ $(document).ready(function(){
         var regexS = "[\\?&]" + name + "=([^&#]*)";
         var regex = new RegExp(regexS);
         var results = regex.exec(window.location.search);
+
         if(results == null)
           return "";
         else
@@ -180,7 +181,9 @@ $(document).ready(function(){
                     $('#buttons-container').show();
                     //_showControls();
                 }
-                $('#currentSlideIdx').html(idx).css('fontSize', document.body.offsetHeight+'px');
+                $('#currentSlideIdx').html(idx)
+                                     .css('fontSize',
+                                         (document.body.offsetHeight/((idx+"").length))+'px');
             });
 
             var syncSlide= ppwFrame().getCurrentSlide().index-1;
