@@ -2276,7 +2276,8 @@ window.PPW = (function ($, _d, console){
                 slides[i].last= true;
 
             slides[i].actions= [];
-            if(!el.length){ // should load it from ajax
+            if(!el.length){
+                // not found in DOM, should load it from ajax
                 nEl= $("<div id='ppw-slide-container-"+slides[i].id+"' class='ppw-slide-container'><section id='"+slides[i].id+"'></section></div>");
                 //nEl.id= slides[i].id;
                 container.appendChild(nEl[0]);
@@ -2330,8 +2331,8 @@ window.PPW = (function ($, _d, console){
                         })(slides[i], i)
                     });
                 el= $('section#'+slides[i].id);
-            }else{ // the slide content is already on the DOM
-
+            }else{
+                // the slide content is already on the DOM
                 _settings.slides[i].el= el[0];
                 tt= el.find('h1, h2, h3, h4, h5, h6')[0];
                 tt= tt? tt.innerHTML: el[0].textContent.substring(0, _conf.defaults.slideTitleSize);
@@ -2340,18 +2341,19 @@ window.PPW = (function ($, _d, console){
 
                 $(container).append("<div id='ppw-slide-container-"+slides[i].id+"' class='ppw-slide-container'></div>");
 
-                $('#ppw-slide-container-'+slides[i].id).append(el[0]);
-//console.log("<<<<", $(el).find("script").length)
                 $(el).find("script").each(function(count, scr){
-//console.log(">>>>>", slides[i], i)
+
                     var f= new Function("PPW.slideIterator= this; "+scr.textContent);
 
                     try{
                         f.apply(slides[i]);
+                        scr.parentNode.removeChild(scr);
                     }catch(e){
                         console.error("[PPW][Script loaded from slide] There was an error on a script, loaded in one of your slides!", e)
                     }
                 });
+
+                $('#ppw-slide-container-'+slides[i].id).append(el[0]);
 
                 _slidePreloaderNext(_settings.slides[i]);
             }
