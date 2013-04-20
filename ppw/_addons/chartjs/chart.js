@@ -30,15 +30,18 @@ window.PPW.extend("chart", (function(){
 
     var _setup= function(ppw){
         _ppw= ppw;
+        ppw.PPWSrc = '../../ppw/';
         conf= PPW.get('charts');
-        console.log(conf);
+
         var chartScript = [ppw.PPWSrc+'/_addons/chartjs/Chart.min.js'];
         $.getScript(chartScript);
+
         $(window).load(function() {            
             for (var i = 0; i < conf.length; i++) {
                 _render(conf[i].element, conf[i].type, conf[i].chartData, conf[i].chartOptions);
             };
         });
+        
     };
 
     return {
