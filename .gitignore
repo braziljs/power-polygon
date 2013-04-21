@@ -13,8 +13,8 @@ nbproject
 nbproject/*
 npm-debug.log
 node_modules
-ppw/_themes/thm-felipenmoura/
-ppw/_themes/trans-page-felipenmoura/
+ppw/_themes/thm-felipenmoura
+ppw/_themes/trans-page-felipenmoura
 
 ##
 ## Internal use

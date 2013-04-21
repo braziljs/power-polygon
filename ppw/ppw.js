@@ -159,6 +159,7 @@ window.PPW = (function ($, _d, console){
 
         // internal configuration properties
         _conf= {
+            mode: 'presentation',
             loadSteps: 0,
             curLoaded: 0,
             showingCamera: false,
@@ -501,7 +502,8 @@ window.PPW = (function ($, _d, console){
         F9_PRESSED              : [],
         F8_PRESSED              : [],
         F7_PRESSED              : [],
-        F6_PRESSED              : []
+        F6_PRESSED              : [],
+        ESC_PRESSED             : []
     }
 
 
@@ -760,6 +762,10 @@ window.PPW = (function ($, _d, console){
             }
         }
 
+        if(_settings.mode){
+            _applyGlobalMode(_settings.mode);
+        }
+
         if(_settings.shortcutsEnable && !_isInPrintableVersion()){
             _enableFuncKeys();
         }
@@ -767,6 +773,30 @@ window.PPW = (function ($, _d, console){
         _triggerEvent('onload', conf);
     };
 
+    /**
+     * Applies a global mode of interaction to Power Polygon.
+     *
+     * It applies some rules to make Power Polygon behave differently as
+     * your need.
+     * For example, the default behaviour is 'presentation', for a talk, but
+     * if you use 'page', PPW will apply a bunch of rules to make it feel like
+     * a web page.
+     */
+    var _applyGlobalMode= function(mode){
+
+        switch(mode){
+            case 'page': {
+                _settings.hashSeparator= '#!';
+                _settings.remote= false;
+                _settings.usetToolBar= false;
+                _settings.useSplashScreen= false;
+                _settings.useGlobalFooter= true;
+                _settings.mode= 'page';
+                break;
+            }
+        }
+
+    }
     /**
      * Sets one step ahead for the loading bar.
      *
@@ -1089,12 +1119,14 @@ window.PPW = (function ($, _d, console){
          var scripts=["/_scripts/jquery-ui-1.8.23.custom.min.js"];
          _loadScripts(scripts, true, PPW.setLoadingBarStatus);
 
-         _tmp.lnk = _d.createElement('link');
-         _tmp.lnk.type = 'image/x-icon';
-         _tmp.lnk.rel = 'shortcut icon';
-         _tmp.lnk.href = _createPPWSrcPath('/_images/power-polygon-icon.png');
-         _d.getElementsByTagName('head')[0].appendChild(_tmp.lnk);
-         delete _tmp.lnk;
+         if(_settings.mode != 'page'){
+             _tmp.lnk = _d.createElement('link');
+            _tmp.lnk.type = 'image/x-icon';
+            _tmp.lnk.rel = 'shortcut icon';
+            _tmp.lnk.href = _createPPWSrcPath('/_images/power-polygon-icon.png');
+            _d.getElementsByTagName('head')[0].appendChild(_tmp.lnk);
+            delete _tmp.lnk;
+         }
 
         _loadTheme();
 
@@ -1729,10 +1761,11 @@ window.PPW = (function ($, _d, console){
          * Keyboard events.
          */
         $d.bind('keydown', function(evt){
+
             var t= evt.target.tagName.toLowerCase(),
                 tmpEl= null;
 
-            if(_isNativeShortcut(evt))
+            if(_isNativeShortcut(evt) || _settings.mode == 'page')
                 return true;
 
             // if the element is an input or has the ppw-focusable class
@@ -1860,30 +1893,6 @@ window.PPW = (function ($, _d, console){
             return true;
         });
 
-        /*$d.bind('keypress', function(evt){
-
-            if(_isNativeShortcut(evt))
-                return true;
-
-            if(evt.altKey){
-                return _preventDefaultstopPropagation(evt);
-            }
-            if(_isLocked(evt)){
-                console.warn("[PPW] User interaction(keypress) ignored because Power Polygon has been locked");
-                return false;
-            }
-            switch(evt.keyCode){
-                /*case 112: // P
-                    if(evt.altKey || evt.ctrlKey){
-                        return _preventDefaultstopPropagation(evt);
-                    }
-                    break;
-                * /
-            }
-
-            return true;
-        });*/
-
         $d.bind('keyup', function(evt){
 
             var s= false;
@@ -1918,6 +1927,13 @@ window.PPW = (function ($, _d, console){
                         _print();
                         return _preventDefaultstopPropagation(evt);
                     }*/
+                    break;
+
+                case 27: // ESC
+                    s= _triggerEvent('ESC_PRESSED');
+                    if(!s){
+                        return _preventDefaultstopPropagation(evt);
+                    }
                     break;
 
                 case 117: // F6
@@ -1959,7 +1975,7 @@ window.PPW = (function ($, _d, console){
             // when the user holds a key
             $d.bind('keypress', function(evt){
 
-                if(_isNativeShortcut(evt))
+                if(_isNativeShortcut(evt) || _settings.mode == 'page')
                     return true;
 
                 if(!evt.altKey)
@@ -1979,7 +1995,7 @@ window.PPW = (function ($, _d, console){
                     break;
                     case 190: // .(>)
                     case 83: // s
-                    case 39: // left
+                    case 39: // right
                         //_showSlidesThumb();
                         return _preventDefaultstopPropagation(evt);
                     break;
@@ -2003,6 +2019,9 @@ window.PPW = (function ($, _d, console){
          * Mouse events.
          */
         $d.bind('click', function(evt){
+
+            if(_settings.mode == 'page')
+                return true;
 
             if(_isLocked(evt)){
                 console.warn("[PPW] User interaction(click) ignored because Power Polygon has been locked");
@@ -2073,11 +2092,12 @@ window.PPW = (function ($, _d, console){
                 }
             }
 
-            _showArrows();
+            if(_settings.mode == 'presentation')
+                _showArrows();
+
         }, false);
         _w.addEventListener('focus', function(){
-            if(!_settings.useArrows){
-                //_hideArrows();
+            if(!_settings.useArrows && _settings.mode == 'presentation'){
                 setTimeout(_hideArrows, 200);
             }
         });
