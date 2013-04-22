@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Charts Demo</title>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="../../ppw/_scripts/jquery-1.8.2.min.js"><\/script>')</script>
+
+        <script src="../../ppw/ppw.js"></script>
+        <script src="../../ppw/_addons/syntaxhighlighter/sh.js"></script>
+        <script src="../../ppw/_addons/chartjs/chart.js"></script>
+        
+    </head>
+    <body>
+
+        <section>
+                <h1>Charts Demo</h1>
+        </section>
+
+        <section>
+            <div class="slide-header">
+                <h2>Pie chart</h2>
+            </div>
+                
+            <canvas id="line" height="550" width="950"></canvas>
+        </section>
+
+        <section>
+            <div class="slide-header">
+                <h2>Bar chart</h2>
+            </div>
+                
+            <canvas id="bar" height="550" width="950"></canvas>
+        </section>
+
+        <section>
+            <div class="slide-header">
+                <h2>Radar chart</h2>
+            </div>
+                
+            <canvas id="radar" height="550" width="950"></canvas>
+        </section>
+
+        <section>
+            <div class="slide-header">
+                <h2>Polar Area chart</h2>
+            </div>
+                
+            <canvas id="polarArea" height="550" width="950"></canvas>
+        </section>
+
+        <section>
+            <div class="slide-header">
+                <h2>Pie chart</h2>
+            </div>
+                
+            <canvas id="pie" height="550" width="950"></canvas>
+        </section>
+
+        <section>
+            <div class="slide-header">
+                <h2>Doughnut chart</h2>
+            </div>
+                
+            <canvas id="doughnut" height="550" width="950"></canvas>
+        </section>
+
+        <section>
+                <h1>End.</h1>
+        </section>
+
+        <script>
+            PPW.init({
+                title: "Charts Demo",
+                authors: [
+                    {
+                        name: "Eduardo Lopes",
+                        email: "EduardoLopesDS@gmail.com"
+                    }
+                ],
+                transition: 'trans-cut',
+                theme: 'thm-simple',
+                useSplashScreen: false,
+                charts : [
+                    {
+                        type : 'line',
+                        element : '#line',
+                        chartOptions : {
+                            animation : true
+                        },
+                        chartData : {
+                            labels : ["January","February","March","April","May","June","July"],
+                            datasets : [
+                                {
+                                    fillColor : "rgba(220,220,220,0.5)",
+                                    strokeColor : "rgba(220,220,220,1)",
+                                    pointColor : "rgba(220,220,220,1)",
+                                    pointStrokeColor : "#fff",
+                                    data : [65,59,90,81,56,55,40]
+                                },
+                                {
+                                    fillColor : "rgba(151,187,205,0.5)",
+                                    strokeColor : "rgba(151,187,205,1)",
+                                    pointColor : "rgba(151,187,205,1)",
+                                    pointStrokeColor : "#fff",
+                                    data : [28,48,40,19,96,27,100]
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        type : 'bar',
+                        element : '#bar',
+                        chartOptions : {
+                            animation : false,
+                            scaleLineColor : "rgb(120,200,10)"
+                        },
+                        chartData : {
+                            labels : ["January","February","March","April","May","June","July"],
+                            datasets : [
+                                {
+                                    fillColor : "rgba(220,220,220,0.5)",
+                                    strokeColor : "rgba(220,220,220,1)",
+                                    pointColor : "rgba(220,220,220,1)",
+                                    pointStrokeColor : "#fff",
+                                    data : [65,59,90,81,56,55,40]
+                                },
+                                {
+                                    fillColor : "rgba(151,187,205,0.5)",
+                                    strokeColor : "rgba(151,187,205,1)",
+                                    pointColor : "rgba(151,187,205,1)",
+                                    pointStrokeColor : "#fff",
+                                    data : [28,48,40,19,96,27,100]
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        type : 'radar',
+                        element : '#radar',
+                        chartOptions : {
+                            animation : true,
+                            pointLabelFontSize : 16
+                        },
+                        chartData : {
+                            labels : ["January","February","March","April","May","June","July"],
+                            datasets : [
+                                {
+                                    fillColor : "rgba(220,220,220,0.5)",
+                                    strokeColor : "rgba(220,220,220,1)",
+                                    pointColor : "rgba(220,220,220,1)",
+                                    pointStrokeColor : "#fff",
+                                    data : [65,59,90,81,56,55,40]
+                                },
+                                {
+                                    fillColor : "rgba(151,187,205,0.5)",
+                                    strokeColor : "rgba(151,187,205,1)",
+                                    pointColor : "rgba(151,187,205,1)",
+                                    pointStrokeColor : "#fff",
+                                    data : [28,48,40,19,96,27,100]
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        type : 'polarArea',
+                        element : '#polarArea',
+                        chartOptions : {
+                            animation : false
+                        },
+                        chartData : [
+                            {
+                                value : 30,
+                                color: "#D97041"
+                            },
+                            {
+                                value : 90,
+                                color: "#C7604C"
+                            },
+                            {
+                                value : 24,
+                                color: "#21323D"
+                            },
+                            {
+                                value : 58,
+                                color: "#9D9B7F"
+                            },
+                            {
+                                value : 82,
+                                color: "#7D4F6D"
+                            },
+                            {
+                                value : 8,
+                                color: "#584A5E"
+                            }
+                        ]
+                    },
+                    {
+                        type : 'pie',
+                        element : '#pie',
+                        chartOptions : {
+                            animation : true,
+                            scaleLineColor : "rgba(0,0,0,.1)"
+                        },
+                        chartData : [
+                            {
+                                value : 30,
+                                color: "#D97041"
+                            },
+                            {
+                                value : 90,
+                                color: "#C7604C"
+                            },
+                            {
+                                value : 24,
+                                color: "#21323D"
+                            },
+                            {
+                                value : 58,
+                                color: "#9D9B7F"
+                            },
+                            {
+                                value : 82,
+                                color: "#7D4F6D"
+                            },
+                            {
+                                value : 8,
+                                color: "#584A5E"
+                            }
+                        ]
+                    },
+                    {
+                        type : 'doughnut',
+                        element : '#doughnut',
+                        chartOptions : {
+                            animation : true
+                        },
+                        chartData : [
+                            {
+                                value : 30,
+                                color: "#D97041"
+                            },
+                            {
+                                value : 90,
+                                color: "#C7604C"
+                            },
+                            {
+                                value : 24,
+                                color: "#21323D"
+                            },
+                            {
+                                value : 58,
+                                color: "#9D9B7F"
+                            },
+                            {
+                                value : 82,
+                                color: "#7D4F6D"
+                            },
+                            {
+                                value : 8,
+                                color: "#584A5E"
+                            }
+                        ]
+                    }
+                ]
+            });
+        </script>
+    </body>
+</html>
