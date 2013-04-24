@@ -48,39 +48,7 @@ window.PPW.extend("chart", (function(){
         conf= PPW.get('charts');
 
         var chartScript = [ppw.PPWSrc+'/_addons/chartjs/Chart.min.js'];
-        $.getScript(chartScript, function(){
-            /*PPW.addListener('onslidechangeX', function(data){
-                //console.log(data);
-
-                var charts= $(data.current.el).find('.ppw-chart');
-
-                charts.each(function(){
-
-                    var o= null, dt= null;
-alert(7);
-                    try{
-alert(6);
-                        o= JSON.parse(this.innerHTML.replace(/([a-zA-Z0-9\-_ ]+)( )?\:/g, '"$1":'));
-alert(5);
-                    }catch(e){
-                        console.error("[PPW] Charts - Could not parse the char data!", this.innerHTML, e);
-                    }
-alert(4);
-
-                    dt= $.extend(_defaultChart, {chartData: o}, {element: this});
-                    console.log("_render NAO funcionando", '#line', dt.type, dt.chartData, dt.chartOptions);
-alert(3);
-alert(dt.type);
-alert(dt.chartData);
-alert(dt.chartOptions);
-alert(2);
-                    alert( _render(this, dt.type, dt.chartData, dt.chartOptions) );
-alert(1);
-                });
-
-            });*/
-        });
-
+        $.getScript(chartScript, function(){});
 
         PPW.addListener('onslidechange', function(data) {
                 var list= $(data.current.el).find('.ppw-chart');
@@ -100,6 +68,9 @@ alert(1);
                         o.type= o.chartData.type;
                     else
                         o.type= _defaultChart.type;
+
+                    if(o.chartData.chartOptions)
+                        o.chartOptions= o.chartData.chartOptions;
 
                     if(o.chartData.data && o.chartData.data.length){
                         // is an array, not an object
