@@ -891,6 +891,13 @@ window.PPW = (function ($, _d, console){
     }
 
     /**
+     * Alias to _createPPWSrcPath('').
+     */
+    var _getPPWPath= function(){
+        return _createPPWSrcPath('');
+    }
+
+    /**
      * Loads an external script.
      *
      * @param String External script file.
@@ -4347,7 +4354,8 @@ window.PPW = (function ($, _d, console){
         set                             : _set,
         Facebook                        : true,
         Google                          : true,
-        pushState                       : _pushState
+        pushState                       : _pushState,
+        getPPWPath                      : _getPPWPath
     };
 
 })(window.jQuery, document, window.console);

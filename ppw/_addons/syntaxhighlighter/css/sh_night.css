@@ -1,8 +1,12 @@
-pre.sh_sourceCode {
+pre.sh_sourceCode, pre.sh_sourceCode li {
   background-color: #000044;
   color: #dd00ff;
   font-weight: normal;
   font-style: normal;
+}
+
+pre.sh_sourceCode li:hover{
+    background-color: #224 !important;
 }
 
 pre.sh_sourceCode .sh_keyword {

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>My presentation</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+        <script src="../../ppw/_scripts/jquery-1.8.2.min.js"></script>
+        <script src="../../ppw/ppw.js"></script>
+
+        <!-- ADDONS -->
+        <script src="../../ppw/_addons/syntaxhighlighter/sh.js"></script>
+        <script src="../../ppw/_addons/chartjs/chart.js"></script>
+
+    </head>
+    <body>
+
+        <section id="slide-0">
+
+            <h1>Power Polygon</h1>
+            <h2>A walk through tutorial</h2>
+
+            <div>
+                <a href="https://github.com/felipenmoura" rel="author">Felipe N. Moura</a>  &lt;https://github.com/felipenmoura>
+            </div>
+
+        </section>
+
+        <section id="slide-2">
+            <h2>Slide three</h2>
+            Another content here!
+        </section>
+
+        <script>
+            PPW.init({
+                theme: 'thm-simple',
+                transition: 'trans-zooming',
+                languages: ['EN', 'PT'],
+                defaultLanguage: 'EN',
+                profile: 'shorter',
+                useSplashScreen: false,
+                /*themeSettings: {
+                    shTheme: 'sh_bright'
+                },*/
+                slides: [
+                    { id: 'slide-0', type: 'opening' },
+                    { id: 'charts' },
+                    { id: 'sh' },
+                    //{ id: 'profiles', profile: 'longer', notes: ['Something!', 'Don\'t forget the milk!'] },
+                    { id: 'slide-2', type: 'section' },
+                    { id: 'animations' }
+
+                ]
+            });
+        </script>
+    </body>
+</html>
