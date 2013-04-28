@@ -47,7 +47,7 @@ window.PPW.extend("sh", (function(){
     ]
 
     var _init= function(_ppw){
-        ppw= _ppw;
+
     };
 
     var _changed= function(evt, that){
@@ -65,6 +65,7 @@ window.PPW.extend("sh", (function(){
         var classes= el.className.split(' '),
             i= classes.length-1,
             sCodes= [],
+            oSrc= "",
             brush= null;
 
         do{
@@ -91,7 +92,14 @@ window.PPW.extend("sh", (function(){
                      * given element, once it looks like the sh_highlightElement
                      * method is not working properly!
                      */
+                    oSrc= $(el).text();
                     sh_highlightDocument(null, null, [el]);
+                    ppw.triggerEvent('onsourcecodechangeend',
+                                     {
+                                         element: el,
+                                         sourceCode: oSrc,
+                                         brush: brush
+                                     });
                 }
 
                 break;
@@ -113,9 +121,28 @@ window.PPW.extend("sh", (function(){
         return ret;
     };
 
+    var _applyCSSElements= function(){
+
+        $('style.sh_css').each(function(){
+            var el= $(this),
+                classes= this.className.split(" ");
+
+            el.after("<pre class='sh_css "+classes.join(' ')+"'>"+el.html()+"</pre>")
+              .bind('click', function(){alert(0)});
+            el.next().bind('keyup', function(){
+                el.html(_getRawContent(this));
+            });
+        });
+
+    }
+
     var _apply= function(){
 
         var sCodes= [PPW.getPPWPath()+'/_addons/syntaxhighlighter/shjs.js'];
+
+        _applyCSSElements();
+        ppw.createListener("onsourcecodechange");
+        ppw.createListener("onsourcecodechangeend");
 
         $('pre').each(function(){
             sCodes= sCodes.concat(_applyTo(this));
@@ -139,8 +166,13 @@ window.PPW.extend("sh", (function(){
                       .addClass('ppw-clickable');
                     el[0].focus();
                     $(el).data('original-content', false);
-                    //PPW.lock();
+
                 }).bind('keydown', function(evt){
+
+                    if($(this).attr('contenteditable') != 'true'){
+                        return true;
+                    }
+
                     switch(evt.keyCode){
                         case 9: // TAB
                             document.execCommand('InsertHTML', false, "    ");
@@ -151,6 +183,14 @@ window.PPW.extend("sh", (function(){
                             break;
                         break
                     }
+
+                    ppw.triggerEvent('onsourcecodechange',
+                                     {
+                                         element: this,
+                                         sourceCode: $(this).text(),
+                                         brush: $(this).data('brush'),
+                                         evt: evt
+                                     });
 
                 }).bind('blur', _changed);
             }
@@ -191,19 +231,22 @@ window.PPW.extend("sh", (function(){
         $("<link/>", {
             rel: "stylesheet",
             type: "text/css",
-            href: ppw.PPWSrc+"/_addons/syntaxhighlighter/css/"+theme+'.css'
+            href: PPW.getPPWPath()+"/_addons/syntaxhighlighter/css/"+theme+'.css'
          }).appendTo("head");
         $("<link/>", {
             rel: "stylesheet",
             type: "text/css",
-            href: ppw.PPWSrc+"/_addons/syntaxhighlighter/sh.css"
+            href: PPW.getPPWPath()+"/_addons/syntaxhighlighter/sh.css"
          }).appendTo("head");
     };
 
     return {
         onload: _init,
         onslidesloaded: _apply,
-        onthemeloaded: _themeLoaded
+        onthemeloaded: _themeLoaded,
+        onextend: function(_ppw){
+            ppw= _ppw;
+        }
     };
 
 })());

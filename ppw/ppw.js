@@ -498,6 +498,7 @@ window.PPW = (function ($, _d, console){
         onlock                  : [],
         onunlock                : [],
         onlangchange            : [],
+        onextend                : [],
         F10_PRESSED             : [],
         F9_PRESSED              : [],
         F8_PRESSED              : [],
@@ -517,6 +518,26 @@ window.PPW = (function ($, _d, console){
      /*************************************************/
 
     /**
+     * This method allows addons to create their own event listeners and trigger them.
+     *
+     * @param String The listener name.
+     */
+    var _createListener= function(listener){
+
+        if(!listener){
+            console.warn("[PPW] To create a listener, the parameter with its name must be given.");
+            return false;
+        }
+
+        if(!_listeners[listener]){
+            _listeners[listener]= [];
+            _listeners[listener].createdByExtensionId= this.extensionId;
+        }else{
+            console.warn("[PPW] Extension '"+this.extensionId+"' is trying to create an existing event listener("+listener+")");
+        }
+    }
+
+    /**
      * Adds an event listener to PPW.
      *
      * Used by addons or external scripts, as well as internal methods calls.
@@ -530,6 +551,9 @@ window.PPW = (function ($, _d, console){
         }
     }
 
+    /**
+     * Just prevents the propagation and default action from an event.
+     */
     var _preventDefaultstopPropagation= function(evt){
         evt.preventDefault();
         evt.stopPropagation();
@@ -608,6 +632,19 @@ window.PPW = (function ($, _d, console){
         for(prop in conf){
             if(_listeners[prop] && typeof conf[prop] == 'function'){
                 _addListener(prop, conf[prop]);
+            }
+        }
+
+        if(conf.onextend && typeof conf.onextend == 'function'){
+            try{
+                // add here, other useful features for addons
+                conf.onextend($.extend({}, _settings, {
+                    createListener: _createListener,
+                    extensionId   : id,
+                    triggerEvent  : _triggerEvent
+                }));
+            }catch(e){
+                console.warn("[PPW] Addon error: failed executing the onextend listener for "+id, conf, e);
             }
         }
     }
@@ -4338,6 +4375,7 @@ window.PPW = (function ($, _d, console){
         goToSlide                       : _goToSlide,
         enableRemote                    : _enableRemote,
         remote                          : {},
+        //triggerEvent                   : _triggerEvent,
         // API GETTERS/SETTERS METHODS
         getSlides                       : _getSlides,
         getValidSlides                  : _getValidSlides,

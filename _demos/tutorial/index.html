@@ -45,12 +45,32 @@
                     { id: 'slide-0', type: 'opening' },
                     { id: 'charts' },
                     { id: 'sh' },
+                    { id: 'sh-css' },
                     //{ id: 'profiles', profile: 'longer', notes: ['Something!', 'Don\'t forget the milk!'] },
                     { id: 'slide-2', type: 'section' },
                     { id: 'animations' }
 
                 ]
             });
+        </script>
+        <script>
+
+            PPW.addListener('onstart', function(){
+                PPW.addListener('onsourcecodechangeend', function(data){
+                    console.log(data);
+                });
+                PPW.addListener('onsourcecodechange', function(data){
+                    console.log('keydown', data.evt.keyCode);
+                    /*if(data.element){
+                        switch(data.element.id){
+                            case 'css-demo':
+                                $('#css-demo').css(JSON.parse(data.sourceCode));
+                            break;
+                        }
+                    }*/
+                });
+            });
+
         </script>
     </body>
 </html>
