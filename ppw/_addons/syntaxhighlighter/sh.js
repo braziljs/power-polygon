@@ -58,6 +58,7 @@ window.PPW.extend("sh", (function(){
         el.html(el.html().replace(/\<div\>/ig, "<br/>"));
         _applyTo(oEl, true);
         oEl.blur();
+        el.removeClass('ppw-sh-editing');
         setTimeout(PPW.unlock, 500);
     }
 
@@ -163,7 +164,8 @@ window.PPW.extend("sh", (function(){
 
                     el.html(_getRawContent(el))
                       .attr('contenteditable', true)
-                      .addClass('ppw-clickable');
+                      .addClass('ppw-clickable')
+                      .addClass('ppw-sh-editing');
                     el[0].focus();
                     $(el).data('original-content', false);
 
@@ -177,11 +179,14 @@ window.PPW.extend("sh", (function(){
                         case 9: // TAB
                             document.execCommand('InsertHTML', false, "    ");
                             evt.preventDefault();
-                            break;
+                        break;
                         case 27: // ESC
                             _changed(evt, this);
-                            break;
-                        break
+                        break;
+                        case 13: // ENTER
+                            if(evt.ctrlKey || evt.metaKey)
+                                _changed(evt, this);
+                        break;
                     }
 
                     ppw.triggerEvent('onsourcecodechange',

@@ -74,3 +74,16 @@ pre:not(.no-numbers) .ppw-sh-focused-line:before{
 pre.sh_sourceCode{
     background: transparent;
 }
+
+.ppw-sh-editing:focus{
+    outline: none !important;
+}
+.ppw-sh-editing{
+    margin-top: 18px;
+    margin-left: 14px;
+    border-left: solid 24px #eee;
+    background-color: white;
+    color: #444;
+    box-shadow: 4px 4px 20px #444;
+    line-height: 28px;
+}
