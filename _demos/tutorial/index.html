@@ -138,9 +138,8 @@ PPW.init({
 PPW.init("talk_definition.json");</pre>
         </section>
 
-
         <section id="slides-features">
-            <h2>Slides Features</h2>
+            <h2>Slide Features</h2>
             <div class="content" style="margin: 40px auto; width: 600px;">
                 Now, you can add more interaction to your slides, like actions, animations, support to<br/>
                 different languages, use the camera, different profiles, etc...<br/>
@@ -148,14 +147,281 @@ PPW.init("talk_definition.json");</pre>
             </div>
         </section>
 
+        <section id="tools-1">
+            <h2>
+                Tools (toolbar)
+            </h2>
+
+            You can, by anytime, go with your mouse to the top-left corner of the screen and see the toolbar.<br/>
+            Try it now!<br/>
+            <br/>
+            You can Use it to:
+            <ul>
+                <li>Search a text on the presentation</li>
+                <li>Jump to another slide</li>
+                <li>See slides thumbnails</li>
+                <li>See printable version</li>
+                <li>Increase/decrease font size</li>
+                <li>Toggle camera</li>
+                <li>Toggle fullscreen</li>
+                <li>Open the presentation toolbox</li>
+                <li>Enable remote control</li>
+                <li>Show the Power Polygon settings</li>
+            </ul>
+        </section>
+
+        <section id="slide-actions">
+            <h2>
+                Slide Actions
+            </h2>
+
+            You can add actions to your slides, so, going next or previous will not go to the next slide, but execute your action.<br/>
+            To do that, add <strong>INSIDE</strong> your slide(inside your section, or in your slide file, in case it is an external slide).<br/>
+
+            <div id="slide-actions-content-1">
+                <pre class="sh_javascript">
+PPW.addAction( function (){ alert(0); } );</pre>
+                But you can have a <strong>does</strong>, and <strong>undo</strong> functions for your action:
+                <pre class="sh_javascript">
+PPW.addAction({
+    does: function(){ alert("doing something"); },
+    undo: function(){ alert("undo that!"); },
+});</pre>
+                You can add as many actions for each of your slides, as you want.
+            </div>
+            <div id="slide-actions-content-2" style="display: none;">
+                <br/>
+                You can also add a <strong>timing</strong> property(in milliseconds).<br/>
+                It will make your action run on schedule, instead of on click/next event.
+
+                <pre class="sh_javascript">
+PPW.addAction({
+    // will execute the 'does' function automatically, after 1 second
+    timing: 1000, // you can use the word 'auto', as equivalent to 0
+    does: function(){ alert("doing something"); },
+    undo: function(){ alert("undo that!"); },
+});</pre>
+                Try going back and forward. These animations are in the same slide.
+
+            </div>
+
+            <script>
+                PPW.addAction({
+                    does: function(){
+                        PPW.lock();
+                        PPW.animate("#slide-actions-content-1", 'fadeOutLeftBig', {
+                            duration: '300ms',
+                            onend: function(){
+                                PPW.animate("#slide-actions-content-2", 'fadeInRightBig');
+                                PPW.unlock();
+                            }
+                        });
+                    },
+                    undo: function(){
+                        PPW.lock();
+                        PPW.animate("#slide-actions-content-2", 'fadeOutRightBig', {
+                            duration: '300ms',
+                            onend: function(){
+                                PPW.animate("#slide-actions-content-1", 'fadeInLeftBig');
+                                PPW.unlock();
+                            }
+                        });
+                    }
+                });
+            </script>
+
+        </section>
+
+        <section id="slide-animations">
+            <h2>
+                Slide Animations
+            </h2>
+
+            Now that you know how to add actions to your slides, it's time to use optimized animations.<br/>
+            Once jQuery is loaded to your presentation, you can, of course, use it to animate elements.
+            Although, with <strong>PPW.animate</strong> you can perform pre-defined animations made in CSS(therefore, probably with a better performance).<br/>
+
+            <pre class="sh_javascript">
+PPW.animate("selector", "animation", {options: values});</pre>
+            Options are optional. It is an object that may contain:
+            <ul>
+                <li>count: the number of repetitions or the world 'infinite'</li>
+                <li>duration: a string with the duration in seconds or milliseconds(CSS format)</li>
+                <li>delay: time delay, also in CSS format</li>
+                <li>onstart: function to be triggered when the animation starts</li>
+                <li>onend: function to be triggered when the animation ends</li>
+            </ul>
+        </section>
+
+        <section id="slide-animations-2">
+            <h2>
+                Slide Animations
+            </h2>
+            Example:
+            <pre class="sh_javascript">
+PPW.addAction({
+    timing: auto,
+    does: function(){
+              PPW.animate("#slide-animations-eg",
+                  "pulse",
+                  {
+                      count: 'infinite',
+                      duration: '500ms',
+                      delay: '2s',
+                      onstart: function(){ console.log(0); },
+                      onend: function(){ console.log(1); }
+                  }
+              );
+          }
+});</pre>
+
+            <div id="slide-animations-eg"
+                 style="width: 90px;
+                        height: 90px;
+                        background: red;
+                        border: solid 1px black;
+                        position: absolute;
+                        right: 40px;
+                        top: 40px;
+                        z-index: 99999;"></div>
+
+            <script>
+                PPW.addAction({
+                    timing: auto,
+                    does: function(){
+
+                              PPW.animate("#slide-animations-eg",
+                                  "pulse",
+                                  {
+                                      count: 'infinite',
+                                      duration: '500ms',
+                                      delay: '2s',
+                                      onstart: function(){ console.log(0); },
+                                      onend: function(){ console.log(1); }
+                                  }
+                              );
+                          }
+                });
+            </script>
+            You can see the list of available animations by typing PPW.animations.
+
+        </section>
+
+        <section id="slide-languages">
+            <h2>Languages</h2>
+
+            <span class="LANG-EN">You can create your talks with as many languages as you need.</span>
+            <span class="LANG-PT">Você pode criar suas palestras com quantos idiomas precisar.</span><br/>
+
+            <pre class="sh_html">
+&lt;span class="LANG-EN">Text in English.&lt;/span>
+&lt;span class="LANG-PT">Texto em Português.&lt;/span></pre>
+
+            Go to the top-left corner of the screen, open the settings and change the language selectbox.
+
+        </section>
+
+        <section id="slide-profiles">
+            <h2>Profiling your talk</h2>
+
+            You can profile your talk by setting the default profile in the <strong>init</strong> method, and defining the slides their profile.<br/>
+            <pre class="sh_javascript">
+PPW.init({
+    profile: 'defaultProfile', // you name it
+    // other settings you may want to use
+    slides: [
+        { id: 'slide-1' },// default profile
+        { id: 'slide-2', profile: 'other' },
+        { id: 'slide-3' },// default profile
+    ]
+});</pre>
+            Once you do it, you can go to settings, using the toolbar in the top-left corner of the screen, and change it.<br/>
+            The next slide is the only slide in this presentation, with the profile 'extra-slide', so, it will be visible only if you have NOT specified a profile, or if you set the profile to 'extra-slide'.
+        </section>
+
+        <section id="slide-profiles-2">
+            <h2>Extra slide</h2>
+            This is the only slide in this presentation with a profile set.<br/>
+            It will be visible only if you have NOT specified a profile, or if you set the profile to 'extra-slide'.
+        </section>
+
+        <section id="plugins-tt">
+            <h2>Plugins</h2>
+        </section>
+
+        <section id="plugins">
+            <h2>Plugins</h2>
+            Power Polygon can be extended so you can use plugins.<br/>
+            To do that, all you gotta do is to include your chosen plugin script right after Power-polygon's script.<br/>
+            Like this:
+
+            <pre class="sh_html">
+&lt;script src="../../ppw/_scripts/jquery-1.8.2.min.js">&lt;/script>
+&lt;script src="../../ppw/ppw.js">&lt;/script>
+
+&lt;script src="../../ppw/_addons/syntaxhighlighter/sh.js">&lt;/script>
+&lt;script src="../../ppw/_addons/chartjs/chart.js">&lt;/script></pre>
+
+            You can find the list of available addons in the _addons directory.<br/>
+            Let's see some addons(each one works on its own way).
+        </section>
+
+
+        <section id="remote-control-tt">
+            <h2>Remote Control</h2>
+        </section>
+
+        <section id="remote-control-1">
+            <h2>Remote Control</h2>
+            You can control your presentation via your cellular phone or tablet.<br/>
+            You can also draw, point or focus, with this remote control.<br/>
+            To use the remote control, follow these steps:
+            <ol>
+                <li>
+                    Start the node service from you node instalations of Power Polygon.
+                    <pre class="sh_sh">
+$ sudo node run.js</pre>
+                </li>
+                <li>
+                    Access your talk <strong>via your IP address</strong> in port 8081 in both you computer and cellphone/tablet.<br/>
+                    Something like: http://192.168.0.11:8081/<br/>
+                </li>
+                <li>
+                    In your computer, click on the icon to open the talk you want to present to your audience.
+                </li>
+                <li>
+                    In your computer, connected to the projector, enable the remote control<br/>
+                    (the little antenna in the toolbar, on the top-left corner of the screen)<br/>
+                    *verify if the antenna was not already on...it tries to keep the last state
+                </li>
+                <li>
+                    In your controller(the cellphone or tablet), instead of opening your talk, click on the "padlock" icon.<br/>
+                    Type your token, and the remote control icon will be enabled, click on the remote control icon for the talk you want to control.
+                </li>
+            </ol>
+
+        </section>
+
+        <section id="links">
+            <h2>Useful resources</h2>
+            You can find more at<br/>
+            <br/>
+            Github: <a href="http://github.com/braziljs/power-polygon/">http://github.com/braziljs/power-polygon/</a><br/>
+            Wiki: <a href="http://github.com/braziljs/power-polygon/wiki">http://github.com/braziljs/power-polygon/wiki</a>
+
+        </section>
+
+
+
+
         <script>
             PPW.init({
                 theme: 'thm-simple',
                 transition: 'trans-zooming',
                 languages: ['EN', 'PT'],
                 defaultLanguage: 'EN',
-                profile: 'shorter',
                 useSplashScreen: false,
+                profile: 'noExtra',
                 //mode: 'page',
                 /*themeSettings: {
                     shTheme: 'sh_bright'
@@ -172,15 +438,23 @@ PPW.init("talk_definition.json");</pre>
                     { id: 'tools-2' },
                     { id: 'slides-features', type: 'section'},
                     { id: 'slide-actions' },
+                    { id: 'slide-animations' },
+                    { id: 'slide-animations-2' },
                     { id: 'slide-languages' },
                     { id: 'slide-profiles' },
-                    { id: 'charts-tt', type: 'section'},
+                    { id: 'slide-profiles-2', profile: 'extra-slide' },
+                    { id: 'plugins-tt', type: 'section'},
+                    { id: 'plugins'},
                     { id: 'charts' },
+                    { id: 'charts-2' },
                     { id: 'sh' },
+                    { id: 'sh-2' },
                     { id: 'sh-css' },
+                    { id: 'remote-control-tt', type: 'section' },
+                    { id: 'remote-control-1' },
+                    { id: 'remote-control-2' },
+                    { id: 'links' }
                     //{ id: 'profiles', profile: 'longer', notes: ['Something!', 'Don\'t forget the milk!'] },
-                    { id: 'slide-2', type: 'section' },
-                    { id: 'animations' }
                 ]
             });
         </script>

@@ -1,16 +1,13 @@
-Double click to edit the code:
-<pre class="sh_javascript ppw-sh-editable">
-    /**
-     * Example Js.
-     * Useless function.
-     */
-    window.foo= function(){
+<h2>Syntax Highlight</h2>
+All the source coude examples in this presentation use this addon.<br/>
+To use it, load the plugin after including the 'ppw.js' script:
+<pre class="sh_html">
+&lt;script src="../../ppw/ppw.js">&lt;/script>
+&lt;script src="../../ppw/_addons/syntaxhighlighter/sh.js">&lt;/script></pre>
 
-        var bar= true,
-            something= "Add a text";
-
-        // return
-        return bar? Math.random(): something;
-    };
-</pre>
-*press ESC or ctrl/command + enter to exit edditing mode.
+Then, you create a <strong>pre</strong> element with a class starting with <strong>sh_</strong> and the name of the language.<br/>
+Like this:
+<pre class="sh_html">
+&lt;pre class="sh_html">your code here&lt;/pre>
+&lt;pre class="sh_php">your code here&lt;/pre>
+&lt;pre class="sh_javascript">your code here&lt;/pre></pre>

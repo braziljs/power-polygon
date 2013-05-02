@@ -3920,6 +3920,14 @@ window.PPW = (function ($, _d, console){
                     });
                 }
                 if(settings.count){
+
+                    el[0].style.webkitAnimationIterationCount= settings.count;
+                    el[0].style.mozAnimationIterationCount= settings.count;
+                    el[0].style.oAnimationIterationCount= settings.count;
+                    el[0].style.animationiterationcount= settings.count;
+                    el[0].style.animationIterationCount= settings.count;
+                    /*
+                    // apparently, browsers do not allow this property to be set on the fly!
                     el.css({
                         'webkitAnimationIterationCount': settings.count,
                         'mozAnimationIterationCount'   : settings.count,
@@ -3927,6 +3935,7 @@ window.PPW = (function ($, _d, console){
                         'oAnimationIterationCount'     : settings.count,
                         'animationiterationcount'      : settings.count
                     });
+                    */
                 }
                 if(settings.onstart && typeof settings.onstart == 'function'){
                     el.one('webkitAnimationStart', settings.onstart);
@@ -3947,8 +3956,8 @@ window.PPW = (function ($, _d, console){
                 el.show();
             }
 
-            el.removeClass(anim).addClass('animated ppw-anim-visible ppw-anim-'+
-                                           anim);
+            el.removeClass('ppw-anim-'+anim).addClass('animated ppw-anim-visible ppw-anim-'+
+                                                      anim);
 
         }else{
             throw new Error("Invalid animation "+anim);

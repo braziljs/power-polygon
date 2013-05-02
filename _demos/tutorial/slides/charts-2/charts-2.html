@@ -1,0 +1,124 @@
+<h2>Charts</h2>
+
+More charts examples.<br/>
+You can change their types among: line, bar, radar, polarArea, pie or doughnut.
+<br/>
+
+<canvas id="polarArea" height="230" width="300" class="ppw-chart">
+                {
+                    type: "polarArea",
+                    data: [
+                        {
+                            value : 30,
+                            color: "#D97041"
+                        },
+                        {
+                            value : 90,
+                            color: "#C7604C"
+                        },
+                        {
+                            value : 24,
+                            color: "#21323D"
+                        },
+                        {
+                            value : 58,
+                            color: "#9D9B7F"
+                        },
+                        {
+                            value : 82,
+                            color: "#7D4F6D"
+                        },
+                        {
+                            value : 8,
+                            color: "#584A5E"
+                        }
+                    ]
+                }
+            </canvas>
+
+<canvas id="doughnut" height="230" width="300" class="ppw-chart">
+    {
+        type: "pie",
+        data: [
+            {
+                value : 30,
+                color: "#D97041"
+            },
+            {
+                value : 90,
+                color: "#C7604C"
+            },
+            {
+                value : 24,
+                color: "#21323D"
+            },
+            {
+                value : 58,
+                color: "#9D9B7F"
+            },
+            {
+                value : 82,
+                color: "#7D4F6D"
+            },
+            {
+                value : 8,
+                color: "#584A5E"
+            }
+        ]
+    }
+</canvas>
+<canvas id="bar" height="230" width="300" class="ppw-chart">
+    {
+        type: "bar",
+        labels : ["January","February","March","April","May","June","July"],
+        datasets : [
+            {
+                fillColor : "rgba(220,220,220,0.5)",
+                strokeColor : "rgba(220,220,220,1)",
+                pointColor : "rgba(220,220,220,1)",
+                pointStrokeColor : "#fff",
+                data : [65,59,90,81,56,55,40]
+            },
+            {
+                fillColor : "rgba(151,187,205,0.5)",
+                strokeColor : "rgba(151,187,205,1)",
+                pointColor : "rgba(151,187,205,1)",
+                pointStrokeColor : "#fff",
+                data : [28,48,40,19,96,27,100]
+            }
+        ]
+    }
+</canvas>
+<canvas id="polarArea" height="230" width="300" class="ppw-chart">
+    {
+        type: "doughnut",
+        data: [
+            {
+                value : 30,
+                color: "#D97041"
+            },
+            {
+                value : 90,
+                color: "#C7604C"
+            },
+            {
+                value : 24,
+                color: "#21323D"
+            },
+            {
+                value : 58,
+                color: "#9D9B7F"
+            },
+            {
+                value : 82,
+                color: "#7D4F6D"
+            },
+            {
+                value : 8,
+                color: "#584A5E"
+            }
+        ]
+    }
+</canvas>
+<br/>
+If you inspect the charts in your console, you will see they are canvases with chart data.

@@ -87,3 +87,6 @@ pre.sh_sourceCode{
     box-shadow: 4px 4px 20px #444;
     line-height: 28px;
 }
+.ppw-sh-editable li{
+    cursor: text !important;
+}
