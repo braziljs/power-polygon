@@ -3969,7 +3969,8 @@ window.PPW = (function ($, _d, console){
      * Resets the coordinates, zoom and rotate effects currently applied.
      */
     var _resetViewport= function(){
-        if(_conf.currentZoom){
+        
+        if(_conf.currentZoom!=1){
             _viewport({zoom: 1});
             _conf.currentZoom= 1;
         }
