@@ -55,13 +55,13 @@ h1 small, h2 small, h3 small{line-height: 32px;}
     line-height: 50px;
 }
 
-header.title{
+.slide-header{
     border-bottom: 1px solid #e8e8e8;
     margin-bottom: 1em;
 }
 
 li, ol{
-    line-height: 1.5em;
+    line-height: 1.7em;
 }
 
 p {
