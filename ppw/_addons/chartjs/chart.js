@@ -11,10 +11,6 @@ window.PPW.extend("chart", (function(){
         },
         conf= null;
 
-    var _compareCaseInsensitive = function(x, y){
-        return x.toLowerCase() == y.toLowerCase();
-    };
-
     var _render = function(element, type, chartData, chartOptions){
 
         var ctx = $(element)[0].getContext("2d");
