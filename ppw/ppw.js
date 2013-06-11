@@ -1240,6 +1240,24 @@ window.PPW = (function ($, _d, console){
     }
 
     /**
+     * Alias for documentQuerySelectorAll.
+     *
+     * @param String The query selector.
+     */
+    var _qsa= function (qs){
+        return _d.querySelectorAll(qs);
+    }
+
+    /**
+     * Alias for documentQuerySelector.
+     *
+     * @param String The query selector.
+     */
+    var _qs= function (qs){
+        return _d.querySelector(qs);
+    }
+
+    /**
      * Takes all the clonable elements and add them to slides, removing them
      * from their original escope.
      *
@@ -1253,20 +1271,27 @@ window.PPW = (function ($, _d, console){
 
             var _t= $(this),
                 clone= this,
-                containers= $('.ppw-slide-element'),
-                i= 0;
+                containers= null,
+                container= null,
+                i= 0,
+                oId= null;
 
             clone.id= clone.id||'ppw-clone';
+            oId= clone.id;
 
             // if slide type specified
             if(_t.hasClass('ppw-type-section')){
-                containers= $('.ppw-slide-type-section');
+                containers= _qsa('.ppw-slide-type-section');
             }else if(_t.hasClass('ppw-type-content')){
-                containers= $('.ppw-slide-type-content');
+                containers= _qsa('.ppw-slide-type-content');
+            }else{
+                containers= _qsa('.ppw-slide-element');
             }
 
-            containers.each(function(){
-                var cont= $(this).find('.ppw-clonable-container');
+            for(container in containers){
+            //$(containers).each(function(){
+                var cont= $(this).find('.ppw-clonable-container'),
+                    nClone= null;
 
                 if(!cont.length)
                     cont= this;
@@ -1275,11 +1300,11 @@ window.PPW = (function ($, _d, console){
                 }
 
                 i++;
-                clone= clone.cloneNode(true);
-                clone.id= clone.id + '-' + i;
+                nClone= clone.cloneNode(true);
+                nClone.id= oId + '-' + i;
 
-                $(cont).append(clone);
-            });
+                $(cont).append(nClone);
+            };
         }).remove();
 
     };
@@ -1648,7 +1673,7 @@ window.PPW = (function ($, _d, console){
             $('a').each(function(){
 
                 var l= this.href? this.href.replace(_l.protocol+'//'+_l.host+_l.pathname, ''): '#';
-
+                l= l.replace(/\?.+\#/, '#');
                 if(l.substring(0, 1) != '#' && l.substring(0, 11) != 'javascript:'){
                     if(!this.getAttribute('target')){
                         this.setAttribute('target', '_blank');
@@ -3969,7 +3994,7 @@ window.PPW = (function ($, _d, console){
      * Resets the coordinates, zoom and rotate effects currently applied.
      */
     var _resetViewport= function(){
-        
+
         if(_conf.currentZoom!=1){
             _viewport({zoom: 1});
             _conf.currentZoom= 1;

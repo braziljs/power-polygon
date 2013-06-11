@@ -40,32 +40,3 @@ PPW.addListener('onslidechange', function(slides){
     console.log(slides)
 
 });
-
-// Binding some events
-(function(){
-    var articlesContainer= $('#articles-container'),
-        fontSizes= [
-            '14px',
-            '16px',
-            '20px',
-            '22px',
-            '26px'
-        ];
-    $('#smallerFont').click(function(){
-        var currentSize= articlesContainer.data('currentFontSize');
-        currentSize= (currentSize||currentSize===0)? currentSize: 2;
-        currentSize--;
-        currentSize= currentSize<0? 0: currentSize;
-        articlesContainer.data('currentFontSize', currentSize);
-        currentSize= fontSizes[currentSize];
-        articlesContainer.css('font-size', currentSize);
-    });
-    $('#biggerFont').click(function(){
-        var currentSize= articlesContainer.data('currentFontSize')||2;
-        currentSize++;
-        currentSize= currentSize>4? 4: currentSize;
-        articlesContainer.data('currentFontSize', currentSize);
-        currentSize= fontSizes[currentSize];
-        articlesContainer.css('font-size', currentSize);
-    });
-})();
