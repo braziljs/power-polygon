@@ -1266,11 +1266,13 @@ window.PPW = (function ($, _d, console){
      * of that type.
      */
     var _applyClonableElements= function(){
+        var clonnable= _qsa('.ppw-clonable'),
+            i= 0, j= clonnable.length;
 
-        $('.ppw-clonable').each(function(){
+        for(; i<j; i++){
 
-            var _t= $(this),
-                clone= this,
+            var clone= clonnable[i],
+                _t= $(clone),
                 containers= null,
                 container= null,
                 i= 0,
@@ -1289,9 +1291,17 @@ window.PPW = (function ($, _d, console){
             }
 
             for(container in containers){
-            //$(containers).each(function(){
-                var cont= $(this).find('.ppw-clonable-container'),
+
+                if(!containers.hasOwnProperty(container))
+                    continue;
+                
+                container= containers[container];
+
+                var cont= $(container).find('.ppw-clonable-container'),
                     nClone= null;
+
+                if(!cont.length)
+                    continue;
 
                 if(!cont.length)
                     cont= this;
@@ -1303,9 +1313,10 @@ window.PPW = (function ($, _d, console){
                 nClone= clone.cloneNode(true);
                 nClone.id= oId + '-' + i;
 
-                $(cont).append(nClone);
+                cont.appendChild(nClone);
             };
-        }).remove();
+        };
+        _t.remove();
 
     };
 
