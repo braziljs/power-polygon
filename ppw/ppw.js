@@ -1267,7 +1267,8 @@ window.PPW = (function ($, _d, console){
      */
     var _applyClonableElements= function(){
         var clonnable= _qsa('.ppw-clonable'),
-            i= 0, j= clonnable.length;
+            i= 0, j= clonnable.length,
+            _t= null;
 
         for(; i<j; i++){
 
@@ -1294,7 +1295,7 @@ window.PPW = (function ($, _d, console){
 
                 if(!containers.hasOwnProperty(container))
                     continue;
-                
+
                 container= containers[container];
 
                 var cont= $(container).find('.ppw-clonable-container'),
@@ -1316,7 +1317,8 @@ window.PPW = (function ($, _d, console){
                 cont.appendChild(nClone);
             };
         };
-        _t.remove();
+        if(_t && _t.length)
+            _t.remove();
 
     };
 

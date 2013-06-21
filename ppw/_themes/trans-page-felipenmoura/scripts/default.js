@@ -37,6 +37,4 @@ PPW.addListener('onslidechange', function(slides){
         });
     }
 
-    console.log(slides)
-
 });
