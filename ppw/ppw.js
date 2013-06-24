@@ -4233,7 +4233,8 @@ window.PPW = (function ($, _d, console){
         if(!PPW.remote.server){
             $('#ppw-remote-io-script').remove();
 
-            $("head").append("<script src='"+srv+"/ppw/_tools/remote/server.js' id='ppw-remote-io-script'></script>");
+            _loadScript('/ppw/_tools/remote/server.js');
+            //$("head").append("< script src='"+srv+"/ppw/_tools/remote/server.js' id='ppw-remote-io-script'>< /script>");
 
             // in 3 seconds, verify again for the status
             setTimeout(_initRemoteService, 3000);
