@@ -391,6 +391,8 @@ window.PPW = (function ($, _d, console){
             PPWSrc: '',
             // the separator to be used on the address bar
             hashSeparator: '#',
+            // a path, given after the slide identification on the url(#!articles/article for example)
+            currentPath: '',
             // enables or not, the shortcuts
             shortcutsEnable: true,
             // may be false(also, 'num') or id(slide's id)
@@ -1535,7 +1537,11 @@ window.PPW = (function ($, _d, console){
                          .replace(/\?$/, '');
 
         hL= hL+ ((hL.indexOf('?')>-1)? '&':'?') + id+'='+val +_l.hash;
-        _h.pushState({}, val, hL);
+
+        if(_settings.currentPath)
+            hL+= _settings.currentPath;
+        _pushState(hL);
+        //_h.pushState({}, val, hL);
     };
 
     /**
@@ -1647,6 +1653,7 @@ window.PPW = (function ($, _d, console){
             _applyTalkVariables();
             // applying global variable values to variable elements not in slides
             _addListener('onslidechange', function(){
+                _settings.currentPath= '';
                 _applyTalkVariables('.ppw-variable');
             });
 
@@ -3456,10 +3463,15 @@ window.PPW = (function ($, _d, console){
      * Returns the index of the current slide based on the url.
      */
     var _getCurrentSlideFromURL= function(){
-        var h= _l.hash.replace(_settings.hashSeparator, '')||_settings.slides[0].idx,
-            i= _settings.slides.length;
+        var h= _l.hash? _l.hash.replace(_settings.hashSeparator, '')||_settings.slides[0].idx : 0,
+            i= _settings.slides.length,
+            extraPath= false;
 
         if(isNaN(h)){
+            if(extraPath= h.match(/\/.+/)){
+                _settings.currentPath= extraPath;
+                h= h.replace(/\/.+/, '');
+            }
             while(i--){
                 if(_settings.slides[i].id == h)
                     return i;
@@ -3771,6 +3783,14 @@ window.PPW = (function ($, _d, console){
     };
 
     /**
+     * Sets a path to be used after the separator in the URL.
+     */
+    var _setCurrentPath= function(path){
+        _settings.currentPath= path||false;
+        return path;
+    };
+
+    /**
      * Sets the history state.
      *
      * Adds the current slide identifier to the history.
@@ -3782,17 +3802,21 @@ window.PPW = (function ($, _d, console){
                 idx:
                 _settings.slides[idx].id;
 
-        if(_l.hash != _settings.hashSeparator+idx){
-            _h.pushState({}, idx, _settings.hashSeparator+idx);
-            _d.title= idx;
-        }
+        _pushState(idx)
+        _d.title= idx;
     };
 
     /**
      * Public method to push a given string to the url/history
      */
     var _pushState= function(state){
-        if(_l.hash != _settings.hashSeparator+state){
+
+        if(_settings.currentPath)
+            state+= _settings.currentPath;
+
+        //if(_l.hash != _settings.hashSeparator+state){
+
+        if(state != _getCurrentSlide().id){
             _h.pushState({}, state, _settings.hashSeparator+state);
         }
     }
@@ -4436,6 +4460,7 @@ window.PPW = (function ($, _d, console){
         setProfile                      : _setPresentationProfile,
         lock                            : _lock,
         unlock                          : _unlock,
+        setCurrentPath                  : _setCurrentPath,
         isLocked                        : function(){return _conf.locked;},
         get                             : _get,
         set                             : _set,
