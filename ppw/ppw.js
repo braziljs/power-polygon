@@ -3469,7 +3469,7 @@ window.PPW = (function ($, _d, console){
 
         if(isNaN(h)){
             if(extraPath= h.match(/\/.+/)){
-                _settings.currentPath= extraPath;
+                _settings.currentPath= extraPath[0];
                 h= h.replace(/\/.+/, '');
             }
             while(i--){
@@ -3763,6 +3763,12 @@ window.PPW = (function ($, _d, console){
                 previous: previousSlide,
                 current: curSlide
             });
+
+        if(_settings.currentPath){
+            curSlide.path= _settings.currentPath;
+        }else{
+            curSlide.path= '';
+        }
 
         // default event for slidechange
         _triggerEvent('onslidechange', {
