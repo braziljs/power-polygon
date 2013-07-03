@@ -3822,9 +3822,9 @@ window.PPW = (function ($, _d, console){
 
         //if(_l.hash != _settings.hashSeparator+state){
 
-        if(state != _getCurrentSlide().id){
+        //if(state != _getCurrentSlide().id){
             _h.pushState({}, state, _settings.hashSeparator+state);
-        }
+        //}
     }
 
     /**
