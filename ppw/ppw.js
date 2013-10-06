@@ -354,15 +354,15 @@ window.PPW = (function ($, _d, console){
             // the top-left toolbar content
             toolBar: '<div id="ppw-toolbar-container" tabindex="0" class="ppw-platform {{clickableClass}}">\
                     <div id="ppw-toolbar" class="ppw-platform {{clickableClass}}">\
-                        <div class="img"><img id="ppw-goto-icon" onclick="PPW.showGoToComponent(false);" title="Go to a specific slide" /></div>\
+                        <!--<div class="img"><img id="ppw-goto-icon" onclick="PPW.showGoToComponent(false);" title="Go to a specific slide" /></div>\
                         <div class="img"><img id="ppw-toolbox-icon" onclick="PPW.openPresentationTool();" title="Open Presentation Tool" /></div>\
                         <div class="img"><img id="ppw-search-icon" onclick="PPW.showSearchBox()" title="Search on slides"/></div>\
                         <div class="img"><img id="ppw-fullscreen-icon" onclick="PPW.enterFullScreen()" title="Go Fullscreen"/></div>\
                         <div class="img"><img id="ppw-camera-icon" onclick="PPW.toggleCamera();" title="Start the camera"/></div>\
                         <div class="img"><img id="ppw-remote-icon" onclick="PPW.enableRemote();" title="No remote server found"/></div>\
-                        <div class="img"><img id="ppw-settings-icon" onclick="PPW.showConfiguration();" title="Settings"/></div>\
+                        <div class="img"><img id="ppw-settings-icon" onclick="PPW.showConfiguration();" title="Settings"/></div>-->\
                     </div>\
-                    <div id="ppw-content-toolbar" class="ppw-platform">\
+                    <!--<div id="ppw-content-toolbar" class="ppw-platform">\
                         <span id="ppw-ct-text-small" title="Smaller fonts" onclick="PPW.smallerFonts();">A</span>\
                         <span id="ppw-ct-text-big" title="Bigger fonts" onclick="PPW.biggerFonts();">A</span>\
                         <img id="ppw-ct-thumbs" onclick="PPW.showThumbs();" title="Show thumbnails"/>\
@@ -371,7 +371,7 @@ window.PPW = (function ($, _d, console){
                             <div class="fb-like" data-href="{{likeSrc}}" data-send="false" data-width="450" data-show-faces="false"></div>\
                             <span class="gp-button"><div class="g-plusone" data-size="medium" data-annotation="none" data-href="{{likeSrc}}"></div></span>\
                         </div>\
-                    </div>\
+                    </div>-->\
                    </div>',
 
             // the settings form content
@@ -467,7 +467,8 @@ window.PPW = (function ($, _d, console){
         _l= location,
         _n= navigator,
         _h= history,
-        _w= window;
+        _w= window,
+        _c= {}; // cached DOM elements
 
     /**
      * Available event listeners.
@@ -2691,7 +2692,7 @@ window.PPW = (function ($, _d, console){
             $b.append(tpl);
 
             // setting images to the icons on the toolbar and their behaviour
-            $('#ppw-goto-icon').attr('src', _createPPWSrcPath('/_images/goto.png'))
+            /*$('#ppw-goto-icon').attr('src', _createPPWSrcPath('/_images/goto.png'))
                                .addClass(_conf.cons.CLICKABLE_ELEMENT)
 
             $('#ppw-toolbox-icon').attr('src', _createPPWSrcPath('/_images/toolbox.png'))
@@ -2721,6 +2722,9 @@ window.PPW = (function ($, _d, console){
 
             $('#ppw-ct-print').attr('src', _createPPWSrcPath('/_images/print.png'))
                                .addClass(_conf.cons.CLICKABLE_ELEMENT);
+            */
+
+            _createDefaultIcons();
         }
 
         // adding the splash screen if enabled
@@ -4353,6 +4357,60 @@ window.PPW = (function ($, _d, console){
         _settings[key]= value;
     };
 
+    /**
+     * Returns a chached DOM element, or cache it, if it is not there yet.
+     *
+     * @param String The element selector
+     * @return jQueryObject
+     */
+    var _getAndCache= function(selector){
+        if(!_c[selector])
+            _c[selector]= $(selector);
+        return _c[selector];
+    };
+
+    /**
+     * Creates the default icons on the toolbar
+     */
+    var _createDefaultIcons= function(){
+        //_createPPWSrcPath('/_images/goto.png')
+        /*
+        <div class="img"><img id="ppw-toolbox-icon" onclick="PPW.openPresentationTool();" title="Open Presentation Tool" /></div>\
+        <div class="img"><img id="ppw-search-icon" onclick="PPW.showSearchBox()" title="Search on slides"/></div>\
+        <div class="img"><img id="ppw-fullscreen-icon" onclick="PPW.enterFullScreen()" title="Go Fullscreen"/></div>\
+        <div class="img"><img id="ppw-camera-icon" onclick="PPW.toggleCamera();" title="Start the camera"/></div>\
+        <div class="img"><img id="ppw-remote-icon" onclick="PPW.enableRemote();" title="No remote server found"/></div>\
+        <div class="img"><img id="ppw-settings-icon" onclick="PPW.showConfiguration();" title="Settings"/></div>-->\
+        */
+        _createIcon({
+            id: 'ppw-toolbox-icon',
+            description: "Open the Presentation Tool",
+            image: _createPPWSrcPath('_images/toolbox.png'),
+            click: _openPresentationTool
+        });
+    }
+
+
+    /**
+     * Adds an icon with its functionalities to the toolbar on top.
+     *
+     * @paran Object The icon data: {id, description, click }
+     * @return jQueryObject A reference to the created icon.
+     */
+    var _createIcon= function(iconData){
+
+        var toolBar= _getAndCache('#ppw-toolbar'),
+            icon= $('<a href="javascript:void(0);" \
+                        class="ppw-icon" \
+                        alt="'+iconData.description+'" \
+                        title="'+iconData.description+'" \
+                        style="background-image: url('+iconData.image+');"></a>');
+        icon.bind('click', iconData.click);
+        toolBar.append(icon);
+        //alert(toolBar.length)
+        return icon;
+    };
+
     /**************************************************
      *                  CONSTRUCTOR                   *
      **************************************************/
@@ -4473,7 +4531,8 @@ window.PPW = (function ($, _d, console){
         Facebook                        : true,
         Google                          : true,
         pushState                       : _pushState,
-        getPPWPath                      : _getPPWPath
+        getPPWPath                      : _getPPWPath,
+        createIcon                      : _createIcon
     };
 
 })(window.jQuery, document, window.console);
