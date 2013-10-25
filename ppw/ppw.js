@@ -354,24 +354,7 @@ window.PPW = (function ($, _d, console){
             // the top-left toolbar content
             toolBar: '<div id="ppw-toolbar-container" tabindex="0" class="ppw-platform {{clickableClass}}">\
                     <div id="ppw-toolbar" class="ppw-platform {{clickableClass}}">\
-                        <!--<div class="img"><img id="ppw-goto-icon" onclick="PPW.showGoToComponent(false);" title="Go to a specific slide" /></div>\
-                        <div class="img"><img id="ppw-toolbox-icon" onclick="PPW.openPresentationTool();" title="Open Presentation Tool" /></div>\
-                        <div class="img"><img id="ppw-search-icon" onclick="PPW.showSearchBox()" title="Search on slides"/></div>\
-                        <div class="img"><img id="ppw-fullscreen-icon" onclick="PPW.enterFullScreen()" title="Go Fullscreen"/></div>\
-                        <div class="img"><img id="ppw-camera-icon" onclick="PPW.toggleCamera();" title="Start the camera"/></div>\
-                        <div class="img"><img id="ppw-remote-icon" onclick="PPW.enableRemote();" title="No remote server found"/></div>\
-                        <div class="img"><img id="ppw-settings-icon" onclick="PPW.showConfiguration();" title="Settings"/></div>-->\
                     </div>\
-                    <!--<div id="ppw-content-toolbar" class="ppw-platform">\
-                        <span id="ppw-ct-text-small" title="Smaller fonts" onclick="PPW.smallerFonts();">A</span>\
-                        <span id="ppw-ct-text-big" title="Bigger fonts" onclick="PPW.biggerFonts();">A</span>\
-                        <img id="ppw-ct-thumbs" onclick="PPW.showThumbs();" title="Show thumbnails"/>\
-                        <img id="ppw-ct-print" onclick="PPW.print();" title="Print or save as PDF(alt+P)"/>\
-                        <div id="ppw-presentation-social-buttons">\
-                            <div class="fb-like" data-href="{{likeSrc}}" data-send="false" data-width="450" data-show-faces="false"></div>\
-                            <span class="gp-button"><div class="g-plusone" data-size="medium" data-annotation="none" data-href="{{likeSrc}}"></div></span>\
-                        </div>\
-                    </div>-->\
                    </div>',
 
             // the settings form content
@@ -4370,6 +4353,16 @@ window.PPW = (function ($, _d, console){
     };
 
     /**
+     * Toggles the camera in the interface.
+     */
+    var _toggleCamera= function(){
+        if(_conf.showingCamera)
+            _pauseCamera();
+        else
+            _startCamera();
+    }
+
+    /**
      * Creates the default icons on the toolbar
      */
     var _createDefaultIcons= function(){
@@ -4383,10 +4376,46 @@ window.PPW = (function ($, _d, console){
         <div class="img"><img id="ppw-settings-icon" onclick="PPW.showConfiguration();" title="Settings"/></div>-->\
         */
         _createIcon({
+            id: 'ppw-goto-icon',
+            description: "Go to a specific slide by its index",
+            image: _createPPWSrcPath('_images/goto.png'),
+            click: _openPresentationTool
+        });
+        _createIcon({
             id: 'ppw-toolbox-icon',
             description: "Open the Presentation Tool",
             image: _createPPWSrcPath('_images/toolbox.png'),
             click: _openPresentationTool
+        });
+        _createIcon({
+            id: 'ppw-search-icon',
+            description: "Search through slides",
+            image: _createPPWSrcPath('_images/search.png'),
+            click: _showSearchBox
+        });
+        _createIcon({
+            id: 'ppw-fullscreen-icon',
+            description: "Show the presentation in full screen mode",
+            image: _createPPWSrcPath('_images/fullscreen.png'),
+            click: _enterFullScreen
+        });
+        _createIcon({
+            id: 'ppw-camera-icon',
+            description: "Opens or closes your camera for the audience",
+            image: _createPPWSrcPath('_images/camera.png'),
+            click: _toggleCamera
+        });
+        _createIcon({
+            id: 'ppw-remote-icon',
+            description: "Enable remove control",
+            image: _createPPWSrcPath('_images/remote-conection-status-no-server.png'),
+            click: _enableRemote
+        });
+        _createIcon({
+            id: 'ppw-settings-icon',
+            description: "Shows the settings pannel",
+            image: _createPPWSrcPath('_images/settings-icon.png'),
+            click: _showConfiguration
         });
     }
 
@@ -4400,11 +4429,11 @@ window.PPW = (function ($, _d, console){
     var _createIcon= function(iconData){
 
         var toolBar= _getAndCache('#ppw-toolbar'),
-            icon= $('<a href="javascript:void(0);" \
+            icon= $('<span href="javascript:void(0);" \
                         class="ppw-icon" \
                         alt="'+iconData.description+'" \
                         title="'+iconData.description+'" \
-                        style="background-image: url('+iconData.image+');"></a>');
+                        style="background-image: url('+iconData.image+');"></span>');
         icon.bind('click', iconData.click);
         toolBar.append(icon);
         //alert(toolBar.length)
@@ -4485,7 +4514,7 @@ window.PPW = (function ($, _d, console){
         showWarning                     : _showWarning,
         showWarn                        : _showWarning,
         showError                       : _showError,
-        toggleCamera                    :  function(){ if(_conf.showingCamera) _pauseCamera(); else _startCamera(); },
+        toggleCamera                    :  _toggleCamera,
         addListener                     : _addListener,
         removeListener                  : _removeListener,
         triggerPresentationToolLoadEvent: _triggerPresentationToolLoadEvent,
