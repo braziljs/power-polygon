@@ -196,6 +196,11 @@ window.PPW = (function ($, _d, console){
                 left: '0px'
             },
 
+            toolbarIcons: {
+                v: [],
+                h: []
+            },
+
             // all the animation
             animations: [
                          // enphasys
@@ -352,12 +357,10 @@ window.PPW = (function ($, _d, console){
                       </div>',
 
             // the top-left toolbar content
-            toolBar: '<div id="ppw-toolbar-container" tabindex="0" class="ppw-platform ppw-clickable">\
+            toolBar: '<div id="ppw-toolbar-container" class="ppw-platform ppw-clickable" onselectstart="return false;">\
                         <div id="ppw-toolbar-trigger-btn" class="ppw-clickable"><span></span></div>\
-                        <div id="ppw-toolbar-v" class="ppw-platform {{clickableClass}}">\
-                        <div id="ppw-toolbar-h" class="ppw-platform {{clickableClass}}">\
-                        </div>\
-                        <div id="ppw-toolbar-overlay"></div>\
+                        <div id="ppw-toolbar-v" class="ppw-platform {{clickableClass}}"></div>\
+                        <div id="ppw-toolbar-h" class="ppw-platform {{clickableClass}}"></div>\
                       </div>',
 
             // the settings form content
@@ -2186,6 +2189,9 @@ window.PPW = (function ($, _d, console){
         /* Toolbar Events */
         $('#ppw-toolbar-trigger-btn').live('click', function(){
             $('#ppw-toolbar-container').toggleClass('active');
+        }).live('selectstart', function(evt){
+            evt.preventDefault();
+            return false;
         });
 
         /*$b.bind('selectstart', function(evt){
@@ -4376,16 +4382,17 @@ window.PPW = (function ($, _d, console){
         <div class="img"><img id="ppw-remote-icon" onclick="PPW.enableRemote();" title="No remote server found"/></div>\
         <div class="img"><img id="ppw-settings-icon" onclick="PPW.showConfiguration();" title="Settings"/></div>-->\
         */
-        _createIcon({
-            id: 'ppw-goto-icon',
-            description: "Go to a specific slide by its index",
-            image: _createPPWSrcPath('_images/goto.png'),
-            click: _openPresentationTool
-        });
+
         _createIcon({
             id: 'ppw-toolbox-icon',
             description: "Open the Presentation Tool",
             image: _createPPWSrcPath('_images/toolbox.png'),
+            click: _openPresentationTool
+        });
+        _createIcon({
+            id: 'ppw-goto-icon',
+            description: "Go to a specific slide by its index",
+            image: _createPPWSrcPath('_images/goto.png'),
             click: _openPresentationTool
         });
         _createIcon({
@@ -4395,29 +4402,29 @@ window.PPW = (function ($, _d, console){
             click: _showSearchBox
         });
         _createIcon({
-            id: 'ppw-fullscreen-icon',
-            description: "Show the presentation in full screen mode",
-            image: _createPPWSrcPath('_images/fullscreen.png'),
-            click: _enterFullScreen
-        });
-        _createIcon({
             id: 'ppw-camera-icon',
             description: "Opens or closes your camera for the audience",
             image: _createPPWSrcPath('_images/camera.png'),
             click: _toggleCamera
-        });
+        }, true);
+        _createIcon({
+            id: 'ppw-fullscreen-icon',
+            description: "Show the presentation in full screen mode",
+            image: _createPPWSrcPath('_images/fullscreen.png'),
+            click: _enterFullScreen
+        }, true);
         _createIcon({
             id: 'ppw-remote-icon',
             description: "Enable remove control",
             image: _createPPWSrcPath('_images/remote-conection-status-no-server.png'),
             click: _enableRemote
-        });
+        }, true);
         _createIcon({
             id: 'ppw-settings-icon',
             description: "Shows the settings pannel",
             image: _createPPWSrcPath('_images/settings-icon.png'),
             click: _showConfiguration
-        });
+        }, true);
     }
 
 
@@ -4430,18 +4437,36 @@ window.PPW = (function ($, _d, console){
     var _createIcon= function(iconData, v){
 
         var toolBar= _getAndCache(v? '#ppw-toolbar-v': '#ppw-toolbar-h'),
-            specialStyle= v? '-webkit-transition-delay: '+iconData.delay+'; '+
+            d= 0,
+            /*specialStyle= v? '-webkit-transition-delay: '+iconData.delay+'; '+
                              '-moz-transition-delay: '+iconData.delay+'; '+
-                             'transition-delay: '+iconData.delay+ '; ': '',
-            icon= $('<span href="javascript:void(0);" \
-                        class="ppw-icon" \
+                             'transition-delay: '+iconData.delay+ '; ': '',*/
+            icon= $('<span id="ppw-toolbaricon-'+iconData.id+'"\
+                        class="ppw-icon ppw-clickable" \
                         alt="'+iconData.description+'" \
                         title="'+iconData.description+'" \
-                        style="background-image: url('+iconData.image+');\
-                               '+specialStyle+'"></span>');
-        icon.bind('click', iconData.click);
-        toolBar.append(icon);
-        //alert(toolBar.length)
+                        style="background-image: url('+iconData.image+');"></span>');
+        if(v){
+            toolBar.prepend(icon);
+        }else{
+            toolBar.append(icon);
+        }
+
+        d= (_conf.toolbarIcons[v?'v': 'h'].length * 0.1)+'s';
+        d= 'all 0.3s linear '+d;
+        // adding a small delay
+        icon.css({
+                '-webkit-transition': d,
+                '-moz-transition': d,
+                'transition': d,
+        });
+
+        if(typeof iconData.click == 'function'){
+            //icon.bind('click', iconData.click);
+            $('#ppw-toolbaricon-'+iconData.id).live('click', iconData.click);
+        }
+
+        _conf.toolbarIcons[v?'v': 'h'].push(iconData);
         return icon;
     };
 

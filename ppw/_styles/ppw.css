@@ -674,7 +674,17 @@
 /* TOOLBAR */
 #ppw-toolbar{
 }
+#ppw-toolbar, .ppw-icon, #ppw-toolbar-v, #ppw-toolbar-h{
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
 .ppw-icon{
+    cursor: pointer;
     display: block;
     width: 26px;
     height: 26px;
@@ -682,6 +692,10 @@
     background-position: center center;
     background-repeat: no-repeat;
     background-size: cover;
+
+    /*-webkit-transition: all 0.3s linear;
+    -moz-transition:    all 0.3s linear;
+    transition:         all 0.3s linear;*/
 }
 
 /** TOOLBOX **/
@@ -821,9 +835,9 @@
 }
 
 #ppw-toolbar-container.active #ppw-toolbar-trigger-btn span:before{
-    -webkit-transform: translateY(0) rotate(45deg);
-    -moz-transform: translateY(0) rotate(45deg);
-    transform: translateY(0) rotate(45deg);
+    -webkit-transform:  translateY(0) rotate(45deg);
+    -moz-transform:     translateY(0) rotate(45deg);
+    transform:          translateY(0) rotate(45deg);
 }
 #ppw-toolbar-container.active #ppw-toolbar-trigger-btn span:after{
     -webkit-transform:  translateY(-4px) rotate(-45deg);
@@ -846,14 +860,56 @@
 
 #ppw-toolbar-v{
     position: fixed;
-    left: 0px;
-    bottom: 90px;
+    left: -90px;
+    bottom: 50px;
     z-index: 3;
     padding: 10px;
+
+    -webkit-transition: left 0.3s;
+    -moz-transition: left 0.3s;
+    transition: left 0.3s;
+}
+.active #ppw-toolbar-v{
+    left: 0px;
+}
+#ppw-toolbar-h{
+    position: fixed;
+    left: 90px;
+    bottom: -90px;
+    z-index: 3;
+    padding: 10px;
+
+    -webkit-transition: bottom 0.3s;
+    -moz-transition: bottom 0.3s;
+    transition: bottom 0.3s;
+}
+.active #ppw-toolbar-h{
+    bottom: 0px;
 }
 
 #ppw-toolbar-v .ppw-icon{
+    -webkit-transform:  translateX(-40px);
+    -moz-transform:     translateX(-40px);
+    transform:          translateX(-40px);
+}
+.active #ppw-toolbar-v .ppw-icon{
+    -webkit-transform:  translateX(0px);
+    -moz-transform:     translateX(0px);
+    transform:          translateX(0px);
+}
 
+#ppw-toolbar-h .ppw-icon{
+    margin-top: 5px;
+    margin-bottom: 5px;
+    float: left;
+    -webkit-transform:  translateY(40px);
+    -moz-transform:     translateY(40px);
+    transform:          translateY(40px);
+}
+.active #ppw-toolbar-h .ppw-icon{
+    -webkit-transform:  translateY(0px);
+    -moz-transform:     translateY(0px);
+    transform:          translateY(0px);
 }
 
 #ppw-toolbar-v .img:hover{
