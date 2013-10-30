@@ -539,33 +539,149 @@
 
 
 #ppw-camera-tool{
+    height: 320px;
+    width: 480px;
+    display: none;
     position: absolute;
-    left: 20px;
-    top: -270px;
-    width: 262px;
-    height: 196px;
-    overflow: visible;
-    /*border: solid 1px black;
-    box-shadow: 0px 0px 20px black;*/
-    z-index: 999999996;
+    z-index: 99999996;
+    background-color: #333;
+    border: solid 3px #333;
+    box-sizing: content-box;
+    text-align: center;
+    top: auto;
+    bottom: 0px;
+
+    -webkit-transition: -webkit-transform 0.5s linear;
+    -moz-transition: -moz-transform 0.5s linear;
+    transition: transform 0.5s linear;
 }
-#ppw-camera-tool video{
+
+#ppw-camera-tool-resize{
+    display: block;
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    right: -6px;
+    top: -6px;
+    border-width: 2px;
+    border-color: #444 #444 transparent transparent;
+    border-style: solid;
+    cursor: nesw-resize;
+}
+#ppw-camera-tool-resize:before{
+    content: "";
+    display: block;
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    right: -5px;
+    top: -5px;
+    border-width: 2px;
+    border-color: #444 #444 transparent transparent;
+    border-style: solid;
+    cursor: nesw-resize;
+}
+#ppw-video-container{
+    position: absolute;
+    left: 0px;
+    top: 0px;
     width: 100%;
     height: 100%;
+    overflow: hidden;
+}
+.ppw-camera-activated{
+    display: block !important;
+
+    -webkit-animation: ppw-show-camera 1s linear 1;
+    -webkit-animation-fill-mode: backwards;
+
+    -moz-animation: ppw-show-camera 1s linear 1;
+    -moz-animation-fill-mode: backwards;
+
+    animation: ppw-show-camera 1s linear 1;
+    animation-fill-mode: backwards;
+}
+.ppw-removing-camera{
+    -webkit-transform: translateX(-100%) translateY(100%);
+    -moz-transform: translateX(-100%) translateY(100%);
+    transform: translateX(-100%) translateY(100%);
+}
+
+@-webkit-keyframes ppw-show-camera{
+    0%{
+        left: -350px;
+        bottom: -270px;
+    }
+    50%, 70%{
+        bottom: 60px;
+        left: 90px;
+        z-index: 99999997;
+    }
+    71%{
+        z-index: 99999998;
+    }
+    100%{
+        bottom: 0px;
+        left: 0px;
+        z-index: 99999998;
+    }
+}
+@-moz-keyframes ppw-show-camera{
+    0%{
+        left: -350px;
+        bottom: -270px;
+    }
+    50%, 70%{
+        bottom: 60px;
+        left: 90px;
+        z-index: 99999997;
+    }
+    71%{
+        z-index: 99999998;
+    }
+    100%{
+        bottom: 0px;
+        left: 0px;
+        z-index: 99999998;
+    }
+}
+@keyframes ppw-show-camera{
+    0%{
+        left: -350px;
+        bottom: -270px;
+    }
+    50%, 70%{
+        bottom: 60px;
+        left: 90px;
+        z-index: 99999997;
+    }
+    71%{
+        z-index: 99999998;
+    }
+    100%{
+        bottom: 0px;
+        left: 0px;
+        z-index: 99999998;
+    }
+}
+
+#ppw-camera-tool video{
+    width: 100%;
+    margin: auto;
+    min-height: 100%;
     background-color: black;
 }
 #ppw-camera-hide-trigger{
-    height: 6px;
-    border: solid 1px gray;
-    background-color: #F44;
-    margin-top: -6px;
+    height: 20px;
+    width: 20px;
     text-align: center;
-    padding-bottom: 2px;
-    cursor: pointer !IMPORTANT;
+    cursor: pointer;
     position: absolute;
-    bottom: -7px;
-    width: 100%;
+    right: 0px;
+    top: 0px;
+    background: url(../_images/close.png) no-repeat center;
 }
+
 
 #ppw-camera-tool .ui-resizable-s{
     bottom: -15px !IMPORTANT;
@@ -674,7 +790,8 @@
 /* TOOLBAR */
 #ppw-toolbar{
 }
-#ppw-toolbar, .ppw-icon, #ppw-toolbar-v, #ppw-toolbar-h{
+#ppw-toolbar, .ppw-icon, #ppw-toolbar-v, #ppw-toolbar-h,
+#ppw-camera-tool, #ppw-camera-tool-resize, #ppw-video-container, #ppw-camera-tool video{
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -874,7 +991,7 @@
 }
 #ppw-toolbar-h{
     position: fixed;
-    left: 90px;
+    left: 80px;
     bottom: -90px;
     z-index: 3;
     padding: 10px;

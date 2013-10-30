@@ -349,10 +349,11 @@ window.PPW = (function ($, _d, console){
                       </div>',
 
             // camera/video placeholder element
-            camera: '<div id="ppw-camera-tool" class="ppw-clickable">\
-                        <video id="ppw-video-element" autoplay="autoplay" class="ppw-clickable"></video>\
-                        <div id="ppw-camera-hide-trigger" class="ppw-clickable">\
-                            <img height="10" class="ppw-clickable" src="">\
+            camera: '<div id="ppw-camera-tool" class="ppw-clickable" onselectstart="return false">\
+                        <div id="ppw-camera-tool-resize"></div>\
+                        <div id="ppw-video-container">\
+                            <video id="ppw-video-element" autoplay="autoplay" class="ppw-clickable" onselectstart="return false"></video>\
+                            <div id="ppw-camera-hide-trigger" class="ppw-clickable"></div>\
                         </div>\
                       </div>',
 
@@ -1150,10 +1151,10 @@ window.PPW = (function ($, _d, console){
              background: '#55f'
          });
 
-         var styles=["/_styles/ppw.css", "/_styles/animate.css", "/_styles/jquery-ui-1.8.23.custom.css", "/_styles/font-awesome.min.css"];
+         var styles=["/_styles/ppw.css", "/_styles/animate.css", "/_styles/font-awesome.min.css"];
          _loadStyles(styles, true, "PPW.setLoadingBarStatus()", false);
-         var scripts=["/_scripts/jquery-ui-1.8.23.custom.min.js"];
-         _loadScripts(scripts, true, PPW.setLoadingBarStatus);
+         //var scripts=["/_scripts/jquery-ui-1.8.23.custom.min.js"];
+         //_loadScripts(scripts, true, PPW.setLoadingBarStatus);
 
          if(_settings.mode != 'page'){
              _tmp.lnk = _d.createElement('link');
@@ -3016,7 +3017,28 @@ window.PPW = (function ($, _d, console){
     var _startCamera= function(){
 
         var video = _d.querySelector('#ppw-video-element'),
-            el= $('#ppw-camera-tool');
+            el= $('#ppw-camera-tool'),
+            dnd= {},
+            rsz= {},
+            dragingTheVideo= function(event){
+                if(dnd.el){
+                    dnd.el.style.left= event.pageX - dnd.offsetX + 'px';
+                    dnd.el.style.bottom= ((_b.offsetHeight - event.pageY) - (dnd.height - dnd.offsetY)) + 'px';
+                }
+            },
+            resizingTheVideo= function(event){
+                var h, w;
+                if(dnd.el){
+                    w= (event.pageX - rsz.left);
+                    h= (_b.offsetHeight - event.pageY - rsz.bottom);
+                    if(w > 40)
+                        rsz.el.style.width= w + 'px';
+                    if(h > 40)
+                        rsz.el.style.height= h + 'px';
+                }
+                event.preventDefault();
+                return false;
+            };
 
         if(!_conf.cameraLoaded){
             _w.URL = _w.URL || _w.webkitURL;
@@ -3051,11 +3073,7 @@ window.PPW = (function ($, _d, console){
                       "device": _conf.stream
                   });
 
-                  el.draggable()
-                    .resizable({
-                        handles: "se, sw, ne, nw, n, e, s, w"
-                    })
-                    .bind('dblclick', function(){
+                  el.bind('dblclick', function(){
 
                         var that= $(this), oldie= [];
 
@@ -3063,32 +3081,66 @@ window.PPW = (function ($, _d, console){
                             oldie= that.data('oldprops');
                             that.data('fullscreened', true)
                                 .show()
-                                .animate({
+                                .css({
                                      width: oldie[2]+'px',
                                      height: oldie[3]+'px',
                                      left: oldie[0]+'px',
-                                     top: oldie[1]+'px'
-                                 }, 500)
+                                     bottom: oldie[1]+'px'
+                                 })
                                  .data('fullscreened', false);
                         }else{
                             that.data('fullscreened', true)
                                 .data('oldprops', [
                                      this.offsetLeft,
-                                     this.offsetTop,
+                                     _b.offsetHeight - (this.offsetHeight + this.offsetTop),
                                      this.offsetWidth,
                                      this.offsetHeight
                                 ])
-                                .animate({
+                                .css({
                                      width: _b.offsetWidth+'px',
                                      height: _b.offsetHeight+'px',
                                      left: '0px',
-                                     top: '0px'
-                                 }, 500);
+                                     bottom: '0px'
+                                 });
                         }
-                    }).css({
-                        left: _b.offsetWidth - el[0].offsetWidth-10,
-                        top: 0-el[0].offsetHeight
-                    }).animate({top: '0px'}, 500);
+                    }).addClass('ppw-camera-activated');
+
+                    $('#ppw-video-container').bind('mousedown', function(event){ // dragg'n'drop
+
+                        dnd.pageX= event.pageX;
+                        dnd.pageY= event.pageY;
+                        dnd.offsetX= event.offsetX;
+                        dnd.offsetY= event.offsetY;
+                        dnd.height= el[0].offsetHeight;
+                        dnd.el= el[0];
+
+                        _b.addEventListener('mousemove', dragingTheVideo);
+                        _b.addEventListener('mouseup', function(){
+                            _b.removeEventListener('mousemove', dragingTheVideo);
+                        });
+
+                        event.preventDefault();
+                        return false;
+                    });
+
+                    $('#ppw-camera-tool-resize').bind('mousedown', function(event){
+                        rsz.pageX= event.pageX;
+                        rsz.pageY= event.pageY;
+                        rsz.offsetX= event.offsetX;
+                        rsz.offsetY= event.offsetY;
+                        rsz.bottom= _b.offsetHeight - (el[0].offsetHeight + el[0].offsetTop);
+                        rsz.left= el[0].offsetLeft;
+                        rsz.el= el[0];
+                        _b.addEventListener('mousemove', resizingTheVideo);
+                        _b.addEventListener('mouseup', function(){
+                            _b.removeEventListener('mousemove', resizingTheVideo);
+                        });
+
+                        event.preventDefault();
+                        return false;
+                    });
+
+                    setTimeout(_closeToolbar, 800);
 
                     _conf.showingCamera= true;
                     $('#ppw-camera-hide-trigger').bind('click', _pauseCamera);
@@ -3104,13 +3156,8 @@ window.PPW = (function ($, _d, console){
             }
         }else{
             _d.querySelector('#ppw-video-element').play();
-
-            if(el[0].offsetTop <0){
-                el.css({
-                            left: _b.offsetWidth - el[0].offsetWidth-10,
-                            top: 0-el[0].offsetHeight
-                       }).animate({top: '0px'}, 500);
-            }
+            el.addClass('ppw-camera-activated');
+            setTimeout(_closeToolbar, 800);
 
             if(_conf.video && _conf.stream){
                 _triggerEvent('onshowcamera', {
@@ -3123,6 +3170,20 @@ window.PPW = (function ($, _d, console){
     };
 
     /**
+     * Closes the toolbar menus.
+     */
+    var _closeToolbar= function(){
+        $('#ppw-toolbar-container').removeClass('active');
+    };
+
+    /**
+     * Shows the toolbar menus.
+     */
+    var _openToolbar= function(){
+        $('#ppw-toolbar-container').addClass('active');
+    };
+
+    /**
      * Pauses the camera and hides it.
      */
     var _pauseCamera= function(){
@@ -3132,10 +3193,9 @@ window.PPW = (function ($, _d, console){
         if(_conf.cameraLoaded){
             el= $('#ppw-camera-tool');
             _d.querySelector('#ppw-video-element').pause();
-            el.animate({top: -el[0].offsetHeight - 30})
-            //PPW.cameraStream.pause();
+            el.addClass("ppw-removing-camera")
+            setTimeout(function(){el.removeClass('ppw-removing-camera ppw-camera-activated'); el[0].removeAttribute('style'); }, 500);
             _conf.showingCamera= false;
-            //_conf.cameraLoaded= false;
         }
         _triggerEvent('onhidecamera');
     };
