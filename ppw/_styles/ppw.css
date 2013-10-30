@@ -602,9 +602,9 @@
     animation-fill-mode: backwards;
 }
 .ppw-removing-camera{
-    -webkit-transform: translateX(-100%) translateY(100%);
-    -moz-transform: translateX(-100%) translateY(100%);
-    transform: translateX(-100%) translateY(100%);
+    -webkit-transform: scale(0);
+    -moz-transform: scale(0);
+    transform: scale(0);
 }
 
 @-webkit-keyframes ppw-show-camera{
