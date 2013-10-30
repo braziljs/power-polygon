@@ -4448,30 +4448,18 @@ window.PPW = (function ($, _d, console){
             description: "Open the Presentation Tool",
             image: _createPPWSrcPath('_images/toolbox.png'),
             click: _openPresentationTool
-        });
-        _createIcon({
-            id: 'ppw-goto-icon',
-            description: "Go to a specific slide by its index",
-            image: _createPPWSrcPath('_images/goto.png'),
-            click: _openPresentationTool
-        });
-        _createIcon({
-            id: 'ppw-search-icon',
-            description: "Search through slides",
-            image: _createPPWSrcPath('_images/search.png'),
-            click: _showSearchBox
-        });
-        _createIcon({
-            id: 'ppw-camera-icon',
-            description: "Opens or closes your camera for the audience",
-            image: _createPPWSrcPath('_images/camera.png'),
-            click: _toggleCamera
         }, true);
         _createIcon({
             id: 'ppw-fullscreen-icon',
             description: "Show the presentation in full screen mode",
             image: _createPPWSrcPath('_images/fullscreen.png'),
             click: _enterFullScreen
+        }, true);
+        _createIcon({
+            id: 'ppw-camera-icon',
+            description: "Opens or closes your camera for the audience",
+            image: _createPPWSrcPath('_images/camera.png'),
+            click: _toggleCamera
         }, true);
         _createIcon({
             id: 'ppw-remote-icon',
@@ -4485,6 +4473,19 @@ window.PPW = (function ($, _d, console){
             image: _createPPWSrcPath('_images/settings-icon.png'),
             click: _showConfiguration
         }, true);
+        
+        _createIcon({
+            id: 'ppw-goto-icon',
+            description: "Go to a specific slide by its index",
+            image: _createPPWSrcPath('_images/goto.png'),
+            click: _openPresentationTool
+        });
+        _createIcon({
+            id: 'ppw-search-icon',
+            description: "Search through slides",
+            image: _createPPWSrcPath('_images/search.png'),
+            click: _showSearchBox
+        });
     }
 
 
@@ -4512,7 +4513,7 @@ window.PPW = (function ($, _d, console){
             toolBar.append(icon);
         }
 
-        d= (_conf.toolbarIcons[v?'v': 'h'].length * 0.1)+'s';
+        d= (_conf.toolbarIcons[v?'v': 'h'].length * 0.05)+'s';
         d= 'all 0.3s linear '+d;
         // adding a small delay
         icon.css({
