@@ -4441,6 +4441,16 @@ window.PPW = (function ($, _d, console){
         <div class="img"><img id="ppw-camera-icon" onclick="PPW.toggleCamera();" title="Start the camera"/></div>\
         <div class="img"><img id="ppw-remote-icon" onclick="PPW.enableRemote();" title="No remote server found"/></div>\
         <div class="img"><img id="ppw-settings-icon" onclick="PPW.showConfiguration();" title="Settings"/></div>-->\
+        
+        <span id="ppw-ct-text-small" title="Smaller fonts" onclick="PPW.smallerFonts();">A</span>\
+        <span id="ppw-ct-text-big" title="Bigger fonts" onclick="PPW.biggerFonts();">A</span>\
+                <img id="ppw-ct-thumbs" onclick="PPW.showThumbs();" title="Show thumbnails"/>\
+        <img id="ppw-ct-print" onclick="PPW.print();" title="Print or save as PDF(alt+P)"/>\
+        <div id="ppw-presentation-social-buttons">\
+            <div class="fb-like" data-href="{{likeSrc}}" data-send="false" data-width="450" data-show-faces="false"></div>\
+            <span class="gp-button"><div class="g-plusone" data-size="medium" data-annotation="none" data-href="{{likeSrc}}"></div></span>\
+        </div>\
+        
         */
 
         _createIcon({
@@ -4456,10 +4466,10 @@ window.PPW = (function ($, _d, console){
             click: _enterFullScreen
         }, true);
         _createIcon({
-            id: 'ppw-camera-icon',
-            description: "Opens or closes your camera for the audience",
-            image: _createPPWSrcPath('_images/camera.png'),
-            click: _toggleCamera
+            id: 'ppw-ct-print',
+            description: "See printable version",
+            image: _createPPWSrcPath('_images/print.png'),
+            click: _print
         }, true);
         _createIcon({
             id: 'ppw-remote-icon',
@@ -4474,6 +4484,33 @@ window.PPW = (function ($, _d, console){
             click: _showConfiguration
         }, true);
         
+        // horizontal
+        _createIcon({
+            id: 'ppw-ct-text-big',
+            description: "Bigger fonts",
+            content: "A",
+            className: 'ppw-bigger-fonts-btn',
+            click: _smallerFonts
+        });
+        _createIcon({
+            id: 'ppw-ct-text-small',
+            description: "Smaller fonts",
+            content: "A",
+            className: 'ppw-smaller-fonts-btn',
+            click: _biggerFonts
+        });
+        _createIcon({
+            id: 'ppw-camera-icon',
+            description: "Opens or closes your camera for the audience",
+            image: _createPPWSrcPath('_images/camera.png'),
+            click: _toggleCamera
+        });
+        _createIcon({
+            id: 'ppw-ct-thumbs',
+            description: "Show slides thumbnails",
+            image: _createPPWSrcPath('_images/thumbs.png'),
+            click: function(){ _showThumbs(); _closeToolbar(); }
+        });
         _createIcon({
             id: 'ppw-goto-icon',
             description: "Go to a specific slide by its index",
@@ -4492,7 +4529,7 @@ window.PPW = (function ($, _d, console){
     /**
      * Adds an icon with its functionalities to the toolbar on top.
      *
-     * @paran Object The icon data: {id, description, click }
+     * @paran Object The icon data: {id, description, click[, className, content] }
      * @return jQueryObject A reference to the created icon.
      */
     var _createIcon= function(iconData, v){
@@ -4503,10 +4540,11 @@ window.PPW = (function ($, _d, console){
                              '-moz-transition-delay: '+iconData.delay+'; '+
                              'transition-delay: '+iconData.delay+ '; ': '',*/
             icon= $('<span id="ppw-toolbaricon-'+iconData.id+'"\
-                        class="ppw-icon ppw-clickable" \
+                        class="ppw-icon ppw-clickable '+(iconData.className||'')+'" \
                         alt="'+iconData.description+'" \
                         title="'+iconData.description+'" \
-                        style="background-image: url('+iconData.image+');"></span>');
+                        style="'+(iconData.image? 'background-image: url('+iconData.image+');': '')+'">\
+                        '+(iconData.content||'')+'</span>');
         if(v){
             toolBar.prepend(icon);
         }else{
