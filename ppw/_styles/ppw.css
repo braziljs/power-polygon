@@ -803,12 +803,11 @@
 .ppw-icon{
     cursor: pointer;
     display: block;
-    width: 26px;
+    min-width: 26px;
     height: 26px;
     margin: 20px;
-    background-position: center center;
+    background-position: center left;
     background-repeat: no-repeat;
-    background-size: cover;
 
     /*-webkit-transition: all 0.3s linear;
     -moz-transition:    all 0.3s linear;
@@ -1016,8 +1015,7 @@
 }
 
 #ppw-toolbar-h .ppw-icon{
-    margin-top: 5px;
-    margin-bottom: 5px;
+    margin: 5px 10px;
     float: left;
     -webkit-transform:  translateY(40px);
     -moz-transform:     translateY(40px);
@@ -1030,6 +1028,49 @@
 }
 
 #ppw-toolbar-v .img:hover{
+}
+
+.ppw-bigger-fonts-btn{
+    font-size: 1.5em;
+    padding-top: 2px;
+    margin-right: 4px !important;
+}
+.ppw-smaller-fonts-btn{
+    font-size: 0.8em;
+    padding-top: 2px;
+    margin-left: 4px !important;
+    border-right: solid 1px #666;
+    width: 36px;
+    margin-right: 0px !important;
+}
+.ppw-smaller-fonts-btn span,
+.ppw-bigger-fonts-btn spn{
+    font-size: 20px;
+    margin: -4px 4px 0 4px;
+}
+
+#ppw-toolbaricon-ppw-search-icon{
+    overflow: hidden;
+    width: 26px;
+}
+#ppw-toolbaricon-ppw-search-icon input{
+    position: relative;
+    left: 30px;
+    background: #ccc;
+    color: #000;
+    border: solid 1px;
+    border-color: #777 #333 #333 #777;
+    height: 20px;
+    -webkit-transition: width 0.3s linear;
+    -moz-transition:    width 0.3s linear;
+    transition:         width 0.3s linear;
+    outline: none;
+}
+#ppw-toolbaricon-ppw-search-icon.ppw-showing{
+    width: 200px;
+}
+.ppw-no-search-results{
+    border-color: red !important;
 }
 
 /*

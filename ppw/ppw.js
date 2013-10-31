@@ -492,6 +492,8 @@ window.PPW = (function ($, _d, console){
         onunlock                : [],
         onlangchange            : [],
         onextend                : [],
+        toolbarClose            : [],
+        toolbarOpen             : [],
         F10_PRESSED             : [],
         F9_PRESSED              : [],
         F8_PRESSED              : [],
@@ -1932,6 +1934,7 @@ window.PPW = (function ($, _d, console){
                     if(_conf.inThumbsMode){
                         _goToSlide(_conf.currentSlide);
                     }
+                    _closeToolbar();
                     break;
 
                 case 70: // F
@@ -2589,52 +2592,60 @@ window.PPW = (function ($, _d, console){
      *
      * @param Boolean Force the search box to replace the current alert message.
      */
-    var _showSearchBox= function(force){
-        var content= _templates.searchTool.replace(/\{\{directionaliconsstyle\}\}/g, _settings.directionalIconsStyle),
-            el= null;
+    var _showSearchBox= function(evt){
 
-        if(_conf.showingMessage && !force)
-            return false;
+        var searchIcon= $('#ppw-toolbaricon-ppw-search-icon'),
+            searchIpt= searchIcon.find('input'),
+            searched= '';
 
-        if(_conf.showingMessage){
-            $('#ppw-message-content').html(content);
-        }else{
-            _showMessage(content);
-        }
-        _unlock();
+        if(!searchIpt.length){
+            searchIcon.append('<input type="text" class="ppw-clickable ppw-selectable" />');
+            searchIpt= searchIcon.find('input');
+            searchIpt.bind('keyup', function(evt){
+                var ret= null;
+                if(evt.keyCode == 13){ // enter
 
-        el= _d.getElementById('ppw-search-slide');
-        setTimeout(function(){_d.getElementById('ppw-search-slide').focus();}, 100);
-        el.addEventListener('keyup', function(evt){
-            if(evt.keyCode == 13){ // enter
-                if(evt.shiftKey)
-                    $('#ppw-search-prev').trigger('click');
-                else
-                    $('#ppw-search-next').trigger('click');
-            }else if(evt.keyCode == 27){ // esc
-                if(_conf.showingMessage){
-                    _closeMessage();
+                    searched= this.value;
+
+                    if(!searched)
+                        return;
+
+                    if(evt.shiftKey){
+                        ret= _searchIntoSlides('prev', searched);
+                    }else{
+                        ret= _searchIntoSlides('next', searched);
+                    }
+
+                    if(!ret){
+                        $(this).addClass('ppw-no-search-results');
+                    }else{
+                        $(this).removeClass('ppw-no-search-results');
+                    }
+                    return;
+                }else if(evt.keyCode == 27){ // esc
+                    searchIcon.removeClass('ppw-showing');
                 }
+                if(searched != this.value){
+                    $(this).removeClass('ppw-no-search-results');
+                }
+            });
+            _addListener('toolbarClose', function(){
+                searchIcon.removeClass('ppw-showing');
+            });
+            searchIcon.addClass('ppw-showing');
+            setTimeout(function(){
+                searchIpt.focus();
+            }, 301);
+        }else{
+            if(searchIcon.hasClass('ppw-showing') && (evt && evt.target.nodeName.toUpperCase() != 'INPUT')){
+                searchIcon.removeClass('ppw-showing');
+            }else{
+                searchIcon.addClass('ppw-showing');
+                setTimeout(function(){
+                    searchIpt.focus();
+                }, 301);
             }
-        }, false);
-
-        $('#ppw-search-prev').bind('click', function(){
-            var ret= _searchIntoSlides('prev', _d.getElementById('ppw-search-slide').value),
-                msg= 'Not found in previous slides!';
-            if(ret !== false){
-                msg= "Found in slide "+(ret+1);
-            }
-            _d.getElementById('ppw-search-found').innerHTML= msg;
-        });
-        $('#ppw-search-next').bind('click', function(){
-            var ret= _searchIntoSlides('next', _d.getElementById('ppw-search-slide').value),
-                msg= 'Not found in next slides!';
-            if(ret !== false){
-                msg= "Found in slide "+(ret+1);
-            }
-            _d.getElementById('ppw-search-found').innerHTML= msg;
-        });
-
+        }
     };
 
     /**
@@ -3174,6 +3185,7 @@ window.PPW = (function ($, _d, console){
      */
     var _closeToolbar= function(){
         $('#ppw-toolbar-container').removeClass('active');
+        _triggerEvent('toolbarClose');
     };
 
     /**
@@ -3181,6 +3193,7 @@ window.PPW = (function ($, _d, console){
      */
     var _openToolbar= function(){
         $('#ppw-toolbar-container').addClass('active');
+        _triggerEvent('toolbarOpen');
     };
 
     /**
@@ -3205,28 +3218,17 @@ window.PPW = (function ($, _d, console){
      */
     var _testAudio= function(){
 
-        /*var el= _d.getElementById('ppw-audioTestElement');
-        if(!el){
-            $b.append("<audio id='ppw-audioTestElement' autoplay='autoplay' loop='loop' controls='controls'>\
-                                <source src='"+_createPPWSrcPath('/_audios/water.mp3')+"'/>\
-                                <source src='"+_createPPWSrcPath('/_audios/water.ogg')+"'/>\
-                               </audio>");
-            el= _d.getElementById('ppw-audioTestElement');
-        }*/
-        //el.play();
         _showMessage("Playing audio<br/><div style='background: url("+_createPPWSrcPath('/_images/animated-wave-sound.gif')+") 0px -37px no-repeat; position: relative; width: 220px; height: 30px; margin: auto; background-size: 248px 108px; border-left: solid 1px #fcc; border-right: solid 1px #fcc;' onclick='var audio = document.getElementById(\"ppw-audioTestElement\"); var t = \"Stopped\";  if(audio.paused) { audio.play(); t = \"Playing\" } else { audio.pause(); }; console.log(\"[PPW] Currently \" + t); '/><div id='ppw-audioPlaceHolder'></div>",
                      function(){
-
                          var el= _d.getElementById('ppw-audioTestElement'),
                             audio= new Audio(el);
-                         //el.volume= 0;
                          el.pause();
                          audio.pause();
                      });
         $('#ppw-audioPlaceHolder').html("<audio id='ppw-audioTestElement' autoplay='autoplay' loop='loop' >\
-                                <source src='"+_createPPWSrcPath('/_audios/water.mp3')+"'/>\
-                                <source src='"+_createPPWSrcPath('/_audios/water.ogg')+"'/>\
-                               </audio>");
+            <source src='"+_createPPWSrcPath('/_audios/water.mp3')+"'/>\
+            <source src='"+_createPPWSrcPath('/_audios/water.ogg')+"'/>\
+           </audio>");
     };
 
     /**
@@ -4441,7 +4443,7 @@ window.PPW = (function ($, _d, console){
         <div class="img"><img id="ppw-camera-icon" onclick="PPW.toggleCamera();" title="Start the camera"/></div>\
         <div class="img"><img id="ppw-remote-icon" onclick="PPW.enableRemote();" title="No remote server found"/></div>\
         <div class="img"><img id="ppw-settings-icon" onclick="PPW.showConfiguration();" title="Settings"/></div>-->\
-        
+
         <span id="ppw-ct-text-small" title="Smaller fonts" onclick="PPW.smallerFonts();">A</span>\
         <span id="ppw-ct-text-big" title="Bigger fonts" onclick="PPW.biggerFonts();">A</span>\
                 <img id="ppw-ct-thumbs" onclick="PPW.showThumbs();" title="Show thumbnails"/>\
@@ -4450,7 +4452,7 @@ window.PPW = (function ($, _d, console){
             <div class="fb-like" data-href="{{likeSrc}}" data-send="false" data-width="450" data-show-faces="false"></div>\
             <span class="gp-button"><div class="g-plusone" data-size="medium" data-annotation="none" data-href="{{likeSrc}}"></div></span>\
         </div>\
-        
+
         */
 
         _createIcon({
@@ -4483,21 +4485,21 @@ window.PPW = (function ($, _d, console){
             image: _createPPWSrcPath('_images/settings-icon.png'),
             click: _showConfiguration
         }, true);
-        
+
         // horizontal
         _createIcon({
             id: 'ppw-ct-text-big',
             description: "Bigger fonts",
-            content: "A",
+            content: "A<span>↑</span>",
             className: 'ppw-bigger-fonts-btn',
-            click: _smallerFonts
+            click: _biggerFonts
         });
         _createIcon({
             id: 'ppw-ct-text-small',
             description: "Smaller fonts",
-            content: "A",
+            content: "A<span>↓</span>",
             className: 'ppw-smaller-fonts-btn',
-            click: _biggerFonts
+            click: _smallerFonts
         });
         _createIcon({
             id: 'ppw-camera-icon',
@@ -4515,7 +4517,7 @@ window.PPW = (function ($, _d, console){
             id: 'ppw-goto-icon',
             description: "Go to a specific slide by its index",
             image: _createPPWSrcPath('_images/goto.png'),
-            click: _openPresentationTool
+            click: _showGoToComponent
         });
         _createIcon({
             id: 'ppw-search-icon',
