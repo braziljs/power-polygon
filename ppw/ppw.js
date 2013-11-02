@@ -362,6 +362,7 @@ window.PPW = (function ($, _d, console){
                         <div id="ppw-toolbar-trigger-btn" class="ppw-clickable"><span></span></div>\
                         <div id="ppw-toolbar-v" class="ppw-platform {{clickableClass}}"></div>\
                         <div id="ppw-toolbar-h" class="ppw-platform {{clickableClass}}"></div>\
+                        <div id="ppw-message-panel" class="ppw-platform {{clickableClass}}"><div class="title"><span></span><button value="x" /></div><div id="ppw-panel-content"></div></div>\
                       </div>',
 
             // the settings form content
@@ -2907,7 +2908,7 @@ window.PPW = (function ($, _d, console){
      * @param String The message type. Can be: false/undefined, warning/warn or error.
      * @return Boolean True if showed the message, false if it was queued.
      */
-    var _showMessage= function(msg, fn, type){
+    var _showMessage= function(msg, fn, type, title){
 
         var container= (type == 'box'? $('#ppw-message-box'):
                         type == 'panel'? $('#ppw-message-panel'):
@@ -2948,8 +2949,12 @@ window.PPW = (function ($, _d, console){
             setTimeout(function(){
                 _d.getElementById('ppw-message-box-button').focus();
             }, 100);
-        }else if(type != 'panel'){
+        }else if(type == 'panel'){
 // TODO: add the feature panel message
+            container.find('.title span').html(title||'');
+            $('#ppw-panel-content').html(msg);
+            container.data('closeCallback', func);
+            container.addClass('ppw-showing');
         }else{
             // is a balloon inside a given container
         }
@@ -3295,7 +3300,7 @@ window.PPW = (function ($, _d, console){
                        .replace('{{duration}}', _settings.duration)
                        .replace('{{alerts}}', _settings.alertAt);
 
-        _showMessage(msg, fn, false, false, true);
+        _showMessage(msg, fn, 'panel', 'Settings');
 
         if(_conf.profiles){
             list= Object.keys(_conf.profiles);
