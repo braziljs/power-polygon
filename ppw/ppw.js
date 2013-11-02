@@ -2515,7 +2515,7 @@ window.PPW = (function ($, _d, console){
         _showMessage(msg, fn, true, false, true);
 
         el= _d.querySelector('#ppw-go-to-slide');
-        _d.getElementById('ppw-go-to-button').addEventListener('click', _closeMessage);
+        //_d.getElementById('ppw-go-to-button').addEventListener('click', _closeMessage);
 
         el.addEventListener('keyup', function(evt){
             if(evt && evt.keyCode && evt.keyCode == 13)
@@ -2891,7 +2891,7 @@ window.PPW = (function ($, _d, console){
             m= null;
         if(q.length){
             m= q.shift();
-            _showMessage(m.msg, m.fn, m.hideButton, m.type);
+            _showMessage(m.msg, m.fn, m.type);
             return true;
         }else{
             return false;
@@ -2907,63 +2907,53 @@ window.PPW = (function ($, _d, console){
      * @param String The message type. Can be: false/undefined, warning/warn or error.
      * @return Boolean True if showed the message, false if it was queued.
      */
-    var _showMessage= function(msg, fn, hideButton, type, notLocked){
+    var _showMessage= function(msg, fn, type){
 
-        var box= $('#ppw-message-box'),
-            func= null;
+        var container= (type == 'box'? $('#ppw-message-box'):
+                        type == 'panel'? $('#ppw-message-panel'):
+                        ($(type).eq(0)) );
 
         if(_conf.showingMessage){
-            _conf.messagesQueue.push({msg: msg, fn: fn, hideButton: hideButton, type: type});
+            _conf.messagesQueue.push({msg: msg, fn: fn, type: type});
             return false;
         }
 
-        PPW.unlock();
-
-        $('#ppw-message-content').html(msg);
-
-        if(hideButton){
-            $('#ppw-message-box-button').hide();
-        }else{
-            if(!notLocked)
-                PPW.lock($('#ppw-message-box-button').show()[0]);
+        if(!container.length){
+            console.warn("[PPW] Failed to locate the container for the message, using mode box for the message");
+            type= 'box';
+            container= $('#ppw-message-box');
         }
 
-        PPW.animate(box, 'fadeInDown', {
-            duration: '300ms',
-            delay: '0s'
-        });
+        if(type == 'box'){
+            $('#ppw-message-content').html(msg);
+            container.addClass('ppw-showing');
 
-        box.css({
-            marginLeft: -(box[0].offsetWidth/2)+'px'
-        });
+            container.css({
+                marginLeft: -(container[0].offsetWidth/2)+'px'
+            });
 
-        if(!type){
-            box.removeClass('warning').removeClass('error');
-        }else{
-            if(type == 'warning' || type == 'error'){
-                box.addClass(type);
-            }
-        }
-
-        _conf.showingMessage= true;
-
-        func= function(){
-            if(fn && typeof fn == 'function'){
-                try{
-                    fn();
-                }catch(e){
-                    console.error('Failed executing callback on closing message', e, fn);
+            var func= function(){
+                if(fn && typeof fn == 'function'){
+                    try{
+                        fn();
+                    }catch(e){
+                        console.error('Failed executing callback on closing message', e, fn);
+                    }
                 }
             }
+
+            container.data('closeCallback', func).data('messageType', 'box');
+
+            $('#ppw-message-box-button').one('click', _closeMessage);
+            setTimeout(function(){
+                _d.getElementById('ppw-message-box-button').focus();
+            }, 100);
+        }else if(type != 'panel'){
+// TODO: add the feature panel message
+        }else{
+            // is a balloon inside a given container
         }
-
-        box.data('closeCallback', func)
-
-        $('#ppw-message-box-button').one('click', _closeMessage);
-        setTimeout(function(){
-            _d.getElementById('ppw-message-box-button').focus();
-        }, 100);
-
+        _conf.showingMessage= container;
         return true;
     };
 
@@ -2994,29 +2984,25 @@ window.PPW = (function ($, _d, console){
      */
     var _closeMessage= function(){
 
-        var box= $('#ppw-message-box'),
-            fn= box.data('closeCallback');
+        var container= _conf.showingMessage,
+            fn= container.data('closeCallback'),
+            type= container.data('messageType');
 
-        PPW.animate(box, 'fadeOutUp', {
-                duration: '300ms',
-                onstart: function(){
 
-                },
-                onend: function(){
+        if(fn && typeof fn == 'function'){
+            try{
+                fn(container);
+            }catch(e){
+                throw("[PPW]:: Failed executing the show message callback!", e);
+            }
+        }
 
-                    _conf.showingMessage= false;
+        _conf.showingMessage= false;
+        if(_showNextMessage()){
+            return;
+        }
 
-                    if(!_showNextMessage()){
-                        PPW.unlock();
-                        _b.focus();
-                    }
-
-                    $('#ppw-message-box').hide().removeClass('ppw-anim-visible');
-
-                    if(fn && typeof fn == 'function')
-                        fn();
-                }
-        });
+        container.removeClass('ppw-showing');
     };
 
     /**
