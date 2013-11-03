@@ -504,38 +504,58 @@
     position: absolute;
     width: 0px;
     height: 100%;
-    background-color: #474C4E;
+    background: #2c2f30;
+    background: -moz-linear-gradient(45deg, #2c2f30 20%, #202021 50%, #474c4e 100%);
+    background: -webkit-gradient(linear, left bottom, right top, color-stop(20%,#2c2f30), color-stop(50%,#202021), color-stop(100%,#474c4e));
+    background: -webkit-linear-gradient(45deg, #2c2f30 20%,#202021 50%,#474c4e 100%);
+    background: -o-linear-gradient(45deg, #2c2f30 20%,#202021 50%,#474c4e 100%);
+    background: -ms-linear-gradient(45deg, #2c2f30 20%,#202021 50%,#474c4e 100%);
+    background: linear-gradient(45deg, #2c2f30 20%,#202021 50%,#474c4e 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#2c2f30', endColorstr='#474c4e',GradientType=1 );
+
     left: 0px;
     top: 0px;
     overflow: hidden;
-    border-right: solid 1px #000;
+    border: solid 1px;
+    border-color: transparent;
 
-    -webkit-transition: width ease-in 0.5s;
-    -moz-transition: width ease-in 0.5s;
-    transition: width ease-in 0.5s;
+    -webkit-transition: width linear 0.2s;
+    -moz-transition: width linear 0.2s;
+    transition: width linear 0.2s;
 }
 #ppw-message-panel .title{
     position: absolute;
     right: 0px;
     width: 250px;
-    background: #000;
     height: 30px;
     font-weight: bold;
     padding: 7px;
-    padding-left: 20px;
+    padding-left: 26px;
     text-transform: uppercase;
     cursor: default;
+
+    background: #373738;
+    background: -moz-linear-gradient(45deg, #373738 0%, #000000 49%, #202021 50%, #444444 100%);
+    background: -webkit-gradient(linear, left bottom, right top, color-stop(0%,#373738), color-stop(49%,#000000), color-stop(50%,#202021), color-stop(100%,#444444));
+    background: -webkit-linear-gradient(45deg, #373738 0%,#000000 49%,#202021 50%,#444444 100%);
+    background: -o-linear-gradient(45deg, #373738 0%,#000000 49%,#202021 50%,#444444 100%);
+    background: -ms-linear-gradient(45deg, #373738 0%,#000000 49%,#202021 50%,#444444 100%);
+    background: linear-gradient(45deg, #373738 0%,#000000 49%,#202021 50%,#444444 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#373738', endColorstr='#444444',GradientType=1 );
+}
+#ppw-message-panel .title span{
+    cursor: pointer;
 }
 #ppw-message-panel .title span:before{
-    content: "";
+    content: "◀";
     display: block;
     position: absolute;
     left: 0px;
     top: 0px;
-    cursor: pointer;
-    width: 16px;
+    width: 22px;
     height: 100%;
     background-color: #000;
+    padding: 5px;
 }
 #ppw-message-panel .title span:hover:before{
     background-color: #f00;
@@ -551,13 +571,14 @@
     width: 250px;
     position: absolute;
     right: 0px;
-    padding: 4px;
+    padding: 4px 8px;
     margin-top: 30px;
-    line-height: 26px;
+    line-height: 28px;
     font-size: 18px;
 }
 #ppw-message-panel.ppw-showing{
     width: 250px;
+    border-color: #555 #000 #777 #000;
 }
 
 
@@ -818,9 +839,25 @@
     height: 20px;
     clear: both;
 }
+
+#ppw-settings-extra-data{
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: dashed 1px #777;
+    font-size: 14px;
+}
+#ppw-settings-extra-data span{
+    clear: right;
+    float: right;
+    color: #bbb;
+}
+
 #ppw-settings-form h3{
     margin: 0px;
     line-height: 12px;
+}
+#ppw-talk-duration{
+    text-align: right;
 }
 
 #ppw-notification-element{
@@ -942,6 +979,7 @@
 
 #ppw-toolbar-trigger-btn{
     position: fixed;
+    display: block;
     z-index: 99999999;
     bottom: 0px;
     left: 0px;
@@ -981,7 +1019,10 @@
     width: 50px;
     height: 4px;
     background-color: white;
-    outline: solid 1px #aaa;
+    /*outline: solid 1px #aaa;*/
+    border: solid 1px #aaa;
+    box-sizing: content-box;
+    -moz-box-sizing: content-box;
 
     -webkit-transition: background-color 0.3s;
     -moz-transition: background-color 0.3s;
@@ -1002,15 +1043,15 @@
 }
 #ppw-toolbar-trigger-btn span:before{
     content: "";
-    -webkit-transform:  translate(0, -8px);
-    -moz-transform:     translate(0, -8px);
-    transform:          translate(0, -8px);
+    -webkit-transform:  translate(-1px, -11px);
+    -moz-transform:     translate(-1px, -11px);
+    transform:          translate(-1px, -11px);
 }
 #ppw-toolbar-trigger-btn span:after{
     content: "";
-    -webkit-transform: translate(0, 4px);
-    -moz-transform:    translate(0, 4px);
-    transform:         translate(0, 4px);
+    -webkit-transform: translate(-1px, 4px);
+    -moz-transform:    translate(-1px, 4px);
+    transform:         translate(-1px, 4px);
 }
 #ppw-toolbar-container.active #ppw-toolbar-trigger-btn span{
     background-color: transparent;
@@ -1018,7 +1059,8 @@
 #ppw-toolbar-container.active #ppw-toolbar-trigger-btn span,
 #ppw-toolbar-container.active #ppw-toolbar-trigger-btn span:before,
 #ppw-toolbar-container.active #ppw-toolbar-trigger-btn span:after{
-    outline-color: transparent;
+    /*outline-color: transparent;*/
+    border-color: transparent;
 }
 
 #ppw-toolbar-container.active #ppw-toolbar-trigger-btn span:before{

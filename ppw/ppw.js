@@ -368,10 +368,11 @@ window.PPW = (function ($, _d, console){
             // the settings form content
             settings: "<form id='ppw-settings-form'>\
                     <label>Enable shortcuts: </label><input type='checkbox' id='ppw-shortcutsEnable' {{shortcuts}} /><br/>\
-                    <label>Duration: </label><input type='integer' id='ppw-talk-duration' value='{{duration}}' /><br/>\
+                    <label>Duration: </label><input type='number' id='ppw-talk-duration' value='{{duration}}' /><br/>\
                     <label>Alert at: </label><input type='string' id='ppw-alert-at' value='{{alerts}}'placeholder='Comma separated minutes' /><br/>\
                     <div id='ppw-profile-config'><label>Profile: </label><select id='ppw-profile-option'></select></div><br/>\
                     <div id='ppw-languages-config'><label>Language: </label><select id='ppw-language-option'></select></div><br/>\
+                    <div id='ppw-settings-extra-data' class='ppw-selectable' ></div>\
               </form>"
         },
 
@@ -2202,6 +2203,10 @@ window.PPW = (function ($, _d, console){
             return false;
         });
 
+        $('#ppw-message-panel .title').bind('click', function(){
+            _closeMessage();
+        });
+
         /*$b.bind('selectstart', function(evt){
 
             if(_isEditableTargetContent(evt.target))
@@ -2918,7 +2923,10 @@ window.PPW = (function ($, _d, console){
                         ($(type).eq(0)) );
 
         if(_conf.showingMessage){
-            _conf.messagesQueue.push({msg: msg, fn: fn, type: type, title: title});
+            if(type == 'box')
+                _conf.messagesQueue.push({msg: msg, fn: fn, type: type, title: title});
+            else
+                _closeMessage();
             return false;
         }
 
@@ -2953,10 +2961,12 @@ window.PPW = (function ($, _d, console){
                 _d.getElementById('ppw-message-box-button').focus();
             }, 100);
         }else if(type == 'panel'){
-// TODO: add the feature panel message
+            //var msgTt= container.data('msgTitle');
+
             container.find('.title span').html(title||'');
             $('#ppw-panel-content').html(msg);
             container.data('closeCallback', func);
+            //container.data('msgTitle', title);
             container.addClass('ppw-showing');
         }else{
             // is a balloon inside a given container
@@ -2997,6 +3007,9 @@ window.PPW = (function ($, _d, console){
             type= container? container.data('messageType'): 'box';
 
 
+        if(!container)
+            return false;
+
         if(fn && typeof fn == 'function'){
             try{
                 fn(container);
@@ -3010,7 +3023,9 @@ window.PPW = (function ($, _d, console){
             return;
         }
 
+        //container.data('msgTitle', false);
         container.removeClass('ppw-showing');
+
     };
 
     /**
@@ -3340,9 +3355,19 @@ window.PPW = (function ($, _d, console){
                                      .bind('change', function(){
                                         _setLION(this.value);
                                      });
-
         }
         console.log('--------', _conf, _settings);
+        $('#ppw-settings-extra-data').html("\
+          <label>Talk</label><span>"+_settings.canonic+"</span>\
+          <label>Number of slides</label><span>"+_conf.validSlides.length+"</span>\
+          <label>Current</label><span>"+(_conf.currentSlide+1)+': '+_settings.slides[_conf.currentSlide].id+"</span>\
+          <label>Themes</label><span>"+(_settings.theme.join(', '))+"</span>\
+          <label>Remote Server</label><span>"+_conf.defaultRemoteServer+"</span>");
+        //
+        //
+        //
+        //
+        //
 
         _triggerEvent('onopensettings', _settings);
     };
