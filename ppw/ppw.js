@@ -362,12 +362,11 @@ window.PPW = (function ($, _d, console){
                         <div id="ppw-toolbar-trigger-btn" class="ppw-clickable"><span></span></div>\
                         <div id="ppw-toolbar-v" class="ppw-platform {{clickableClass}}"></div>\
                         <div id="ppw-toolbar-h" class="ppw-platform {{clickableClass}}"></div>\
-                        <div id="ppw-message-panel" class="ppw-platform {{clickableClass}}"><div class="title"><span></span><button value="x" /></div><div id="ppw-panel-content"></div></div>\
+                        <div id="ppw-message-panel" class="ppw-platform {{clickableClass}}"><div class="title"><span></span></div><div id="ppw-panel-content"></div></div>\
                       </div>',
 
             // the settings form content
             settings: "<form id='ppw-settings-form'>\
-                    <h3>Settings</h3><br/>\
                     <label>Enable shortcuts: </label><input type='checkbox' id='ppw-shortcutsEnable' {{shortcuts}} /><br/>\
                     <label>Duration: </label><input type='integer' id='ppw-talk-duration' value='{{duration}}' /><br/>\
                     <label>Alert at: </label><input type='string' id='ppw-alert-at' value='{{alerts}}'placeholder='Comma separated minutes' /><br/>\
@@ -2193,7 +2192,11 @@ window.PPW = (function ($, _d, console){
 
         /* Toolbar Events */
         $('#ppw-toolbar-trigger-btn').live('click', function(){
-            $('#ppw-toolbar-container').toggleClass('active');
+            if($('#ppw-toolbar-container').hasClass('active')){
+                _closeToolbar();
+            }else{
+                _openToolbar();
+            }
         }).live('selectstart', function(evt){
             evt.preventDefault();
             return false;
@@ -2892,7 +2895,7 @@ window.PPW = (function ($, _d, console){
             m= null;
         if(q.length){
             m= q.shift();
-            _showMessage(m.msg, m.fn, m.type);
+            _showMessage(m.msg, m.fn, m.type, m.title);
             return true;
         }else{
             return false;
@@ -2915,7 +2918,7 @@ window.PPW = (function ($, _d, console){
                         ($(type).eq(0)) );
 
         if(_conf.showingMessage){
-            _conf.messagesQueue.push({msg: msg, fn: fn, type: type});
+            _conf.messagesQueue.push({msg: msg, fn: fn, type: type, title: title});
             return false;
         }
 
@@ -2990,8 +2993,8 @@ window.PPW = (function ($, _d, console){
     var _closeMessage= function(){
 
         var container= _conf.showingMessage,
-            fn= container.data('closeCallback'),
-            type= container.data('messageType');
+            fn= container? container.data('closeCallback'): false,
+            type= container? container.data('messageType'): 'box';
 
 
         if(fn && typeof fn == 'function'){
@@ -3176,6 +3179,7 @@ window.PPW = (function ($, _d, console){
      */
     var _closeToolbar= function(){
         $('#ppw-toolbar-container').removeClass('active');
+        _closeMessage();
         _triggerEvent('toolbarClose');
     };
 
@@ -3283,6 +3287,7 @@ window.PPW = (function ($, _d, console){
             list= [],
             l= 0,
             fn= function(){
+
                 var parsed= "";
 
                 _triggerEvent('onclosesettings');
@@ -3337,6 +3342,7 @@ window.PPW = (function ($, _d, console){
                                      });
 
         }
+        console.log('--------', _conf, _settings);
 
         _triggerEvent('onopensettings', _settings);
     };

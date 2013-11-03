@@ -504,10 +504,11 @@
     position: absolute;
     width: 0px;
     height: 100%;
-    background-color: #555;
+    background-color: #474C4E;
     left: 0px;
     top: 0px;
     overflow: hidden;
+    border-right: solid 1px #000;
 
     -webkit-transition: width ease-in 0.5s;
     -moz-transition: width ease-in 0.5s;
@@ -518,11 +519,29 @@
     right: 0px;
     width: 250px;
     background: #000;
-    height: 26px;
+    height: 30px;
     font-weight: bold;
-    padding: 4px;
+    padding: 7px;
+    padding-left: 20px;
     text-transform: uppercase;
+    cursor: default;
 }
+#ppw-message-panel .title span:before{
+    content: "";
+    display: block;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    cursor: pointer;
+    width: 16px;
+    height: 100%;
+    background-color: #000;
+}
+#ppw-message-panel .title span:hover:before{
+    background-color: #f00;
+}
+
+
 #ppw-message-panel .title button{
     float: right;
     width: 20px;
@@ -533,7 +552,9 @@
     position: absolute;
     right: 0px;
     padding: 4px;
-    margin-top: 26px;
+    margin-top: 30px;
+    line-height: 26px;
+    font-size: 18px;
 }
 #ppw-message-panel.ppw-showing{
     width: 250px;
