@@ -1606,3 +1606,13 @@ BODY.remote-controller iframe{
 .remote-controller:not(.ppw-showing-thumb) .ppw-active-slide-element-container{
     display: block !important;
 }
+
+#ppw-toolbaricon-ppw-remote-icon[rule=no-server]{
+    background-image: url(../_images/remote-conection-status-no-server.png) !important;
+}
+#ppw-toolbaricon-ppw-remote-icon[rule=offline]{
+    background-image: url(../_images/remote-conection-status-off.png) !important;
+}
+#ppw-toolbaricon-ppw-remote-icon[rule=online]{
+    background-image: url(../_images/remote-conection-status-on.png) !important;
+}

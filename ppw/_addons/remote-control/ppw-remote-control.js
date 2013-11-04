@@ -1,5 +1,5 @@
 window.PPW.extend("remote-control", (function(){
-    
+
     var _ppw= null,
         remote= null,
         _conf= {
@@ -11,9 +11,9 @@ window.PPW.extend("remote-control", (function(){
             w: 0,
             h: 0
         };
-    
+
     var _enable= function(){
-        
+
         var conf= null;
         if(conf= PPW.get('remote')){
             if(conf.server)
@@ -21,24 +21,24 @@ window.PPW.extend("remote-control", (function(){
             if(conf.controller)
                 _conf.controller= conf.controller;
         }
-        
+
         var msg= "<strong>Remote control</strong><br/>In your remote device, go to the address: <div style='text-align: center; font-style: italic;'>"+_conf.controller+"</div>and enter the code:<br/>",
             hash= false;
-            
+
         if(_conf.hash){
             PPW.showMessage(msg+"<div style='text-align: center; font-weight: bold; font-size: 120%;' class='ppw-focusable ppw-platform'>"+_conf.hash+"</div>");
             return;
         }
-        
+
         this.innerHTML= "<img src='"+_ppw.PPWSrc + "/_addons/remote-control/loading.gif' height='14' />";
-        
+
         remote = new RemoteControl();
         remote.connect(_conf.server);
-        
+
         remote.on('sync', function() {
             document.getElementById('ppw-addon-remote-trigger').innerHTML= "On";
         });
-        
+
         remote.on('next', function() {
             PPW.goNextSlide();
         });
@@ -51,7 +51,7 @@ window.PPW.extend("remote-control", (function(){
         remote.on('start', function() {
            PPW.startPresentation();
         });
-        
+
         remote.on('holofote', function(data) {
             var holofote = $('#holofote');
             holofote.css('display', 'block');
@@ -69,30 +69,30 @@ window.PPW.extend("remote-control", (function(){
                 left : data[0]
             });
         });
-        
+
         remote.on('point', function(data) {
             $('#laserpoint').css('display', 'none');
             $('#holofote').css('display', 'none');
             var l, t;
-            
+
             if(!_conf.pointer){
                 _conf.w= document.body.clientWidth;
                 _conf.h= document.body.clientHeight;
-                
+
                 _conf.pointer= document.getElementById('ppw-pointer');
                 _conf.pointer.width= _conf.w;
                 _conf.pointer.height= _conf.h;
                 _conf.pointer= _conf.pointer.getContext('2d');
             }
-            
+
             if(!_conf.drawing){
                 document.getElementById('ppw-pointer').style.display= '';
             }
-            
+
             if(data[0]>=0){
-                
+
                 _conf.drawing= true;
-                
+
                 if(data[2]){
                     _conf.pointer.closePath();
                     _conf.pointer.strokeStyle = "#ff0000";
@@ -104,7 +104,7 @@ window.PPW.extend("remote-control", (function(){
                     _conf.pointer.lineTo(data[0]/100*_conf.w, data[1]/100*_conf.h);
                 }
                 _conf.pointer.stroke();
-                
+
             }else{
                 _conf.pointer.closePath();
                 _conf.pointer.clearRect(0, 0, _conf.w, _conf.h);
@@ -113,19 +113,19 @@ window.PPW.extend("remote-control", (function(){
                 $('#laserpoint').css('display', 'none');
             }
         });
-        
+
         hash= remote.sync();
         _conf.hash= hash;
         PPW.showMessage(msg+"<div style='text-align: center; font-weight: bold; font-size: 120%;' class='ppw-focusable ppw-platform'>"+hash+"</div>");
-        
+
     }
-    
+
     var _init = function (data) {
-        
+
         var head = document.getElementsByTagName('head')[0],
         //socketio = document.createElement('script'),
         remotecontrol = document.createElement('script');
-        
+
         //socketio.src = ;
         remotecontrol.src = _ppw.PPWSrc + '/_addons/remote-control/remote-control.js';
 
@@ -137,7 +137,8 @@ window.PPW.extend("remote-control", (function(){
                 remotecontrol.onload = function () {
 
                     // Enable button
-                    $('#ppw-addon-remote-trigger').css('cursor', 'pointer')
+                    alert($('#ppw-toolbaricon-ppw-remote-icon').length)
+                    $('#ppw-toolbaricon-ppw-remote-icon').css('cursor', 'pointer')
                                                   .html("Off")
                                                   .click('click', _enable);
 
@@ -152,8 +153,8 @@ window.PPW.extend("remote-control", (function(){
 
         // Add a disabled button
         $('#ppw-addons-container').append("<span>Remote controle: <span id='ppw-addon-remote-trigger'>...</span></span>")
-        
-    }    
+
+    }
 
     var _setup= function(data){
         var holofote = $('<div id="holofote"/>'),
@@ -183,7 +184,7 @@ window.PPW.extend("remote-control", (function(){
         });
 
         $('body').prepend(holofote);
-        $('body').prepend(pointer);        
+        $('body').prepend(pointer);
 
         $(document.body).append("<canvas id='ppw-pointer' style='position: absolute; left: 0px; top: 0px; z-index: 99999999; opacity: 0.3; display: none;' width='100%' height='100%'></canvas>");
         _ppw= data;
@@ -193,5 +194,5 @@ window.PPW.extend("remote-control", (function(){
         onload: _setup,
         onsplashscreen: _init
     };
-    
+
 })());

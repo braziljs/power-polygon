@@ -1919,18 +1919,16 @@ window.PPW = (function ($, _d, console){
 
                 case 27: // esc
 
-                    if($('#ppw-message-box').css('display') != 'none'){
+                    if(_conf.showingMessage){
+                        _closeMessage();
+                        return true;
+                    }
 
-                        if(_conf.showingMessage){
-                            _closeMessage();
-                        }
-
-                        _pauseCamera();
-                        _preventDefaultstopPropagation(evt);
-                        if(_conf.currentZoom != 1){
-                            _resetViewport();
-                        }
-                        return false;
+                    _pauseCamera();
+                    _preventDefaultstopPropagation(evt);
+                    if(_conf.currentZoom != 1){
+                        _resetViewport();
+                        return true;
                     }
                     if(_conf.inThumbsMode){
                         _goToSlide(_conf.currentSlide);
@@ -3412,7 +3410,7 @@ window.PPW = (function ($, _d, console){
                                         _setLION(this.value);
                                      });
         }
-        console.log('--------', _conf, _settings);
+
         $('#ppw-settings-extra-data').html("\
           <label>Talk</label><span>"+_settings.canonic+"</span>\
           <label>Number of slides</label><span>"+_conf.validSlides.length+"</span>\
@@ -4398,8 +4396,6 @@ window.PPW = (function ($, _d, console){
             $('#ppw-remote-io-script').remove();
 
             _loadScript('/ppw/_tools/remote/server.js');
-            //$("head").append("< script src='"+srv+"/ppw/_tools/remote/server.js' id='ppw-remote-io-script'>< /script>");
-
             // in 3 seconds, verify again for the status
             setTimeout(_initRemoteService, 3000);
         }else{
@@ -4554,7 +4550,7 @@ window.PPW = (function ($, _d, console){
         _createIcon({
             id: 'ppw-remote-icon',
             description: "Enable remove control",
-            image: _createPPWSrcPath('_images/remote-conection-status-no-server.png'),
+            image: false, //_createPPWSrcPath('_images/remote-conection-status-no-server.png'),
             click: _enableRemote
         }, true);
         _createIcon({
