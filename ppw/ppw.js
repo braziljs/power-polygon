@@ -2504,35 +2504,91 @@ window.PPW = (function ($, _d, console){
     /**
      * Opens the go-to-slide component.
      */
-    var _showGoToComponent= function(useEnter){
+    var _showGoToComponent= function(){
 
         var el= null, fn,
-            msg= "Go to slide number <input style='margin: auto;' type='integer' id='ppw-go-to-slide' maxlength=3 value='' /><input type=button id=ppw-go-to-button value=Go>";
+        msg= "<div class='ppw-goto-filter-container'><input type=text value='' id='ppw-go-to-slide-filter' placeholder='Type the number or title' /></div>";
+
+        msg+= "<div class='ppw-go-to-slides-list'><ul>";
+        PPW.getSlides().map(function(i){
+            msg+= "<li data-slide-id='"+i.index+"' class='ppw-goto-list-item'>";
+            msg+= "<span class='ppw-slide-num'>"+ i.index +"</span><span class='ppw-slide-tt'>"+ i.title.replace(/[ \n\r\t]/g, '')+"</span>";
+            msg+= "</li>";
+        });
+        msg+= "</ul></div>";
 
         fn= function(){
-            var i= $('#ppw-go-to-slide').val();
+            var item= _d.querySelector('.ppw-goto-list-item.active'),
+                i= item? item.getAttribute('data-slide-id'): false;
 
-            if(i && i.replace(/ /g, '') != '' && !isNaN(i)){
-                _goToSlide(_getValidSlides()[parseInt(i, 10) -1]);
-                _closeMessage();
+            if(i){
+                _goToSlide(i-1);
+                _closeToolbar();
             }
         };
 
         if(_conf.showingMessage)
             return false;
 
-        _showMessage(msg, fn, true, false, true);
+        _showMessage(msg, false, 'panel', 'Go to Slide');
 
-        el= _d.querySelector('#ppw-go-to-slide');
-        //_d.getElementById('ppw-go-to-button').addEventListener('click', _closeMessage);
+        var list= _d.querySelectorAll('.ppw-go-to-slides-list li'),
+            l= list.length,
+            i= 0;
+
+        el= _d.querySelector('#ppw-go-to-slide-filter');
 
         el.addEventListener('keyup', function(evt){
-            if(evt && evt.keyCode && evt.keyCode == 13)
+            var v= this.value,
+                item= false;
+
+            if(evt && evt.keyCode == 13)
                 fn();
+            else{
+                if(evt.keyCode == 38){ // up
+                    item= $('.ppw-goto-list-item.active');
+                    if(item.length){
+                        item.removeClass('active');
+                        item= item.prevAll('.ppw-goto-list-item').first();
+                        if(!item.length){
+                            item= $('.ppw-goto-list-item');
+                            item= item.eq(item.length-1);
+                        }
+                        item.addClass('active');
+                    }
+                }else if(evt.keyCode == 40){ // down
+                    item= $('.ppw-goto-list-item.active');
+                    if(item.length){
+                        item.removeClass('active');
+                        item= item.nextAll('.ppw-goto-list-item').first();
+
+                        if(!item.length)
+                            item= $('.ppw-goto-list-item').eq(0);
+
+                        item.addClass('active');
+                    }
+                }else{
+                    for(i=0; i<l; i++){
+                        if(!v.length || $(list[i]).text().toLowerCase().indexOf(v) >=0 )
+                            $(list[i]).addClass('ppw-goto-list-item');
+                        else
+                            $(list[i]).removeClass('ppw-goto-list-item');
+                    }
+                    if(v.length)
+                        $('.ppw-goto-list-item').removeClass('active').eq(0).addClass('active');
+                    else
+                        $('.ppw-goto-list-item').removeClass('active')
+                }
+            }
         }, false);
 
-        if(!useEnter)
-            el.focus();
+        for(i=0; i<l; i++){
+            list[i].addEventListener('click', function(){
+                _goToSlide(this.getAttribute('data-slide-id') -1);
+                _closeToolbar();
+            });
+        }
+        el.focus();
     };
 
     /**

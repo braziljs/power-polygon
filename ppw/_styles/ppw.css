@@ -575,6 +575,8 @@
     margin-top: 30px;
     line-height: 28px;
     font-size: 18px;
+    /*overflow: auto;*/
+    height: 100%;
 }
 #ppw-message-panel.ppw-showing{
     width: 250px;
@@ -1019,7 +1021,6 @@
     width: 50px;
     height: 4px;
     background-color: white;
-    /*outline: solid 1px #aaa;*/
     border: solid 1px #aaa;
     box-sizing: content-box;
     -moz-box-sizing: content-box;
@@ -1036,7 +1037,6 @@
     user-select: none;
 }
 #ppw-toolbar-trigger-btn span:before, #ppw-toolbar-trigger-btn span:after{
-    /*-webkit-transform-origin: 50% 50%;*/
     -webkit-transition: -webkit-transform 0.3s;
     -moz-transition: -moz-transform 0.3s;
     transition: transform 0.3s;
@@ -1059,7 +1059,6 @@
 #ppw-toolbar-container.active #ppw-toolbar-trigger-btn span,
 #ppw-toolbar-container.active #ppw-toolbar-trigger-btn span:before,
 #ppw-toolbar-container.active #ppw-toolbar-trigger-btn span:after{
-    /*outline-color: transparent;*/
     border-color: transparent;
 }
 
@@ -1231,6 +1230,66 @@
 */
 #ppw-go-to-slide{
     width: 220px;
+}
+.ppw-goto-filter-container{
+    border-bottom: dashed 1px #444;
+    height: 38px;
+}
+.ppw-goto-filter-container input{
+    width: 100%;
+}
+.ppw-go-to-slides-list{
+    margin: 0px;
+    margin-bottom: 30px;
+    margin-top: 10px;
+    width: 100%;
+    overflow: auto;
+    height: 100%;
+    white-space: nowrap;
+    padding: 0px;
+}
+.ppw-go-to-slides-list ul{
+    list-style: none;
+    width: 100%;
+    overflow: hidden;
+    margin: 0px;
+    padding: 0px;
+    margin-bottom: 80px;
+}
+
+.ppw-go-to-slides-list li.ppw-goto-list-item{
+    display: block;
+}
+
+.ppw-go-to-slides-list li{
+    margin: 0px;
+    width: 100%;
+    display: none;
+    font-size: 16px;
+    line-height: 20px;
+    cursor: pointer;
+}
+.ppw-go-to-slides-list .ppw-slide-num,
+.ppw-go-to-slides-list .ppw-slide-tt{
+    background-color: #3F4851;
+    border-radius: 4px;
+    padding: 0px 3px;
+    margin: 0px;
+    margin-bottom: 3px;
+    display: block;
+    float: left;
+}
+.ppw-go-to-slides-list .ppw-slide-num{
+    width: 36px;
+    text-align: right;
+}
+.ppw-go-to-slides-list .ppw-slide-tt{
+    width: 195px;
+    padding-left: 6px;
+}
+.ppw-go-to-slides-list li:hover span,
+.ppw-go-to-slides-list li.active span{
+    background-color: #29323A;
 }
 
 #ppw-search-container *{
