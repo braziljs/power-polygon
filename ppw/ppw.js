@@ -2201,7 +2201,7 @@ window.PPW = (function ($, _d, console){
             return false;
         });
 
-        $('#ppw-message-panel .title').bind('click', function(){
+        $('#ppw-message-panel .title').live('click', function(){
             _closeMessage();
         });
 
@@ -2525,8 +2525,8 @@ window.PPW = (function ($, _d, console){
             }
         };
 
-        if(_conf.showingMessage)
-            return false;
+        //if(_conf.showingMessage)
+          //  return false;
 
         _showMessage(msg, false, 'panel', 'Go to Slide');
 
@@ -2979,8 +2979,21 @@ window.PPW = (function ($, _d, console){
         if(_conf.showingMessage){
             if(type == 'box')
                 _conf.messagesQueue.push({msg: msg, fn: fn, type: type, title: title});
-            else
-                _closeMessage();
+            else{
+                if(type != 'panel'){
+                    _closeMessage();
+                    return false;
+                }
+                
+                if(_conf.showingMessage.data('messageTitle') != title){
+                    _closeMessage();
+                    setTimeout(function(){
+                        _showMessage(msg, fn, type, title);
+                    }, 500);
+                }else{
+                    _closeMessage();
+                }
+            }
             return false;
         }
 
@@ -3025,6 +3038,7 @@ window.PPW = (function ($, _d, console){
         }else{
             // is a balloon inside a given container
         }
+        container.data('messageType', type).data('messageTitle', title);
         _conf.showingMessage= container;
         return true;
     };
@@ -3078,7 +3092,9 @@ window.PPW = (function ($, _d, console){
         }
 
         //container.data('msgTitle', false);
-        container.removeClass('ppw-showing');
+        container.removeClass('ppw-showing')
+                 .data('messageType', false)
+                 .data('messageTitle', false);
 
     };
 
@@ -4638,7 +4654,11 @@ window.PPW = (function ($, _d, console){
 
         if(typeof iconData.click == 'function'){
             //icon.bind('click', iconData.click);
-            $('#ppw-toolbaricon-'+iconData.id).live('click', iconData.click);
+            $('#ppw-toolbaricon-'+iconData.id).live('click', function(evt){
+                /*$('.ppw-icon').removeClass('active');
+                $(this).addClass('active');*/
+                iconData.click(evt);
+            });
         }
 
         _conf.toolbarIcons[v?'v': 'h'].push(iconData);
