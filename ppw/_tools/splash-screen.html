@@ -1,6 +1,14 @@
 <div id="ppw-splash-screen" class="ppw-platform">
     <div id="ppw-splash-screen-container">
-        <h1 id="ppw-talk-title">Talk title</h1>
+
+        <div id="ppw-talk-title-container">
+            <div class="bottom">
+                <h1 id="ppw-talk-title">Talk title</h1>
+                <span>Talk Description</span>
+                <author>by <a href="algo">autor um</a>, <a href="algo">Segundo autor</a> and <a href="algo">third author</a></author>
+            </div>
+        </div>
+
         <div id="ppw-splash-screen-menu">
             <div id="ppw-menu-icon-list">
                 <div class="ppw-menu-help-icon" tabindex="0" onclick="PPW.showHelp();">
@@ -12,12 +20,12 @@
                 <div class="ppw-menu-open-icon" tabindex="0" onclick="PPW.openPresentationTool();">
                     ToolBox
                 </div>
-                <div class="ppw-menu-conf-icon" tabindex="0" onclick="PPW.showConfiguration();">
+                <!--<div class="ppw-menu-conf-icon" tabindex="0" onclick="PPW.showConfiguration();">
                     Settings
-                </div>
+                </div>-->
             </div>
         </div>
-        
+
         <div id="ppw-tests">
             <span id="ppw-goFullScreen-trigger" class="ppw-test-menu-item" tabindex="0">Go Fullscreen</span>
             <span id="ppw-testResolution-trigger" class="ppw-test-menu-item" tabindex="0">Test Resolution</span>
@@ -64,7 +72,7 @@
             <img id="ppw-splash-res-test-img-2" src="" />
         </div>
     </div>
-    
+
     <div class="ppw-powered-by">
         <div id="ppw-social-buttons">
             <div class="fb-like" data-href="http://www.powerpolygon.com" data-send="false" data-width="450" data-show-faces="false"></div>
