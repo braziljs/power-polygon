@@ -1611,7 +1611,7 @@ window.PPW = (function ($, _d, console){
                 fn= function(){
                     _w.setTimeout(function(){
                         $('#ppw-slides-loader-bar').stop().animate({
-                            marginTop: '-61px'
+                            marginTop: '61px'
                         }, 500);
                     }, 1000);
                 };
