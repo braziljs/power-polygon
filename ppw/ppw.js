@@ -3349,6 +3349,8 @@ window.PPW = (function ($, _d, console){
             toolName= 'ppw-Presentation-tool',
             toolProps= "width=780,height=520,left=40,top=10";
 
+        _closeToolbar();
+
         if(!_conf.presentationTool || !_conf.presentationTool.focus){
             _conf.presentationTool= _w.open(toolSrc,
                                                 toolName,
