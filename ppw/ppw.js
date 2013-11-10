@@ -2805,16 +2805,34 @@ window.PPW = (function ($, _d, console){
 
             $.get(_createPPWSrcPath("/_tools/splash-screen.html"), {}, function(data){
 
+                var i=0, l=0, str= '', authors= [], cachedEl;
                 _d.body.innerHTML+= data;
                 _setLoadingBarStatus("splash screen");
-
+                    
                 $('#ppw-goFullScreen-trigger').click(_enterFullScreen);
                 $('#ppw-testResolution-trigger').click(_testResolution);
                 $('#ppw-testAudio-trigger').click(_testAudio);
                 $('#ppw-testCamera-trigger').click(PPW.toggleCamera);
                 $('#ppw-testConnection-trigger').click(_testConnection);
                 $('#ppw-talk-title').html(_settings.title);
-
+                
+                cachedEl= $('#ppw-talk-title-container');
+                if(_settings.authors){
+                    for(i=0, l=_settings.authors.length; i<l; i++){
+                        if(_settings.authors[i].name){
+                            str= "<a href='"+(_settings.authors[i].link? _settings.authors[i].link: 'mailto:'+_settings.authors[i].email)+"'>"+
+                                    _settings.authors[i].name+
+                                 "</a>";
+                        }else{
+                            str= _settings.authors[i];
+                        }
+                        authors.push(str);
+                    }
+                    cachedEl.find('author').html('by '+str);
+                }
+                
+                cachedEl.find('span').html(_settings.description);
+                
                 $('.ppw-menu-start-icon').click(_startPresentation);
                 $('.ppw-notification-close-button').click(_closeNotification);
 
