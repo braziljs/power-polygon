@@ -2728,11 +2728,12 @@ window.PPW = (function ($, _d, console){
         var intro= _w.localStorage.getItem('ppw-newDesignIntroduction');
         intro= !intro;
 
-        if(intro){
+        if(!_w.localStorage.getItem('ppw-newDesignIntroduction')){
             _settings.useToolBar= true;
             _settings.useSplashScreen= true;
-            //window.localStorage.setItem('ppw-newDesignIntroduction', false);
-            //_conf.loadSteps+= 2;
+            _loadScript(_createPPWSrcPath('/_scripts/intro.js'), true, function(){_setLoadingBarStatus('IntroJS.js');});
+            _loadStyle(_createPPWSrcPath('/_styles/introjs.css'), true, function(){_setLoadingBarStatus('IntroJS.css');}, true);
+            //_w.localStorage.setItem('ppw-newDesignIntroduction', true);
         }
         
         _loadScript(_createPPWSrcPath('/_scripts/intro.js'), true, function(){
