@@ -196,6 +196,11 @@ window.PPW = (function ($, _d, console){
                 left: '0px'
             },
 
+            toolbarIcons: {
+                v: [],
+                h: []
+            },
+
             // all the animation
             animations: [
                          // enphasys
@@ -344,44 +349,30 @@ window.PPW = (function ($, _d, console){
                       </div>',
 
             // camera/video placeholder element
-            camera: '<div id="ppw-camera-tool" class="ppw-clickable">\
-                        <video id="ppw-video-element" autoplay="autoplay" class="ppw-clickable"></video>\
-                        <div id="ppw-camera-hide-trigger" class="ppw-clickable">\
-                            <img height="10" class="ppw-clickable" src="">\
+            camera: '<div id="ppw-camera-tool" class="ppw-clickable" onselectstart="return false">\
+                        <div id="ppw-camera-tool-resize"></div>\
+                        <div id="ppw-video-container">\
+                            <video id="ppw-video-element" autoplay="autoplay" class="ppw-clickable" onselectstart="return false"></video>\
+                            <div id="ppw-camera-hide-trigger" class="ppw-clickable"></div>\
                         </div>\
                       </div>',
 
             // the top-left toolbar content
-            toolBar: '<div id="ppw-toolbar-container" tabindex="0" class="ppw-platform {{clickableClass}}">\
-                    <div id="ppw-toolbar" class="ppw-platform {{clickableClass}}">\
-                        <div class="img"><img id="ppw-goto-icon" onclick="PPW.showGoToComponent(false);" title="Go to a specific slide" /></div>\
-                        <div class="img"><img id="ppw-toolbox-icon" onclick="PPW.openPresentationTool();" title="Open Presentation Tool" /></div>\
-                        <div class="img"><img id="ppw-search-icon" onclick="PPW.showSearchBox()" title="Search on slides"/></div>\
-                        <div class="img"><img id="ppw-fullscreen-icon" onclick="PPW.enterFullScreen()" title="Go Fullscreen"/></div>\
-                        <div class="img"><img id="ppw-camera-icon" onclick="PPW.toggleCamera();" title="Start the camera"/></div>\
-                        <div class="img"><img id="ppw-remote-icon" onclick="PPW.enableRemote();" title="No remote server found"/></div>\
-                        <div class="img"><img id="ppw-settings-icon" onclick="PPW.showConfiguration();" title="Settings"/></div>\
-                    </div>\
-                    <div id="ppw-content-toolbar" class="ppw-platform">\
-                        <span id="ppw-ct-text-small" title="Smaller fonts" onclick="PPW.smallerFonts();">A</span>\
-                        <span id="ppw-ct-text-big" title="Bigger fonts" onclick="PPW.biggerFonts();">A</span>\
-                        <img id="ppw-ct-thumbs" onclick="PPW.showThumbs();" title="Show thumbnails"/>\
-                        <img id="ppw-ct-print" onclick="PPW.print();" title="Print or save as PDF(alt+P)"/>\
-                        <div id="ppw-presentation-social-buttons">\
-                            <div class="fb-like" data-href="{{likeSrc}}" data-send="false" data-width="450" data-show-faces="false"></div>\
-                            <span class="gp-button"><div class="g-plusone" data-size="medium" data-annotation="none" data-href="{{likeSrc}}"></div></span>\
-                        </div>\
-                    </div>\
-                   </div>',
+            toolBar: '<div id="ppw-toolbar-container" class="ppw-platform ppw-clickable" onselectstart="return false;">\
+                        <div id="ppw-toolbar-trigger-btn" class="ppw-clickable"><span></span></div>\
+                        <div id="ppw-toolbar-v" class="ppw-platform {{clickableClass}}"></div>\
+                        <div id="ppw-toolbar-h" class="ppw-platform {{clickableClass}}"></div>\
+                        <div id="ppw-message-panel" class="ppw-platform {{clickableClass}}"><div class="title"><span></span></div><div id="ppw-panel-content"></div></div>\
+                      </div>',
 
             // the settings form content
             settings: "<form id='ppw-settings-form'>\
-                    <h3>Settings</h3><br/>\
                     <label>Enable shortcuts: </label><input type='checkbox' id='ppw-shortcutsEnable' {{shortcuts}} /><br/>\
-                    <label>Duration: </label><input type='integer' id='ppw-talk-duration' value='{{duration}}' /><br/>\
+                    <label>Duration: </label><input type='number' id='ppw-talk-duration' value='{{duration}}' /><br/>\
                     <label>Alert at: </label><input type='string' id='ppw-alert-at' value='{{alerts}}'placeholder='Comma separated minutes' /><br/>\
                     <div id='ppw-profile-config'><label>Profile: </label><select id='ppw-profile-option'></select></div><br/>\
                     <div id='ppw-languages-config'><label>Language: </label><select id='ppw-language-option'></select></div><br/>\
+                    <div id='ppw-settings-extra-data' class='ppw-selectable' ></div>\
               </form>"
         },
 
@@ -467,7 +458,8 @@ window.PPW = (function ($, _d, console){
         _l= location,
         _n= navigator,
         _h= history,
-        _w= window;
+        _w= window,
+        _c= {}; // cached DOM elements
 
     /**
      * Available event listeners.
@@ -501,6 +493,8 @@ window.PPW = (function ($, _d, console){
         onunlock                : [],
         onlangchange            : [],
         onextend                : [],
+        toolbarClose            : [],
+        toolbarOpen             : [],
         F10_PRESSED             : [],
         F9_PRESSED              : [],
         F8_PRESSED              : [],
@@ -1160,10 +1154,10 @@ window.PPW = (function ($, _d, console){
              background: '#55f'
          });
 
-         var styles=["/_styles/ppw.css", "/_styles/animate.css", "/_styles/jquery-ui-1.8.23.custom.css", "/_styles/font-awesome.min.css"];
+         var styles=["/_styles/ppw.css", "/_styles/animate.css", "/_styles/font-awesome.min.css"];
          _loadStyles(styles, true, "PPW.setLoadingBarStatus()", false);
-         var scripts=["/_scripts/jquery-ui-1.8.23.custom.min.js"];
-         _loadScripts(scripts, true, PPW.setLoadingBarStatus);
+         //var scripts=["/_scripts/jquery-ui-1.8.23.custom.min.js"];
+         //_loadScripts(scripts, true, PPW.setLoadingBarStatus);
 
          if(_settings.mode != 'page'){
              _tmp.lnk = _d.createElement('link');
@@ -1175,13 +1169,6 @@ window.PPW = (function ($, _d, console){
          }
 
         _loadTheme();
-
-        if(!_isInPrintableVersion()){
-            _bindEvents();
-        }else{
-            _triggerEvent('onthemeloaded', _settings.themeSettings);
-            $('#ppw-lock-loading').hide();
-        }
     };
 
     /**
@@ -1624,7 +1611,7 @@ window.PPW = (function ($, _d, console){
                 fn= function(){
                     _w.setTimeout(function(){
                         $('#ppw-slides-loader-bar').stop().animate({
-                            marginTop: '-61px'
+                            marginTop: '61px'
                         }, 500);
                     }, 1000);
                 };
@@ -1932,22 +1919,21 @@ window.PPW = (function ($, _d, console){
 
                 case 27: // esc
 
-                    if($('#ppw-message-box').css('display') != 'none'){
+                    if(_conf.showingMessage){
+                        _closeMessage();
+                        return true;
+                    }
 
-                        if(_conf.showingMessage){
-                            _closeMessage();
-                        }
-
-                        _pauseCamera();
-                        _preventDefaultstopPropagation(evt);
-                        if(_conf.currentZoom != 1){
-                            _resetViewport();
-                        }
-                        return false;
+                    _pauseCamera();
+                    _preventDefaultstopPropagation(evt);
+                    if(_conf.currentZoom != 1){
+                        _resetViewport();
+                        return true;
                     }
                     if(_conf.inThumbsMode){
                         _goToSlide(_conf.currentSlide);
                     }
+                    _closeToolbar();
                     break;
 
                 case 70: // F
@@ -2130,11 +2116,11 @@ window.PPW = (function ($, _d, console){
         });
 
         // scrolling, used to apply zoom effects
-        if(_settings.zoomOnScroll){
+        /*if(_settings.zoomOnScroll){
             mouseWheelFn= _mouseWheelZoom;
             $d.bind('DOMMouseScroll', mouseWheelFn);
             $d.bind('mousewheel', mouseWheelFn);
-        }
+        }*/
 
         /**
          * Online/Offline events
@@ -2202,6 +2188,22 @@ window.PPW = (function ($, _d, console){
 
             return null;
         };
+
+        /* Toolbar Events */
+        $('#ppw-toolbar-trigger-btn').live('click', function(){
+            if($('#ppw-toolbar-container').hasClass('active')){
+                _closeToolbar();
+            }else{
+                _openToolbar();
+            }
+        }).live('selectstart', function(evt){
+            evt.preventDefault();
+            return false;
+        });
+
+        $('#ppw-message-panel .title').live('click', function(){
+            _closeMessage();
+        });
 
         /*$b.bind('selectstart', function(evt){
 
@@ -2500,35 +2502,91 @@ window.PPW = (function ($, _d, console){
     /**
      * Opens the go-to-slide component.
      */
-    var _showGoToComponent= function(useEnter){
+    var _showGoToComponent= function(){
 
         var el= null, fn,
-            msg= "Go to slide number <input style='margin: auto;' type='integer' id='ppw-go-to-slide' maxlength=3 value='' /><input type=button id=ppw-go-to-button value=Go>";
+        msg= "<div class='ppw-goto-filter-container'><input type=text value='' id='ppw-go-to-slide-filter' placeholder='Type the number or title' /></div>";
+
+        msg+= "<div class='ppw-go-to-slides-list'><ul>";
+        PPW.getSlides().map(function(i){
+            msg+= "<li data-slide-id='"+i.index+"' class='ppw-goto-list-item'>";
+            msg+= "<span class='ppw-slide-num'>"+ i.index +"</span><span class='ppw-slide-tt'>"+ i.title.replace(/[ \n\r\t]/g, '')+"</span>";
+            msg+= "</li>";
+        });
+        msg+= "</ul></div>";
 
         fn= function(){
-            var i= $('#ppw-go-to-slide').val();
+            var item= _d.querySelector('.ppw-goto-list-item.active'),
+                i= item? item.getAttribute('data-slide-id'): false;
 
-            if(i && i.replace(/ /g, '') != '' && !isNaN(i)){
-                _goToSlide(_getValidSlides()[parseInt(i, 10) -1]);
-                _closeMessage();
+            if(i){
+                _goToSlide(i-1);
+                _closeToolbar();
             }
         };
 
-        if(_conf.showingMessage)
-            return false;
+        //if(_conf.showingMessage)
+          //  return false;
 
-        _showMessage(msg, fn, true, false, true);
+        _showMessage(msg, false, 'panel', 'Go to Slide');
 
-        el= _d.querySelector('#ppw-go-to-slide');
-        _d.getElementById('ppw-go-to-button').addEventListener('click', _closeMessage);
+        var list= _d.querySelectorAll('.ppw-go-to-slides-list li'),
+            l= list.length,
+            i= 0;
+
+        el= _d.querySelector('#ppw-go-to-slide-filter');
 
         el.addEventListener('keyup', function(evt){
-            if(evt && evt.keyCode && evt.keyCode == 13)
+            var v= this.value,
+                item= false;
+
+            if(evt && evt.keyCode == 13)
                 fn();
+            else{
+                if(evt.keyCode == 38){ // up
+                    item= $('.ppw-goto-list-item.active');
+                    if(item.length){
+                        item.removeClass('active');
+                        item= item.prevAll('.ppw-goto-list-item').first();
+                        if(!item.length){
+                            item= $('.ppw-goto-list-item');
+                            item= item.eq(item.length-1);
+                        }
+                        item.addClass('active');
+                    }
+                }else if(evt.keyCode == 40){ // down
+                    item= $('.ppw-goto-list-item.active');
+                    if(item.length){
+                        item.removeClass('active');
+                        item= item.nextAll('.ppw-goto-list-item').first();
+
+                        if(!item.length)
+                            item= $('.ppw-goto-list-item').eq(0);
+
+                        item.addClass('active');
+                    }
+                }else{
+                    for(i=0; i<l; i++){
+                        if(!v.length || $(list[i]).text().toLowerCase().indexOf(v) >=0 )
+                            $(list[i]).addClass('ppw-goto-list-item');
+                        else
+                            $(list[i]).removeClass('ppw-goto-list-item');
+                    }
+                    if(v.length)
+                        $('.ppw-goto-list-item').removeClass('active').eq(0).addClass('active');
+                    else
+                        $('.ppw-goto-list-item').removeClass('active')
+                }
+            }
         }, false);
 
-        if(!useEnter)
-            el.focus();
+        for(i=0; i<l; i++){
+            list[i].addEventListener('click', function(){
+                _goToSlide(this.getAttribute('data-slide-id') -1);
+                _closeToolbar();
+            });
+        }
+        el.focus();
     };
 
     /**
@@ -2597,52 +2655,60 @@ window.PPW = (function ($, _d, console){
      *
      * @param Boolean Force the search box to replace the current alert message.
      */
-    var _showSearchBox= function(force){
-        var content= _templates.searchTool.replace(/\{\{directionaliconsstyle\}\}/g, _settings.directionalIconsStyle),
-            el= null;
+    var _showSearchBox= function(evt){
 
-        if(_conf.showingMessage && !force)
-            return false;
+        var searchIcon= $('#ppw-toolbaricon-ppw-search-icon'),
+            searchIpt= searchIcon.find('input'),
+            searched= '';
 
-        if(_conf.showingMessage){
-            $('#ppw-message-content').html(content);
-        }else{
-            _showMessage(content);
-        }
-        _unlock();
+        if(!searchIpt.length){
+            searchIcon.append('<input type="text" class="ppw-clickable ppw-selectable" />');
+            searchIpt= searchIcon.find('input');
+            searchIpt.bind('keyup', function(evt){
+                var ret= null;
+                if(evt.keyCode == 13){ // enter
 
-        el= _d.getElementById('ppw-search-slide');
-        setTimeout(function(){_d.getElementById('ppw-search-slide').focus();}, 100);
-        el.addEventListener('keyup', function(evt){
-            if(evt.keyCode == 13){ // enter
-                if(evt.shiftKey)
-                    $('#ppw-search-prev').trigger('click');
-                else
-                    $('#ppw-search-next').trigger('click');
-            }else if(evt.keyCode == 27){ // esc
-                if(_conf.showingMessage){
-                    _closeMessage();
+                    searched= this.value;
+
+                    if(!searched)
+                        return;
+
+                    if(evt.shiftKey){
+                        ret= _searchIntoSlides('prev', searched);
+                    }else{
+                        ret= _searchIntoSlides('next', searched);
+                    }
+
+                    if(!ret){
+                        $(this).addClass('ppw-no-search-results');
+                    }else{
+                        $(this).removeClass('ppw-no-search-results');
+                    }
+                    return;
+                }else if(evt.keyCode == 27){ // esc
+                    searchIcon.removeClass('ppw-showing');
                 }
+                if(searched != this.value){
+                    $(this).removeClass('ppw-no-search-results');
+                }
+            });
+            _addListener('toolbarClose', function(){
+                searchIcon.removeClass('ppw-showing');
+            });
+            searchIcon.addClass('ppw-showing');
+            setTimeout(function(){
+                searchIpt.focus();
+            }, 301);
+        }else{
+            if(searchIcon.hasClass('ppw-showing') && (evt && evt.target.nodeName.toUpperCase() != 'INPUT')){
+                searchIcon.removeClass('ppw-showing');
+            }else{
+                searchIcon.addClass('ppw-showing');
+                setTimeout(function(){
+                    searchIpt.focus();
+                }, 301);
             }
-        }, false);
-
-        $('#ppw-search-prev').bind('click', function(){
-            var ret= _searchIntoSlides('prev', _d.getElementById('ppw-search-slide').value),
-                msg= 'Not found in previous slides!';
-            if(ret !== false){
-                msg= "Found in slide "+(ret+1);
-            }
-            _d.getElementById('ppw-search-found').innerHTML= msg;
-        });
-        $('#ppw-search-next').bind('click', function(){
-            var ret= _searchIntoSlides('next', _d.getElementById('ppw-search-slide').value),
-                msg= 'Not found in next slides!';
-            if(ret !== false){
-                msg= "Found in slide "+(ret+1);
-            }
-            _d.getElementById('ppw-search-found').innerHTML= msg;
-        });
-
+        }
     };
 
     /**
@@ -2659,6 +2725,30 @@ window.PPW = (function ($, _d, console){
 
         _b= _d.body;
         $b= $(_b);
+        var intro= _w.localStorage.getItem('ppw-newDesignIntroduction');
+        intro= !intro;
+
+        if(!_w.localStorage.getItem('ppw-newDesignIntroduction')){
+            _settings.useToolBar= true;
+            _settings.useSplashScreen= true;
+//            _loadScript(_createPPWSrcPath('/_scripts/intro.js'), true, function(){_setLoadingBarStatus('IntroJS.js');});
+//            _loadStyle(_createPPWSrcPath('/_styles/introjs.css'), true, function(){_setLoadingBarStatus('IntroJS.css');}, true);
+            //_w.localStorage.setItem('ppw-newDesignIntroduction', true);
+        }
+        
+        _loadScript(_createPPWSrcPath('/_scripts/intro.js'), true, function(){
+            introJs().setOptions({
+                skipLabel: 'Exit',
+                tooltipPosition: 'top',
+                showStepNumbers: false,
+                exitOnOverlayClick: false,
+                exitOnEsc: true
+            });
+            _setLoadingBarStatus('IntroJS.js');
+        });
+        _loadStyle(_createPPWSrcPath('/_styles/introjs.css'), true, function(){
+            _setLoadingBarStatus('IntroJS.css');
+        }, true);
 
         _preparePPW();
 
@@ -2689,38 +2779,7 @@ window.PPW = (function ($, _d, console){
                                 .replace(/\{\{clickableClass\}\}/g, _conf.cons.CLICKABLE_ELEMENT)
                                 .replace(/\{\{likeSrc\}\}/g, _l.protocol+'//'+(_l.host == 'localhost'? 'powerpolygon.com': _l.host)+''+_l.pathname);
             $b.append(tpl);
-
-            // setting images to the icons on the toolbar and their behaviour
-            $('#ppw-goto-icon').attr('src', _createPPWSrcPath('/_images/goto.png'))
-                               .addClass(_conf.cons.CLICKABLE_ELEMENT)
-
-            $('#ppw-toolbox-icon').attr('src', _createPPWSrcPath('/_images/toolbox.png'))
-                                  .addClass(_conf.cons.CLICKABLE_ELEMENT);
-
-            $('#ppw-search-icon').attr('src', _createPPWSrcPath('/_images/search.png'))
-                                 .addClass(_conf.cons.CLICKABLE_ELEMENT);
-
-            $('#ppw-fullscreen-icon').attr('src', _createPPWSrcPath('/_images/fullscreen.png'))
-                                     .addClass(_conf.cons.CLICKABLE_ELEMENT);
-
-            $('#ppw-camera-icon').attr('src', _createPPWSrcPath('/_images/camera.png'))
-                                 .addClass(_conf.cons.CLICKABLE_ELEMENT);
-
-            if(_settings.remote && _settings.remote.useButton !== false){
-                $('#ppw-remote-icon').attr('src', _createPPWSrcPath('/_images/remote-conection-status-no-server.png'))
-                                     .addClass(_conf.cons.CLICKABLE_ELEMENT);
-            }else{
-                $('#ppw-remote-icon').parent().hide();
-            }
-
-            $('#ppw-settings-icon').attr('src', _createPPWSrcPath('/_images/settings-icon.png'))
-                                   .addClass(_conf.cons.CLICKABLE_ELEMENT);
-
-            $('#ppw-ct-thumbs').attr('src', _createPPWSrcPath('/_images/thumbs.png'))
-                               .addClass(_conf.cons.CLICKABLE_ELEMENT);
-
-            $('#ppw-ct-print').attr('src', _createPPWSrcPath('/_images/print.png'))
-                               .addClass(_conf.cons.CLICKABLE_ELEMENT);
+            _createDefaultIcons();
         }
 
         // adding the splash screen if enabled
@@ -2728,16 +2787,34 @@ window.PPW = (function ($, _d, console){
 
             $.get(_createPPWSrcPath("/_tools/splash-screen.html"), {}, function(data){
 
+                var i=0, l=0, str= '', authors= [], cachedEl;
                 _d.body.innerHTML+= data;
                 _setLoadingBarStatus("splash screen");
-
+                    
                 $('#ppw-goFullScreen-trigger').click(_enterFullScreen);
                 $('#ppw-testResolution-trigger').click(_testResolution);
                 $('#ppw-testAudio-trigger').click(_testAudio);
                 $('#ppw-testCamera-trigger').click(PPW.toggleCamera);
                 $('#ppw-testConnection-trigger').click(_testConnection);
                 $('#ppw-talk-title').html(_settings.title);
-
+                
+                cachedEl= $('#ppw-talk-title-container');
+                if(_settings.authors){
+                    for(i=0, l=_settings.authors.length; i<l; i++){
+                        if(_settings.authors[i].name){
+                            str= "<a href='"+(_settings.authors[i].link? _settings.authors[i].link: 'mailto:'+_settings.authors[i].email)+"'>"+
+                                    _settings.authors[i].name+
+                                 "</a>";
+                        }else{
+                            str= _settings.authors[i];
+                        }
+                        authors.push(str);
+                    }
+                    cachedEl.find('author').html('by '+str);
+                }
+                
+                cachedEl.find('span').html(_settings.description);
+                
                 $('.ppw-menu-start-icon').click(_startPresentation);
                 $('.ppw-notification-close-button').click(_closeNotification);
 
@@ -2755,6 +2832,110 @@ window.PPW = (function ($, _d, console){
 
                 _triggerEvent('onsplashscreen', _d.getElementById('ppw-addons-container'));
 
+                if(intro){
+                    $('#ppw-toolbar-trigger-btn').attr('data-intro', "<strong>Meet the new design</strong><br/>Now, the toolbar is hidden down here!<br/>Hover it to see the toolbar trigger button and show the toolbar.")
+                                                 .attr('data-position', 'top')
+                                                 .attr('data-step', 1);
+                    $('#ppw-toolbaricon-ppw-settings-icon').attr('data-intro', '<strong>Settings and properties</strong><br/>Use this item to see and change the settings and presentation properties')
+                                                           .attr('data-position', 'right')
+                                                           .attr('data-step', 2);
+                    $('#ppw-toolbaricon-ppw-remote-icon')  .attr('data-intro', '<strong>Remote Control</strong><br/>When available, use it to enable or disable the remote control.<br/>You can use your cellphone to pass slides or even draw or point on your presentation.')
+                                                           .attr('data-position', 'right')
+                                                           .attr('data-step', 3);
+                    $('#ppw-toolbaricon-ppw-toolbox-icon') .attr('data-intro', '<strong>Presentation Tools</strong><br/>You can keep these tools in a different screen, when giving your talk.')
+                                                           .attr('data-position', 'right')
+                                                           .attr('data-step', 4);
+                    $('#ppw-toolbaricon-ppw-ct-text-big')  .attr('data-intro', '<strong>Font sizes</strong><br/>Increase or decrease the size of texts in your slides easily')
+                                                           .attr('data-position', 'top')
+                                                           .attr('data-step', 5);
+                    $('#ppw-toolbaricon-ppw-camera-icon')  .attr('data-intro', '<strong>Toggle your camera</strong><br/>You can use it to toggle on and off your camera, showing it to the audience.<br/>You can then maximize the camera, adjust its size or drag it around')
+                                                           .attr('data-position', 'top')
+                                                           .attr('data-step', 6);
+                    $('#ppw-toolbaricon-ppw-ct-thumbs')    .attr('data-intro', '<strong>See thumbs and go-to</strong><br/>With these tools, you cansee the thumbnails of your slides and then jump to the one you want, or see the list and type to filter it and go to the right slide')
+                                                           .attr('data-position', 'top')
+                                                           .attr('data-step', 7);
+                    $('#ppw-toolbaricon-ppw-search-icon')  .attr('data-intro', '<strong>Search into slides</strong><br/>Search for a given term inside your slides.<br/>Use <em>Enter</em> to search forward and <em>Shift+Enter</em> to search backwards.')
+                                                           .attr('data-position', 'top')
+                                                           .attr('data-step', 8);
+                    $('#ppw-talk-title-container .bottom') .attr('data-intro', '<strong>Talk data</strong><br/>Information about your talk, like title, description and authors.')
+                                                           .attr('data-position', 'bottom')
+                                                           .attr('data-step', 9);
+                    $('#ppw-tests')                        .attr('data-intro', '<strong>Tests and plugins</strong><br/>Basic tests come here. Also, plugins can be loaded to add functionalities to Power Polygon and they triggers may be added here.')
+                                                           .attr('data-position', 'top')
+                                                           .attr('data-step', 10);
+                    $('.ppw-menu-start-icon')              .attr('data-intro', '<strong>Done!</strong><br/>Great!<br/>You are good to go and have fun!')
+                                                           .attr('data-position', 'top')
+                                                           .attr('data-step', 11);
+
+                    setTimeout(function(){
+                        var itemsIntroduced= 0;
+
+                        var showIntroToEl= function(step){
+                            switch(step){
+                                case 0:
+                                    _closeMessage();
+                                    break
+                                case 1:
+                                    _showConfiguration();
+                                    break;
+                                case 2:
+                                    _closeMessage();
+                                    break;
+                                case 3:
+                                    _closeMessage();
+                                    break;
+                                case 4:
+                                    $('.introjs-helperLayer').css('width', '70px');
+                                    break;
+                                case 6:
+                                    $('.introjs-helperLayer').css('width', '84px');
+                                    _showGoToComponent();
+                                    break;
+                                case 7:
+                                    _closeMessage();
+                                    //_showSearchBox();
+                                    break;
+                                case 8:
+                                    _closeToolbar();
+                                    break;
+                            }
+                        };
+
+                        _openToolbar();
+                        $('.introjs-nextbutton').live('click keydown', function(evt){
+                            if(!evt.keyCode || evt.keyCode == 13){
+                                itemsIntroduced++;
+                                showIntroToEl(itemsIntroduced);
+                            }
+                        });
+                        $('.introjs-prevbutton').live('click keydown', function(evt){
+                            if(!evt.keyCode || evt.keyCode == 13){
+                                itemsIntroduced--;
+                                showIntroToEl(itemsIntroduced);
+                            }
+                        });
+                        $('.introjs-skipbutton').live('click keydown', function(evt){
+                            if(!evt.keyCode || evt.keyCode == 13){
+                                //if(itemsIntroduced == 10){
+                                    // finished
+                                    _w.localStorage.setItem('ppw-newDesignIntroduction', 1);
+                                //}else{
+                                    // skiped
+                                  //  itemsIntroduced= 0;
+                                    _closeToolbar();
+                                //}
+                            }
+                        });
+                        /*_w.introJs().onexit(function(target){
+                            alert(9);
+                        });
+                        _w.introJs().oncomplete(function(target){
+                            alert(8);
+                        });*/
+                        _w.introJs().start();
+                        $('.introjs-helperLayer').css('top', '+=20px');
+                    }, 3000);
+                }
             });
         }else{
             _setLoadingBarStatus("splash screen not used");
@@ -2790,7 +2971,6 @@ window.PPW = (function ($, _d, console){
             }
 
         }
-
     };
 
     var _updateScreenSizes= function(){
@@ -2885,7 +3065,7 @@ window.PPW = (function ($, _d, console){
             m= null;
         if(q.length){
             m= q.shift();
-            _showMessage(m.msg, m.fn, m.hideButton, m.type);
+            _showMessage(m.msg, m.fn, m.type, m.title);
             return true;
         }else{
             return false;
@@ -2901,63 +3081,76 @@ window.PPW = (function ($, _d, console){
      * @param String The message type. Can be: false/undefined, warning/warn or error.
      * @return Boolean True if showed the message, false if it was queued.
      */
-    var _showMessage= function(msg, fn, hideButton, type, notLocked){
+    var _showMessage= function(msg, fn, type, title){
 
-        var box= $('#ppw-message-box'),
-            func= null;
+        var container= (type == 'box'? $('#ppw-message-box'):
+                        type == 'panel'? $('#ppw-message-panel'):
+                        ($(type).eq(0)) );
 
         if(_conf.showingMessage){
-            _conf.messagesQueue.push({msg: msg, fn: fn, hideButton: hideButton, type: type});
+            if(type == 'box')
+                _conf.messagesQueue.push({msg: msg, fn: fn, type: type, title: title});
+            else{
+                if(type != 'panel'){
+                    _closeMessage();
+                    return false;
+                }
+
+                if(_conf.showingMessage.data('messageTitle') != title){
+                    _closeMessage();
+                    setTimeout(function(){
+                        _showMessage(msg, fn, type, title);
+                    }, 500);
+                }else{
+                    _closeMessage();
+                }
+            }
             return false;
         }
 
-        PPW.unlock();
-
-        $('#ppw-message-content').html(msg);
-
-        if(hideButton){
-            $('#ppw-message-box-button').hide();
-        }else{
-            if(!notLocked)
-                PPW.lock($('#ppw-message-box-button').show()[0]);
+        if(!container.length){
+            console.warn("[PPW] Failed to locate the container for the message, using mode box for the message");
+            type= 'box';
+            container= $('#ppw-message-box');
         }
 
-        PPW.animate(box, 'fadeInDown', {
-            duration: '300ms',
-            delay: '0s'
-        });
+        if(type == 'box'){
+            $('#ppw-message-content').html(msg);
+            container.addClass('ppw-showing');
 
-        box.css({
-            marginLeft: -(box[0].offsetWidth/2)+'px'
-        });
+            container.css({
+                marginLeft: -(container[0].offsetWidth/2)+'px'
+            });
 
-        if(!type){
-            box.removeClass('warning').removeClass('error');
-        }else{
-            if(type == 'warning' || type == 'error'){
-                box.addClass(type);
-            }
-        }
-
-        _conf.showingMessage= true;
-
-        func= function(){
-            if(fn && typeof fn == 'function'){
-                try{
-                    fn();
-                }catch(e){
-                    console.error('Failed executing callback on closing message', e, fn);
+            var func= function(){
+                if(fn && typeof fn == 'function'){
+                    try{
+                        fn();
+                    }catch(e){
+                        console.error('Failed executing callback on closing message', e, fn);
+                    }
                 }
             }
+
+            container.data('closeCallback', func).data('messageType', 'box');
+
+            $('#ppw-message-box-button').one('click', _closeMessage);
+            setTimeout(function(){
+                _d.getElementById('ppw-message-box-button').focus();
+            }, 100);
+        }else if(type == 'panel'){
+            //var msgTt= container.data('msgTitle');
+
+            container.find('.title span').html(title||'');
+            $('#ppw-panel-content').html(msg);
+            container.data('closeCallback', func);
+            //container.data('msgTitle', title);
+            container.addClass('ppw-showing');
+        }else{
+            // is a balloon inside a given container
         }
-
-        box.data('closeCallback', func)
-
-        $('#ppw-message-box-button').one('click', _closeMessage);
-        setTimeout(function(){
-            _d.getElementById('ppw-message-box-button').focus();
-        }, 100);
-
+        container.data('messageType', type).data('messageTitle', title);
+        _conf.showingMessage= container;
         return true;
     };
 
@@ -2988,29 +3181,32 @@ window.PPW = (function ($, _d, console){
      */
     var _closeMessage= function(){
 
-        var box= $('#ppw-message-box'),
-            fn= box.data('closeCallback');
+        var container= _conf.showingMessage,
+            fn= container? container.data('closeCallback'): false,
+            type= container? container.data('messageType'): 'box';
 
-        PPW.animate(box, 'fadeOutUp', {
-                duration: '300ms',
-                onstart: function(){
 
-                },
-                onend: function(){
+        if(!container)
+            return false;
 
-                    _conf.showingMessage= false;
+        if(fn && typeof fn == 'function'){
+            try{
+                fn(container);
+            }catch(e){
+                throw("[PPW]:: Failed executing the show message callback!", e);
+            }
+        }
 
-                    if(!_showNextMessage()){
-                        PPW.unlock();
-                        _b.focus();
-                    }
+        _conf.showingMessage= false;
+        if(_showNextMessage()){
+            return;
+        }
 
-                    $('#ppw-message-box').hide().removeClass('ppw-anim-visible');
+        //container.data('msgTitle', false);
+        container.removeClass('ppw-showing')
+                 .data('messageType', false)
+                 .data('messageTitle', false);
 
-                    if(fn && typeof fn == 'function')
-                        fn();
-                }
-        });
     };
 
     /**
@@ -3022,7 +3218,28 @@ window.PPW = (function ($, _d, console){
     var _startCamera= function(){
 
         var video = _d.querySelector('#ppw-video-element'),
-            el= $('#ppw-camera-tool');
+            el= $('#ppw-camera-tool'),
+            dnd= {},
+            rsz= {},
+            dragingTheVideo= function(event){
+                if(dnd.el){
+                    dnd.el.style.left= event.pageX - dnd.offsetX + 'px';
+                    dnd.el.style.bottom= ((_b.offsetHeight - event.pageY) - (dnd.height - dnd.offsetY)) + 'px';
+                }
+            },
+            resizingTheVideo= function(event){
+                var h, w;
+                if(dnd.el){
+                    w= (event.pageX - rsz.left);
+                    h= (_b.offsetHeight - event.pageY - rsz.bottom);
+                    if(w > 40)
+                        rsz.el.style.width= w + 'px';
+                    if(h > 40)
+                        rsz.el.style.height= h + 'px';
+                }
+                event.preventDefault();
+                return false;
+            };
 
         if(!_conf.cameraLoaded){
             _w.URL = _w.URL || _w.webkitURL;
@@ -3057,11 +3274,7 @@ window.PPW = (function ($, _d, console){
                       "device": _conf.stream
                   });
 
-                  el.draggable()
-                    .resizable({
-                        handles: "se, sw, ne, nw, n, e, s, w"
-                    })
-                    .bind('dblclick', function(){
+                  el.bind('dblclick', function(){
 
                         var that= $(this), oldie= [];
 
@@ -3069,32 +3282,66 @@ window.PPW = (function ($, _d, console){
                             oldie= that.data('oldprops');
                             that.data('fullscreened', true)
                                 .show()
-                                .animate({
+                                .css({
                                      width: oldie[2]+'px',
                                      height: oldie[3]+'px',
                                      left: oldie[0]+'px',
-                                     top: oldie[1]+'px'
-                                 }, 500)
+                                     bottom: oldie[1]+'px'
+                                 })
                                  .data('fullscreened', false);
                         }else{
                             that.data('fullscreened', true)
                                 .data('oldprops', [
                                      this.offsetLeft,
-                                     this.offsetTop,
+                                     _b.offsetHeight - (this.offsetHeight + this.offsetTop),
                                      this.offsetWidth,
                                      this.offsetHeight
                                 ])
-                                .animate({
+                                .css({
                                      width: _b.offsetWidth+'px',
                                      height: _b.offsetHeight+'px',
                                      left: '0px',
-                                     top: '0px'
-                                 }, 500);
+                                     bottom: '0px'
+                                 });
                         }
-                    }).css({
-                        left: _b.offsetWidth - el[0].offsetWidth-10,
-                        top: 0-el[0].offsetHeight
-                    }).animate({top: '0px'}, 500);
+                    }).addClass('ppw-camera-activated');
+
+                    $('#ppw-video-container').bind('mousedown', function(event){ // dragg'n'drop
+
+                        dnd.pageX= event.pageX;
+                        dnd.pageY= event.pageY;
+                        dnd.offsetX= event.offsetX;
+                        dnd.offsetY= event.offsetY;
+                        dnd.height= el[0].offsetHeight;
+                        dnd.el= el[0];
+
+                        _b.addEventListener('mousemove', dragingTheVideo);
+                        _b.addEventListener('mouseup', function(){
+                            _b.removeEventListener('mousemove', dragingTheVideo);
+                        });
+
+                        event.preventDefault();
+                        return false;
+                    });
+
+                    $('#ppw-camera-tool-resize').bind('mousedown', function(event){
+                        rsz.pageX= event.pageX;
+                        rsz.pageY= event.pageY;
+                        rsz.offsetX= event.offsetX;
+                        rsz.offsetY= event.offsetY;
+                        rsz.bottom= _b.offsetHeight - (el[0].offsetHeight + el[0].offsetTop);
+                        rsz.left= el[0].offsetLeft;
+                        rsz.el= el[0];
+                        _b.addEventListener('mousemove', resizingTheVideo);
+                        _b.addEventListener('mouseup', function(){
+                            _b.removeEventListener('mousemove', resizingTheVideo);
+                        });
+
+                        event.preventDefault();
+                        return false;
+                    });
+
+                    setTimeout(_closeToolbar, 800);
 
                     _conf.showingCamera= true;
                     $('#ppw-camera-hide-trigger').bind('click', _pauseCamera);
@@ -3110,13 +3357,8 @@ window.PPW = (function ($, _d, console){
             }
         }else{
             _d.querySelector('#ppw-video-element').play();
-
-            if(el[0].offsetTop <0){
-                el.css({
-                            left: _b.offsetWidth - el[0].offsetWidth-10,
-                            top: 0-el[0].offsetHeight
-                       }).animate({top: '0px'}, 500);
-            }
+            el.addClass('ppw-camera-activated');
+            setTimeout(_closeToolbar, 800);
 
             if(_conf.video && _conf.stream){
                 _triggerEvent('onshowcamera', {
@@ -3129,6 +3371,23 @@ window.PPW = (function ($, _d, console){
     };
 
     /**
+     * Closes the toolbar menus.
+     */
+    var _closeToolbar= function(){
+        $('#ppw-toolbar-container').removeClass('active');
+        _closeMessage();
+        _triggerEvent('toolbarClose');
+    };
+
+    /**
+     * Shows the toolbar menus.
+     */
+    var _openToolbar= function(){
+        $('#ppw-toolbar-container').addClass('active');
+        _triggerEvent('toolbarOpen');
+    };
+
+    /**
      * Pauses the camera and hides it.
      */
     var _pauseCamera= function(){
@@ -3138,10 +3397,9 @@ window.PPW = (function ($, _d, console){
         if(_conf.cameraLoaded){
             el= $('#ppw-camera-tool');
             _d.querySelector('#ppw-video-element').pause();
-            el.animate({top: -el[0].offsetHeight - 30})
-            //PPW.cameraStream.pause();
+            el.addClass("ppw-removing-camera")
+            setTimeout(function(){el.removeClass('ppw-removing-camera ppw-camera-activated'); el[0].removeAttribute('style'); }, 500);
             _conf.showingCamera= false;
-            //_conf.cameraLoaded= false;
         }
         _triggerEvent('onhidecamera');
     };
@@ -3151,28 +3409,17 @@ window.PPW = (function ($, _d, console){
      */
     var _testAudio= function(){
 
-        /*var el= _d.getElementById('ppw-audioTestElement');
-        if(!el){
-            $b.append("<audio id='ppw-audioTestElement' autoplay='autoplay' loop='loop' controls='controls'>\
-                                <source src='"+_createPPWSrcPath('/_audios/water.mp3')+"'/>\
-                                <source src='"+_createPPWSrcPath('/_audios/water.ogg')+"'/>\
-                               </audio>");
-            el= _d.getElementById('ppw-audioTestElement');
-        }*/
-        //el.play();
         _showMessage("Playing audio<br/><div style='background: url("+_createPPWSrcPath('/_images/animated-wave-sound.gif')+") 0px -37px no-repeat; position: relative; width: 220px; height: 30px; margin: auto; background-size: 248px 108px; border-left: solid 1px #fcc; border-right: solid 1px #fcc;' onclick='var audio = document.getElementById(\"ppw-audioTestElement\"); var t = \"Stopped\";  if(audio.paused) { audio.play(); t = \"Playing\" } else { audio.pause(); }; console.log(\"[PPW] Currently \" + t); '/><div id='ppw-audioPlaceHolder'></div>",
                      function(){
-
                          var el= _d.getElementById('ppw-audioTestElement'),
                             audio= new Audio(el);
-                         //el.volume= 0;
                          el.pause();
                          audio.pause();
                      });
         $('#ppw-audioPlaceHolder').html("<audio id='ppw-audioTestElement' autoplay='autoplay' loop='loop' >\
-                                <source src='"+_createPPWSrcPath('/_audios/water.mp3')+"'/>\
-                                <source src='"+_createPPWSrcPath('/_audios/water.ogg')+"'/>\
-                               </audio>");
+            <source src='"+_createPPWSrcPath('/_audios/water.mp3')+"'/>\
+            <source src='"+_createPPWSrcPath('/_audios/water.ogg')+"'/>\
+           </audio>");
     };
 
     /**
@@ -3186,6 +3433,8 @@ window.PPW = (function ($, _d, console){
         var toolSrc= _createPPWSrcPath('/_tools/presentation-tool.html'),
             toolName= 'ppw-Presentation-tool',
             toolProps= "width=780,height=520,left=40,top=10";
+
+        _closeToolbar();
 
         if(!_conf.presentationTool || !_conf.presentationTool.focus){
             _conf.presentationTool= _w.open(toolSrc,
@@ -3236,6 +3485,7 @@ window.PPW = (function ($, _d, console){
             list= [],
             l= 0,
             fn= function(){
+
                 var parsed= "";
 
                 _triggerEvent('onclosesettings');
@@ -3253,7 +3503,7 @@ window.PPW = (function ($, _d, console){
                        .replace('{{duration}}', _settings.duration)
                        .replace('{{alerts}}', _settings.alertAt);
 
-        _showMessage(msg, fn, false, false, true);
+        _showMessage(msg, fn, 'panel', 'Settings');
 
         if(_conf.profiles){
             list= Object.keys(_conf.profiles);
@@ -3288,8 +3538,19 @@ window.PPW = (function ($, _d, console){
                                      .bind('change', function(){
                                         _setLION(this.value);
                                      });
-
         }
+
+        $('#ppw-settings-extra-data').html("\
+          <label>Talk</label><span>"+_settings.canonic+"</span>\
+          <label>Number of slides</label><span>"+_conf.validSlides.length+"</span>\
+          <label>Current</label><span>"+(_conf.currentSlide+1)+': '+_settings.slides[_conf.currentSlide].id+"</span>\
+          <label>Themes</label><span>"+(_settings.theme.join(', '))+"</span>\
+          <label>Remote Server</label><span>"+_conf.defaultRemoteServer+"</span>");
+        //
+        //
+        //
+        //
+        //
 
         _triggerEvent('onopensettings', _settings);
     };
@@ -4264,8 +4525,6 @@ window.PPW = (function ($, _d, console){
             $('#ppw-remote-io-script').remove();
 
             _loadScript('/ppw/_tools/remote/server.js');
-            //$("head").append("< script src='"+srv+"/ppw/_tools/remote/server.js' id='ppw-remote-io-script'>< /script>");
-
             // in 3 seconds, verify again for the status
             setTimeout(_initRemoteService, 3000);
         }else{
@@ -4353,6 +4612,154 @@ window.PPW = (function ($, _d, console){
         _settings[key]= value;
     };
 
+    /**
+     * Returns a chached DOM element, or cache it, if it is not there yet.
+     *
+     * @param String The element selector
+     * @return jQueryObject
+     */
+    var _getAndCache= function(selector){
+        if(!_c[selector])
+            _c[selector]= $(selector);
+        return _c[selector];
+    };
+
+    /**
+     * Toggles the camera in the interface.
+     */
+    var _toggleCamera= function(){
+        if(_conf.showingCamera)
+            _pauseCamera();
+        else
+            _startCamera();
+    }
+
+    /**
+     * Creates the default icons on the toolbar
+     */
+    var _createDefaultIcons= function(){
+        
+        _createIcon({
+            id: 'ppw-toolbox-icon',
+            description: "Open the Presentation Tool",
+            image: _createPPWSrcPath('_images/toolbox.png'),
+            click: _openPresentationTool
+        }, true);
+        _createIcon({
+            id: 'ppw-fullscreen-icon',
+            description: "Show the presentation in full screen mode",
+            image: _createPPWSrcPath('_images/fullscreen.png'),
+            click: _enterFullScreen
+        }, true);
+        _createIcon({
+            id: 'ppw-ct-print',
+            description: "See printable version",
+            image: _createPPWSrcPath('_images/print.png'),
+            click: _print
+        }, true);
+        _createIcon({
+            id: 'ppw-remote-icon',
+            description: "Enable remove control",
+            image: false, //_createPPWSrcPath('_images/remote-conection-status-no-server.png'),
+            click: _enableRemote
+        }, true).attr('rule', 'no-server');
+        
+        _createIcon({
+            id: 'ppw-settings-icon',
+            description: "Shows the settings pannel",
+            image: _createPPWSrcPath('_images/settings-icon.png'),
+            click: _showConfiguration
+        }, true);
+
+        // horizontal
+        _createIcon({
+            id: 'ppw-ct-text-big',
+            description: "Bigger fonts",
+            content: "A<span>↑</span>",
+            className: 'ppw-bigger-fonts-btn',
+            click: _biggerFonts
+        });
+        _createIcon({
+            id: 'ppw-ct-text-small',
+            description: "Smaller fonts",
+            content: "A<span>↓</span>",
+            className: 'ppw-smaller-fonts-btn',
+            click: _smallerFonts
+        });
+        _createIcon({
+            id: 'ppw-camera-icon',
+            description: "Opens or closes your camera for the audience",
+            image: _createPPWSrcPath('_images/camera.png'),
+            click: _toggleCamera
+        });
+        _createIcon({
+            id: 'ppw-ct-thumbs',
+            description: "Show slides thumbnails",
+            image: _createPPWSrcPath('_images/thumbs.png'),
+            click: function(){ _showThumbs(); _closeToolbar(); }
+        });
+        _createIcon({
+            id: 'ppw-goto-icon',
+            description: "Go to a specific slide by its index",
+            image: _createPPWSrcPath('_images/goto.png'),
+            click: _showGoToComponent
+        });
+        _createIcon({
+            id: 'ppw-search-icon',
+            description: "Search through slides",
+            image: _createPPWSrcPath('_images/search.png'),
+            click: _showSearchBox
+        });
+    }
+
+
+    /**
+     * Adds an icon with its functionalities to the toolbar on top.
+     *
+     * @paran Object The icon data: {id, description, click[, className, content] }
+     * @return jQueryObject A reference to the created icon.
+     */
+    var _createIcon= function(iconData, v){
+
+        var toolBar= _getAndCache(v? '#ppw-toolbar-v': '#ppw-toolbar-h'),
+            d= 0,
+            /*specialStyle= v? '-webkit-transition-delay: '+iconData.delay+'; '+
+                             '-moz-transition-delay: '+iconData.delay+'; '+
+                             'transition-delay: '+iconData.delay+ '; ': '',*/
+            icon= $('<span id="ppw-toolbaricon-'+iconData.id+'"\
+                        class="ppw-icon ppw-clickable '+(iconData.className||'')+'" \
+                        alt="'+iconData.description+'" \
+                        title="'+iconData.description+'" \
+                        style="'+(iconData.image? 'background-image: url('+iconData.image+');': '')+'">\
+                        '+(iconData.content||'')+'</span>');
+        if(v){
+            toolBar.prepend(icon);
+        }else{
+            toolBar.append(icon);
+        }
+
+        d= (_conf.toolbarIcons[v?'v': 'h'].length * 0.05)+'s';
+        d= 'all 0.3s linear '+d;
+        // adding a small delay
+        icon.css({
+                '-webkit-transition': d,
+                '-moz-transition': d,
+                'transition': d,
+        });
+
+        if(typeof iconData.click == 'function'){
+            //icon.bind('click', iconData.click);
+            $('#ppw-toolbaricon-'+iconData.id).live('click', function(evt){
+                /*$('.ppw-icon').removeClass('active');
+                $(this).addClass('active');*/
+                iconData.click(evt);
+            });
+        }
+
+        _conf.toolbarIcons[v?'v': 'h'].push(iconData);
+        return icon;
+    };
+
     /**************************************************
      *                  CONSTRUCTOR                   *
      **************************************************/
@@ -4384,7 +4791,6 @@ window.PPW = (function ($, _d, console){
         (function(a){if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(a)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0,4))) isMobile= true})(navigator.userAgent||navigator.vendor||window.opera);
         _conf.isMobile= isMobile;
 
-
         _createSplashScreen();
 
         if(!_isInPrintableVersion()){
@@ -4392,6 +4798,13 @@ window.PPW = (function ($, _d, console){
             _goToSlide(_conf.currentSlide);
         }else{
             _goToSlide(0);
+        }
+
+        if(!_isInPrintableVersion()){
+            _bindEvents();
+        }else{
+            _triggerEvent('onthemeloaded', _settings.themeSettings);
+            $('#ppw-lock-loading').hide();
         }
 
         _initRemoteService();
@@ -4427,7 +4840,7 @@ window.PPW = (function ($, _d, console){
         showWarning                     : _showWarning,
         showWarn                        : _showWarning,
         showError                       : _showError,
-        toggleCamera                    :  function(){ if(_conf.showingCamera) _pauseCamera(); else _startCamera(); },
+        toggleCamera                    :  _toggleCamera,
         addListener                     : _addListener,
         removeListener                  : _removeListener,
         triggerPresentationToolLoadEvent: _triggerPresentationToolLoadEvent,
@@ -4473,7 +4886,8 @@ window.PPW = (function ($, _d, console){
         Facebook                        : true,
         Google                          : true,
         pushState                       : _pushState,
-        getPPWPath                      : _getPPWPath
+        getPPWPath                      : _getPPWPath,
+        createIcon                      : _createIcon
     };
 
 })(window.jQuery, document, window.console);

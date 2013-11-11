@@ -260,7 +260,7 @@ PPW.animate("selector", "animation", {options: values});</pre>
             Example:
             <pre class="sh_javascript">
 PPW.addAction({
-    timing: auto,
+    timing: 'auto',
     does: function(){
               PPW.animate("#slide-animations-eg",
                   "pulse",
@@ -287,7 +287,7 @@ PPW.addAction({
 
             <script>
                 PPW.addAction({
-                    timing: auto,
+                    timing: 'auto',
                     does: function(){
 
                               PPW.animate("#slide-animations-eg",
@@ -416,11 +416,20 @@ $ sudo node run.js</pre>
 
         <script>
             PPW.init({
+                title: "Tutorial for Power Polygon",
+                description: "A tutorial to introduce Power Polygon to new users.",
+                authors: [
+                    {
+                        name: "Felipe N. Moura",
+                        email: "felipenmoura@gmail.com",
+                        link: "http://felipenmoura.org"
+                    }
+                ],
                 theme: 'thm-simple',
                 transition: 'trans-zooming',
                 languages: ['EN', 'PT'],
                 defaultLanguage: 'EN',
-                useSplashScreen: false,
+                useSplashScreen: true,
                 profile: 'noExtra',
                 //mode: 'page',
                 /*themeSettings: {

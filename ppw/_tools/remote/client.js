@@ -40,7 +40,7 @@ $(document).ready(function(){
                       </div>\
                   </li>";
         return str;
-    }
+    };
 
     var buildLists= function(callback){
         // mounting the screen

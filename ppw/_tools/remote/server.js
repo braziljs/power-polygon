@@ -8,6 +8,7 @@ PPW.remote= (function(){
         _io= null,
         _status= 'offline',
         _lastState= window.sessionStorage.getItem('lastRemoteControlState')||'off',
+        _toolbarIcon= null,
         _canvasState= null,
         _canvas= null,
         _ctx= null,
@@ -61,8 +62,6 @@ PPW.remote= (function(){
 
     var _clearCanvas= function(){
 
-        /*var w= _canvas.width,
-            h= _canvas.height;*/
         if(_ctx)
             _ctx.clearRect(0, 0, 4000, 3500);
 
@@ -176,9 +175,6 @@ PPW.remote= (function(){
 
                 _clearCanvas();
                 _ctx.fill();
-                //_ctx.lineWidth = 2;
-                //_ctx.strokeStyle = '#003300';
-                //_ctx.stroke();
             break;
             case 'clear':
                 _canvasCurrentDrawState.type= _canvasState.type;
@@ -187,7 +183,6 @@ PPW.remote= (function(){
         };
         if(conf)
             _hideCanvas();
-        //_canvasIterator= setTimeout(_drawOnCanvas, 120);
     };
 
     var _setCanvasState= function(o){
@@ -219,7 +214,7 @@ PPW.remote= (function(){
 
         _socket.on('control-command', function(command){
 
-            console.log(command);
+            //console.log(command);
 
             if(_status != 'online'){
                 return;
@@ -281,10 +276,6 @@ PPW.remote= (function(){
                     PPW.setProfile(command.data.profile);
                 break;
             }
-            /*if(command.data &&
-                (command.data.curSlide != PPW.getCurrentSlide().index)){
-                PPW.goToSlide(command.data.curSlide);
-            }*/
         });
 
     };
@@ -305,11 +296,22 @@ PPW.remote= (function(){
     };
 
     var _setAsOffline= function(){
-        $('#ppw-remote-icon').attr('src', PPWSrc+"/_images/remote-conection-status-off.png").attr('title', 'Server available, click to connect');
+        //$('#ppw-remote-icon').attr('src', PPWSrc+"/_images/remote-conection-status-off.png").attr('title', 'Server available, click to connect');
+        if(_toolbarIcon){
+            _toolbarIcon.setAttribute('title', 'Server available, click to connect');
+            _toolbarIcon.setAttribute('rule', 'offline');
+        }
+        /*$('#ppw-toolbaricon-ppw-settings-icon').attr('title', 'Server available, click to connect')
+                                               .attr('rule', 'offline');*/
         _status= 'available';
     }
     var _setAsOnline= function(){
-        $('#ppw-remote-icon').attr('src', PPWSrc+"/_images/remote-conection-status-on.png").attr('title', 'Connected/listening - click to disconnect');
+        //$('#ppw-remote-icon').attr('src', PPWSrc+"/_images/remote-conection-status-on.png").attr('title', 'Connected/listening - click to disconnect');
+        if(_toolbarIcon){
+            _toolbarIcon.setAttribute('title', 'Connected/listening - click to disconnect');
+            _toolbarIcon.setAttribute('rule', 'online');
+
+        }
         _socket.emit('listening',
                      location.pathname.replace('/index.html', '')
                                       .replace(/\/$/, '')
@@ -318,7 +320,13 @@ PPW.remote= (function(){
         _status= 'online';
     }
     var _setAsNoServer= function(){
-        $('#ppw-remote-icon').attr('src', PPWSrc+"/_images/remote-conection-status-no-server.png").attr('title', 'No server available');
+        //$('#ppw-remote-icon').attr('src', PPWSrc+"/_images/remote-conection-status-no-server.png").attr('title', 'No server available');
+        if(_toolbarIcon){
+            _toolbarIcon.setAttribute('title', 'No server available');
+            _toolbarIcon.setAttribute('rule', 'no-server');
+        }
+        /*$('#ppw-toolbaricon-ppw-settings-icon').attr('title', 'No server available')
+                                               .attr('rule', 'no-server');*/
         _status= 'offline';
     }
 
@@ -334,6 +342,8 @@ PPW.remote= (function(){
         _conf= conf,
         PPWSrc= src;
         _b= document.body;
+
+        _toolbarIcon= document.getElementById('ppw-toolbaricon-ppw-remote-icon');
 
         if(!_settings.remote.server){
             _settings.remote.server= location.protocol+'//'+location.host;
