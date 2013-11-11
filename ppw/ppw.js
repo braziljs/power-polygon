@@ -2734,7 +2734,6 @@ window.PPW = (function ($, _d, console){
 //            _loadScript(_createPPWSrcPath('/_scripts/intro.js'), true, function(){_setLoadingBarStatus('IntroJS.js');});
 //            _loadStyle(_createPPWSrcPath('/_styles/introjs.css'), true, function(){_setLoadingBarStatus('IntroJS.css');}, true);
             //_w.localStorage.setItem('ppw-newDesignIntroduction', true);
-
         }
         
         _loadScript(_createPPWSrcPath('/_scripts/intro.js'), true, function(){
