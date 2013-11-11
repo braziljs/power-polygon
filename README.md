@@ -9,6 +9,19 @@ Watch the Video:<br/>
 ![Video - meet Power Polygon](http://i4.ytimg.com/vi/oZIvKOCDvus/mqdefault.jpg)
 </a>
 
+### Quick docs
+To use it, just unzip it(or clone it) under a server(like apache) and access it in your browser.
+But, if you want to use all the tools, you can use nodejs by running, in the unziped(or cloned) directory:
+
+`$ npm install`
+
+A token will be asked, type a word that you will not forget very easily.
+Then, to run it, all you gotta do is:
+
+`$ sudo node run.js`
+
+Done, now, access <a href='http://localhost:8081/'>http://localhost:8081/</a>.
+To create your talk, check the documentation below.
 
 ### Documentation
 For detailed information and documentation, please read the wiki:

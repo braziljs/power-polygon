@@ -1,0 +1,18 @@
+{
+    "name": "thm-powerpolygon",
+    "type": "theme",
+    "dependencies": {
+        "css": [
+            "styles/default.css",
+            "styles/scrollpath.css"
+            
+        ],
+        "js": [
+            
+            "scripts/default.js",
+            "scripts/jquery.scrollpath.js",
+            "scripts/jquery.easing.js"
+
+        ]
+    }
+}

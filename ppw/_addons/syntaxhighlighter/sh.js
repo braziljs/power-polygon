@@ -1,9 +1,9 @@
 window.PPW.extend("sh", (function(){
-    
+
     var ppw= null,
         hlToLoad= {},
-        theme= 'sh_nedit';
-    
+        theme= 'sh_'+'bright';
+
     var validSH= [
         'sh_bison',
         'sh_c',
@@ -45,91 +45,213 @@ window.PPW.extend("sh", (function(){
         'sh_xml',
         'sh_xorg'
     ]
-    
+
     var _init= function(_ppw){
-        ppw= _ppw;
+
     };
-    
-    var _apply= function(){
-        
-        var sCodes= [ppw.PPWSrc+'/_addons/syntaxhighlighter/shjs.js'];
-        
-        $('pre').each(function(){
-            var classes= this.className.split(' '),
-            i= classes.length-1;
-            
-            do{
-                if(validSH.indexOf(classes[i])>=0){
-                    
-                    this.innerHTML= "<ol type='1' class='ppw-sh-source-container ppw-clickable'>"+
-                                    this.innerHTML.replace(/</g, "&lt;")
-                                                  .replace(/^/gm, "<li class='ppw-sh-line'><div>")
-                                                  .replace(/$/gm, "<br/></div></li>") +
-                                    "</ol>";
-                    
-                    if(!hlToLoad[classes[i]]){
-                        hlToLoad[classes[i]]= true;
-                        sCodes.push(ppw.PPWSrc+'/_addons/syntaxhighlighter/lang/'+classes[i]+".js");
-                    }
-                    break;
+
+    var _changed= function(evt, that){
+        var oEl= (that || this),
+            el= $(oEl);
+        PPW.lock();
+        el.attr('contenteditable', false);
+        el.html(el.html().replace(/\<div\>/ig, "<br/>"));
+        _applyTo(oEl, true);
+        oEl.blur();
+        el.removeClass('ppw-sh-editing');
+        setTimeout(PPW.unlock, 500);
+    }
+
+    var _applyTo= function (el, apply){
+        var classes= el.className.split(' '),
+            i= classes.length-1,
+            sCodes= [],
+            oSrc= "",
+            brush= null;
+
+        do{
+            if(validSH.indexOf(classes[i])>=0){
+
+                $(el).data('original-content', _getRawContent(el))
+                     .removeClass('sh_sourceCode');
+
+                el.innerHTML= "<ol type='1' class='ppw-sh-source-container ppw-clickable'>"+
+                                  $(el).data('original-content').replace(/</g, "&lt;")
+                                              .replace(/^/gm, "<li class='ppw-sh-line'><div>")
+                                              .replace(/$/gm, "<br/></div></li>") +
+                              "</ol>";
+
+                brush= classes[i];
+                if(!hlToLoad[brush]){
+                    hlToLoad[brush]= true;
+                    sCodes.push(PPW.getPPWPath()+'/_addons/syntaxhighlighter/lang/'+brush+".js");
+                    $(el).data('brush', brush);
                 }
-            }while(i--);
+
+                if(apply){
+                    /* changed the sh_highlightDocument method to work with a
+                     * given element, once it looks like the sh_highlightElement
+                     * method is not working properly!
+                     */
+                    oSrc= $(el).text();
+                    sh_highlightDocument(null, null, [el]);
+                    ppw.triggerEvent('onsourcecodechangeend',
+                                     {
+                                         element: el,
+                                         sourceCode: oSrc,
+                                         brush: brush
+                                     });
+                }
+
+                break;
+            }
+        }while(i--);
+
+        return sCodes;
+    }
+
+    var _getRawContent= function(el){
+
+        var ret= "";
+        el= $(el);
+
+        ret= (el.data('original-content') || el.html())
+                .replace(/\<(\/)?(div|span|blockquote)([ a-z\_\-\.0-9]+)?\>/ig, '')
+                .replace(/\<br(\/)?>/ig, "\n");
+
+        return ret;
+    };
+
+    var _applyCSSElements= function(){
+
+        $('style.sh_css').each(function(){
+            var el= $(this),
+                classes= this.className.split(" ");
+
+            el.after("<pre class='sh_css "+classes.join(' ')+"'>"+el.html()+"</pre>")
+              .bind('click', function(){alert(0)});
+            el.next().bind('keyup', function(){
+                el.html(_getRawContent(this));
+            });
         });
-        
+
+    }
+
+    var _apply= function(){
+
+        var sCodes= [PPW.getPPWPath()+'/_addons/syntaxhighlighter/shjs.js'];
+
+        _applyCSSElements();
+        ppw.createListener("onsourcecodechange");
+        ppw.createListener("onsourcecodechangeend");
+
+        $('pre').each(function(){
+            sCodes= sCodes.concat(_applyTo(this));
+        });
+
         $.getScript(
             sCodes,
             function(){
                 console.log("[PPW Addon] Syntax Highlighter being applied");
                 sh_highlightDocument();
-        });
-        
+
+                $('.ppw-sh-editable').bind('dblclick', function(){
+                    var el = $(this);
+
+                    if(el.attr('contenteditable') == true){
+                        return;
+                    }
+
+                    el.html(_getRawContent(el))
+                      .attr('contenteditable', true)
+                      .addClass('ppw-clickable')
+                      .addClass('ppw-sh-editing');
+                    el[0].focus();
+                    $(el).data('original-content', false);
+
+                }).bind('keydown', function(evt){
+
+                    if($(this).attr('contenteditable') != 'true'){
+                        return true;
+                    }
+
+                    switch(evt.keyCode){
+                        case 9: // TAB
+                            document.execCommand('InsertHTML', false, "    ");
+                            evt.preventDefault();
+                        break;
+                        case 27: // ESC
+                            _changed(evt, this);
+                        break;
+                        case 13: // ENTER
+                            if(evt.ctrlKey || evt.metaKey)
+                                _changed(evt, this);
+                        break;
+                    }
+
+                    ppw.triggerEvent('onsourcecodechange',
+                                     {
+                                         element: this,
+                                         sourceCode: $(this).text(),
+                                         brush: $(this).data('brush'),
+                                         evt: evt
+                                     });
+
+                }).bind('blur', _changed);
+            }
+        );
+
         PPW.sh= {
             focus: function(el, lines){
-                
+
                 var i= 0, list= null;
-                
+
                 el= $(el);
-                
+
                 list= el.find('.ppw-sh-line');
                 list.removeClass('ppw-sh-focused-line');
-                
+
                 if(!lines){
                     el.removeClass('ppw-sh-focused-lines');
                     return true;
                 }
-                
+
                 el.addClass('ppw-sh-focused-lines');
-                
+
                 if(!lines.length)
                     lines= [lines];
-                
+
                 for(; i<lines.length; i++){
                     list.eq(lines[i]-1).addClass('ppw-sh-focused-line');
                 }
             }
         };
-        
+
     };
-    
+
     var _themeLoaded= function(settings){
-        theme= settings.shTheme||theme;
-        
+
+        theme= settings && settings.shTheme? settings.shTheme: theme;
+
         $("<link/>", {
             rel: "stylesheet",
             type: "text/css",
-            href: ppw.PPWSrc+"/_addons/syntaxhighlighter/css/"+theme+'.css'
+            href: PPW.getPPWPath()+"/_addons/syntaxhighlighter/css/"+theme+'.css'
          }).appendTo("head");
         $("<link/>", {
             rel: "stylesheet",
             type: "text/css",
-            href: ppw.PPWSrc+"/_addons/syntaxhighlighter/sh.css"
+            href: PPW.getPPWPath()+"/_addons/syntaxhighlighter/sh.css"
          }).appendTo("head");
     };
-    
+
     return {
         onload: _init,
         onslidesloaded: _apply,
-        onthemeloaded: _themeLoaded
+        onthemeloaded: _themeLoaded,
+        onextend: function(_ppw){
+            ppw= _ppw;
+        }
     };
-    
+
 })());

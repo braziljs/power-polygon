@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Power Polygon - Basic remote control</title>
+        
+        <script src="/ppw/_scripts/jquery-1.8.2.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="../control.js"></script>
+        
+        <link type="text/css" href="style.css" rel="stylesheet" />
+        <link type="text/css" href="/ppw/_styles/font-awesome.min.css" rel="stylesheet" />
+        
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+        
+    </head>
+    <body>
+        <canvas id="canvas"></canvas>
+        
+        <div id="basic-pointer"></div>
+        
+        <div id="annotations-container"></div>
+        <nav id="buttons-container">
+            <ul class="nav">
+                <li id="btn-toggle-camera">
+                  <a href="#">
+                    <span class="btn-icon icon-facetime-video"></span>
+                    <span class="screen-reader-text">Toggle Camera</span>
+                  </a>
+                </li>
+                <li id="btn-previous-slide">
+                  <a href="#">
+                    <span class="btn-icon icon-chevron-left"></span>
+                    <span class="screen-reader-text">Previous slide</span>
+                  </a>
+                </li>
+                <li id="btn-next-slide">
+                    <a href="#">
+                    <span class="btn-icon icon-chevron-right"></span>
+                    <span class="screen-reader-text">Next slide</span>
+                  </a>
+                </li>
+            </ul>
+        </nav>​
+    </body>
+    <script>
+        //alert(document.body.clientWidth)
+        //alert(document.body.clientHeight)
+    </script>
+</html>

@@ -1,0 +1,165 @@
+html, body{
+    height: 100%;
+    width: 100%;
+    font-family: Arial, Tahoma, sans-serif;
+}
+body{
+    margin: 0px;
+    padding: 0px;
+    overflow: hidden;
+}
+body.loaded{
+    background: url(/ppw/_images/power-polygon-logo-bg.png) no-repeat;
+    background-attachment: fixed;
+    background-position: bottom left;
+}
+body.loaded .body-container{
+    display: block !important;
+}
+*{
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+#opening{
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    background: url(/ppw/_images/ppw-gray-bg.png);
+}
+
+#opening .logo{
+    margin: auto;
+    margin-top: 20px;
+    width: 186px;
+    height: 178px;
+    background: url(/ppw/_images/power-polygon-logo.png) no-repeat;
+}
+#opening h1{
+    margin-top: 0px;
+}
+
+.body-container{
+    display: none;
+    position: relative;
+    margin: 4px;
+    margin-left: 6px;
+    height: 100%;
+    overflow: auto;
+}
+
+#demosList-container{
+    width: 100%;
+    clear: both;
+}
+
+#re-lock-interface{
+    display: none;
+}
+.talk-list{
+    list-style: none;
+    padding: 0px;
+    margin-top: 4px;
+}
+.talk-list li{
+    height: 38px;
+    cursor: default;
+    padding: 9px;
+    position: relative;
+    margin-bottom: 3px;
+    /*width: 50%;
+    float: left;*/
+    overflow: hidden;
+    white-space: nowrap;
+    padding-right: 150px;
+    border-top: dotted 1px #e0e0e0;
+}
+.talk-list li:hover{
+    background-color: #b6cfde;
+}
+.talk-butons{
+    margin-right: 18px;
+    height: 36px;
+    overflow: hidden;
+    position: absolute;
+    right: 0px;
+    top: 2px;
+    text-align: right;
+}
+
+.talk-butons a{
+    display: inline-block;
+    width: 36px;
+    height: 36px;
+    background-position: center center;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.talk-butons a:nth-child(1){
+    margin-right: 6px;
+    background-image: url(../../_images/presentation-ico.png);
+}
+.talk-butons a:nth-child(2){
+    display: none;
+    background-image: url(../../_images/remote-control-full.png);
+}
+.talk-butons a:nth-child(3){
+    display: none;
+    background-image: url(../../_images/remote-control-basic.png);
+}
+
+.talk-butons a:nth-child(3){
+    position: absolute;
+    left: -9000px;
+}
+/* if it is a small mobile device, it will not support full remote control */
+/*@media screen and (max-width: 460px){
+    .talk-butons a:nth-child(2){
+        position: absolute;
+        left: -9000px;
+    }
+    .talk-list li{
+        float: none;
+        width: 100%;
+    }
+}*/
+
+#unlock-interface, #re-lock-interface{
+    background-color: #e0e0e0;
+    min-height: 40px;
+    font-style: italic;
+    padding-top: 12px;
+    padding-left: 10px;
+    /*background: url(/ppw/_images/power-polygon-icon.png) no-repeat;*/
+}
+#unlock-interface img, #re-lock-interface img{
+    height: 38px;
+    cursor: pointer;
+    position: absolute;
+    top: 0px;
+    right: 26px;
+}
+
+#demosList{
+    background-color: #fcefa1;
+    background-color: rgba(250, 236, 160, 0.7);
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+.links{
+    background-color: #e0e0e0;
+    min-height: 40px;
+    padding-top: 6px;
+    line-height: 30px;
+    text-align: center;
+}
+.links a{
+    white-space: nowrap;
+    margin: 0px 10px 0px 10px;
+    color: #444;
+    text-decoration: none;
+}

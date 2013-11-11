@@ -1,0 +1,282 @@
+html, body{
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    margin: 0px;
+}
+*{
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+
+body{
+    background: rgb(30,87,153); 
+    background: -moz-linear-gradient(-45deg, rgba(30,87,153,1) 0%, rgba(41,137,216,1) 50%, rgba(32,124,202,1) 51%, rgba(125,185,232,1) 100%); 
+    background: -webkit-gradient(linear, left top, right bottom, color-stop(0%,rgba(30,87,153,1)), color-stop(50%,rgba(41,137,216,1)), color-stop(51%,rgba(32,124,202,1)), color-stop(100%,rgba(125,185,232,1)));
+    background: -webkit-linear-gradient(-45deg, rgba(30,87,153,1) 0%,rgba(41,137,216,1) 50%,rgba(32,124,202,1) 51%,rgba(125,185,232,1) 100%); 
+    background: -o-linear-gradient(-45deg, rgba(30,87,153,1) 0%,rgba(41,137,216,1) 50%,rgba(32,124,202,1) 51%,rgba(125,185,232,1) 100%);
+    background: -ms-linear-gradient(-45deg, rgba(30,87,153,1) 0%,rgba(41,137,216,1) 50%,rgba(32,124,202,1) 51%,rgba(125,185,232,1) 100%);
+    background: linear-gradient(135deg, rgba(30,87,153,1) 0%,rgba(41,137,216,1) 50%,rgba(32,124,202,1) 51%,rgba(125,185,232,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#1e5799', endColorstr='#7db9e8',GradientType=1 );
+
+/*background: rgb(184,225,252);
+background: -moz-linear-gradient(-45deg, rgba(184,225,252,1) 0%, rgba(169,210,243,1) 10%, rgba(144,186,228,1) 25%, rgba(144,188,234,1) 37%, rgba(144,191,240,1) 50%, rgba(107,168,229,1) 51%, rgba(162,218,245,1) 83%, rgba(189,243,253,1) 100%);
+background: -webkit-gradient(linear, left top, right bottom, color-stop(0%,rgba(184,225,252,1)), color-stop(10%,rgba(169,210,243,1)), color-stop(25%,rgba(144,186,228,1)), color-stop(37%,rgba(144,188,234,1)), color-stop(50%,rgba(144,191,240,1)), color-stop(51%,rgba(107,168,229,1)), color-stop(83%,rgba(162,218,245,1)), color-stop(100%,rgba(189,243,253,1)));
+background: -webkit-linear-gradient(-45deg, rgba(184,225,252,1) 0%,rgba(169,210,243,1) 10%,rgba(144,186,228,1) 25%,rgba(144,188,234,1) 37%,rgba(144,191,240,1) 50%,rgba(107,168,229,1) 51%,rgba(162,218,245,1) 83%,rgba(189,243,253,1) 100%);
+background: -o-linear-gradient(-45deg, rgba(184,225,252,1) 0%,rgba(169,210,243,1) 10%,rgba(144,186,228,1) 25%,rgba(144,188,234,1) 37%,rgba(144,191,240,1) 50%,rgba(107,168,229,1) 51%,rgba(162,218,245,1) 83%,rgba(189,243,253,1) 100%);
+background: -ms-linear-gradient(-45deg, rgba(184,225,252,1) 0%,rgba(169,210,243,1) 10%,rgba(144,186,228,1) 25%,rgba(144,188,234,1) 37%,rgba(144,191,240,1) 50%,rgba(107,168,229,1) 51%,rgba(162,218,245,1) 83%,rgba(189,243,253,1) 100%);
+background: linear-gradient(135deg, rgba(184,225,252,1) 0%,rgba(169,210,243,1) 10%,rgba(144,186,228,1) 25%,rgba(144,188,234,1) 37%,rgba(144,191,240,1) 50%,rgba(107,168,229,1) 51%,rgba(162,218,245,1) 83%,rgba(189,243,253,1) 100%);
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#b8e1fc', endColorstr='#bdf3fd',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+}
+
+#presentation-iframe, #canvas, #buttons-container,
+#buttons-container .nav{
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    height: 100%;
+    width: 100%;
+}
+
+#presentation-iframe{
+    z-index: 1;
+}
+#canvas{
+    z-index: 2 !important;
+}
+
+#annotations-container{
+    position: absolute;
+    left: 50%;
+    bottom: 0px;
+    width: 70%;
+    height: 0px;
+    overflow: auto;
+    margin-left: -35%;
+    background-color: rgba(255, 255, 255, 0.95);
+    color: #555;
+    z-index: 6;
+    font-size: 2em;
+    line-height: 2.4em;
+    
+    -webkit-transition: height 300ms linear;
+    -moz-transition: height 300ms linear;
+    transition: height 300ms linear;
+}
+
+/* BUTTONS */
+#buttons-container{
+    z-index: 5 !important;
+}
+#btn-back{
+    
+}
+
+#btn-toggle-camera{
+    position: absolute;
+    top: -70px;
+    right: -60px;
+}
+#btn-next-slide{
+    position: absolute;
+    bottom: 6px;
+    right: 0px;
+}
+#btn-previous-slide{
+    position: absolute;
+    bottom: 6px;
+    left: 0px;
+}
+#btn-annotations{
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    margin: 0px;
+    margin-left: -110px;
+}
+#btn-annotations a{
+    margin-bottom: 0px;
+    border-radius: 20px 20px 0px 0px;
+    height: 80px;
+    
+    -webkit-transition: bottom 300ms linear;
+    -moz-transition: bottom 300ms linear;
+    transition: bottom 300ms linear;
+    
+}
+#btn-annotations a span{
+    margin: 0px;
+    line-height: 122px !important;
+}
+#btn-annotations a:before{
+    display: none;
+}
+#btn-annotations a span:before{
+    position: relative;
+    top: -12px;
+}
+
+
+
+
+
+
+
+
+
+/* buttons styles (inspired by http://codepen.io/chriscoyier/pen/ctugI) */
+.screen-reader-text {
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
+}
+
+.btn-icon {
+    line-height: 150px !important;
+    font-size: 3em;
+}
+
+html {
+  background: #f7f7f7 url(http://css-tricks.com/examples/RoundButtons/images/bg.png) repeat center top;
+}
+
+.nav {
+  list-style: none;
+  text-align: center;
+}
+
+.nav li {
+  position: relative;
+  display: inline-block;
+  margin-right: -4px;
+}
+
+.nav a:link, .nav a:visited {
+  display: block;
+  text-decoration: none;
+  background-color: #f7f7f7;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#f7f7f7), to(#e7e7e7));
+  background-image: -webkit-linear-gradient(top, #f7f7f7, #e7e7e7); 
+  background-image: -moz-linear-gradient(top, #f7f7f7, #e7e7e7); 
+  background-image: -ms-linear-gradient(top, #f7f7f7, #e7e7e7); 
+  background-image: -o-linear-gradient(top, #f7f7f7, #e7e7e7); 
+  color: #a7a7a7;
+  margin: 36px;
+  width: 144px;
+  height: 144px;
+  position: relative;
+  text-align: center;
+  line-height: 144px;
+  border-radius: 50%;
+  box-shadow: 0px 3px 8px #aaa, inset 0px 2px 3px #fff;
+  border: solid 1px transparent;
+}
+
+.nav a:before {
+  content: "";
+  display: block;
+  /*background: #fff;*/
+  border-top: 2px solid #ddd;
+  position: absolute;
+  top: -18px;
+  left: -18px;
+  bottom: -18px;
+  right: -18px;
+  z-index: -1;
+  border-radius: 50%;
+  box-shadow: inset 0px 8px 48px #ddd;
+}
+
+.nav a:active {
+  box-shadow: none;
+  border: solid 1px #a7a7a7;
+  
+  font-size: 0.9em;
+}
+
+
+@media screen and (max-width: 319px){
+    .nav a:link, .nav a:visited {
+        width: 90px;
+        height: 90px;
+        padding-top: 0px;
+    }
+    .icon-facetime-video:before{
+        content: "C" !important;
+        position: absolute;
+        top: -30px !important;
+        left: -4px !important;
+        width: 100%;
+        font-weight: bold;
+        font-family: Arial, Tahoma, sans-serif;
+    }
+    .icon-chevron-right:before{
+        content: ">" !important;
+        font-weight: bold;
+        position: absolute;
+        width: 100%;
+        top: -30px !important;
+        left: 4px;
+    }
+    .icon-chevron-left:before{
+        content: "<" !important;
+        font-weight: bold;
+        position: absolute;
+        width: 100%;
+        top: -30px !important;
+        left: 4px;
+    }
+}
+
+@media screen and (max-height: 239px){
+    .nav a:link, .nav a:visited {
+        width: 90px;
+        height: 90px;
+        padding-top: 0px;
+    }
+    .icon-facetime-video:before{
+        content: "C" !important;
+        position: absolute;
+        top: -30px !important;
+        left: -4px !important;
+        width: 100%;
+        font-weight: bold;
+        font-family: Arial, Tahoma, sans-serif;
+    }
+    #btn-next-slide{
+        left: 140px !important;
+    }
+    .icon-chevron-right:before{
+        content: ">" !important;
+        font-weight: bold;
+        position: absolute;
+        width: 100%;
+        top: -30px !important;
+        left: 4px;
+    }
+    .icon-chevron-left:before{
+        content: "<" !important;
+        font-weight: bold;
+        position: absolute;
+        width: 100%;
+        top: -30px !important;
+        left: 4px;
+    }
+}
+
+.nav a:hover {
+  text-decoration: none;
+  color: #555;
+  background: #f5f5f5;
+}
+
+#basic-pointer{
+    position: absolute;
+    left: 20px;
+    top: 10px;
+    width: 20px;
+    height: 20px;
+    background: red;
+    border-radius: 50%;
+    z-index: 999999;
+}

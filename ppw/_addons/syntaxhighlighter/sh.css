@@ -3,7 +3,7 @@
     padding: 0px !IMPORTANT;
     list-style-position: inside;
     white-space: nowrap;
-    
+
     counter-reset: item;
     overflow: hidden;
 }
@@ -15,6 +15,10 @@ pre.no-numbers .ppw-sh-source-container{
 }
 .ppw-sh-source-container li{
     background-color: white;
+}
+
+.sh_sourceCode{
+    text-align: left !IMPORTANT;
 }
 
 .ppw-sh-line:nth-child(1){
@@ -29,7 +33,7 @@ pre.no-numbers .ppw-sh-source-container{
     border: solid 1px rgba(100, 100, 100, 0.1);
     border-top: none;
     cursor: default;
-    
+
     position: relative;
     left: 2em;
     display: block;
@@ -64,9 +68,25 @@ pre:not(.no-numbers) .ppw-sh-focused-line:before{
     -ms-filter: blur(2px);
     filter: blur(2px);
     opacity: 0.7;
-    
+
     /*filter: url(#blur-effect-1);*/
 }
 pre.sh_sourceCode{
     background: transparent;
+}
+
+.ppw-sh-editing:focus{
+    outline: none !important;
+}
+.ppw-sh-editing{
+    margin-top: 18px;
+    margin-left: 14px;
+    border-left: solid 24px #eee;
+    background-color: white;
+    color: #444;
+    box-shadow: 4px 4px 20px #444;
+    line-height: 28px;
+}
+.ppw-sh-editable li{
+    cursor: text !important;
 }

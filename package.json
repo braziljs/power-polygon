@@ -1,0 +1,22 @@
+{
+  "name": "power-polygon",
+  "description": "The definitive Presentation tool, based on free open web technologies.",
+  "version": "0.0.1",
+  "author": "Felipe N. Moura<felipenmoura@gmail.com>",
+  "license": "MIT",
+  "repository": "http://github.com/braziljs/power-polygon",
+  "keywords": [
+      "talk",
+      "presentation",
+      "conference",
+      "html5",
+      "browser"
+  ],
+  "dependencies": {
+    "express": "*",
+    "socket.io": "0.9.13",
+    "grunt": "*",
+    "grunt-contrib-uglify": "*",
+    "sqlite3": "*"
+  }
+}

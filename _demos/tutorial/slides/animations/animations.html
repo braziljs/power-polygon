@@ -1,0 +1,29 @@
+<div class="anim1 LANG-EN">
+    The first animated guy!
+</div>
+<div class="anim1 LANG-PT"  id="umaCoisaQualquer">
+    O primeiro cara!
+</div>
+
+<span class="anim2">
+    The other happy element!
+</span>
+
+<script>
+    PPW.addAction({
+        does: function(){
+            PPW.animate('#animations .anim1', 'bounceOutRight');
+        },
+        undo: function(){
+            PPW.animate('#animations .anim1', 'bounceInRight');
+        }
+    });
+    PPW.addAction({
+        does: function(){
+            PPW.animate('#animations .anim2', 'hinge');
+        },
+        undo: function(){
+            PPW.animate('#animations .anim2', 'fadeIn');
+        }
+    });
+</script>
