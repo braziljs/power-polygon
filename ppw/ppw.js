@@ -2725,14 +2725,29 @@ window.PPW = (function ($, _d, console){
 
         _b= _d.body;
         $b= $(_b);
+        var intro= _w.localStorage.getItem('ppw-newDesignIntroduction');
+        intro= !intro;
 
-        if(!localStorage.getItem('ppw-newDesignIntroduction')){
+        if(intro){
             _settings.useToolBar= true;
             _settings.useSplashScreen= true;
-            _loadScript(_createPPWSrcPath('/_scripts/intro.js'), true, function(){_setLoadingBarStatus('IntroJS.js');});
-            _loadStyle(_createPPWSrcPath('/_styles/introjs.css'), true, function(){_setLoadingBarStatus('IntroJS.css');}, true);
+            //window.localStorage.setItem('ppw-newDesignIntroduction', false);
             //_conf.loadSteps+= 2;
         }
+        
+        _loadScript(_createPPWSrcPath('/_scripts/intro.js'), true, function(){
+            introJs().setOptions({
+                skipLabel: 'Exit',
+                tooltipPosition: 'top',
+                showStepNumbers: false,
+                exitOnOverlayClick: false,
+                exitOnEsc: true
+            });
+            _setLoadingBarStatus('IntroJS.js');
+        });
+        _loadStyle(_createPPWSrcPath('/_styles/introjs.css'), true, function(){
+            _setLoadingBarStatus('IntroJS.css');
+        }, true);
 
         _preparePPW();
 
@@ -2763,40 +2778,6 @@ window.PPW = (function ($, _d, console){
                                 .replace(/\{\{clickableClass\}\}/g, _conf.cons.CLICKABLE_ELEMENT)
                                 .replace(/\{\{likeSrc\}\}/g, _l.protocol+'//'+(_l.host == 'localhost'? 'powerpolygon.com': _l.host)+''+_l.pathname);
             $b.append(tpl);
-
-            // setting images to the icons on the toolbar and their behaviour
-            /*$('#ppw-goto-icon').attr('src', _createPPWSrcPath('/_images/goto.png'))
-                               .addClass(_conf.cons.CLICKABLE_ELEMENT)
-
-            $('#ppw-toolbox-icon').attr('src', _createPPWSrcPath('/_images/toolbox.png'))
-                                  .addClass(_conf.cons.CLICKABLE_ELEMENT);
-
-            $('#ppw-search-icon').attr('src', _createPPWSrcPath('/_images/search.png'))
-                                 .addClass(_conf.cons.CLICKABLE_ELEMENT);
-
-            $('#ppw-fullscreen-icon').attr('src', _createPPWSrcPath('/_images/fullscreen.png'))
-                                     .addClass(_conf.cons.CLICKABLE_ELEMENT);
-
-            $('#ppw-camera-icon').attr('src', _createPPWSrcPath('/_images/camera.png'))
-                                 .addClass(_conf.cons.CLICKABLE_ELEMENT);
-
-            if(_settings.remote && _settings.remote.useButton !== false){
-                $('#ppw-remote-icon').attr('src', _createPPWSrcPath('/_images/remote-conection-status-no-server.png'))
-                                     .addClass(_conf.cons.CLICKABLE_ELEMENT);
-            }else{
-                $('#ppw-remote-icon').parent().hide();
-            }
-
-            $('#ppw-settings-icon').attr('src', _createPPWSrcPath('/_images/settings-icon.png'))
-                                   .addClass(_conf.cons.CLICKABLE_ELEMENT);
-
-            $('#ppw-ct-thumbs').attr('src', _createPPWSrcPath('/_images/thumbs.png'))
-                               .addClass(_conf.cons.CLICKABLE_ELEMENT);
-
-            $('#ppw-ct-print').attr('src', _createPPWSrcPath('/_images/print.png'))
-                               .addClass(_conf.cons.CLICKABLE_ELEMENT);
-            */
-
             _createDefaultIcons();
         }
 
@@ -2850,6 +2831,110 @@ window.PPW = (function ($, _d, console){
 
                 _triggerEvent('onsplashscreen', _d.getElementById('ppw-addons-container'));
 
+                if(intro){
+                    $('#ppw-toolbar-trigger-btn').attr('data-intro', "<strong>Meet the new design</strong><br/>Now, the toolbar is hidden down here!<br/>Hover it to see the toolbar trigger button and show the toolbar.")
+                                                 .attr('data-position', 'top')
+                                                 .attr('data-step', 1);
+                    $('#ppw-toolbaricon-ppw-settings-icon').attr('data-intro', '<strong>Settings and properties</strong><br/>Use this item to see and change the settings and presentation properties')
+                                                           .attr('data-position', 'right')
+                                                           .attr('data-step', 2);
+                    $('#ppw-toolbaricon-ppw-remote-icon')  .attr('data-intro', '<strong>Remote Control</strong><br/>When available, use it to enable or disable the remote control.<br/>You can use your cellphone to pass slides or even draw or point on your presentation.')
+                                                           .attr('data-position', 'right')
+                                                           .attr('data-step', 3);
+                    $('#ppw-toolbaricon-ppw-toolbox-icon') .attr('data-intro', '<strong>Presentation Tools</strong><br/>You can keep these tools in a different screen, when giving your talk.')
+                                                           .attr('data-position', 'right')
+                                                           .attr('data-step', 4);
+                    $('#ppw-toolbaricon-ppw-ct-text-big')  .attr('data-intro', '<strong>Font sizes</strong><br/>Increase or decrease the size of texts in your slides easily')
+                                                           .attr('data-position', 'top')
+                                                           .attr('data-step', 5);
+                    $('#ppw-toolbaricon-ppw-camera-icon')  .attr('data-intro', '<strong>Toggle your camera</strong><br/>You can use it to toggle on and off your camera, showing it to the audience.<br/>You can then maximize the camera, adjust its size or drag it around')
+                                                           .attr('data-position', 'top')
+                                                           .attr('data-step', 6);
+                    $('#ppw-toolbaricon-ppw-ct-thumbs')    .attr('data-intro', '<strong>See thumbs and go-to</strong><br/>With these tools, you cansee the thumbnails of your slides and then jump to the one you want, or see the list and type to filter it and go to the right slide')
+                                                           .attr('data-position', 'top')
+                                                           .attr('data-step', 7);
+                    $('#ppw-toolbaricon-ppw-search-icon')  .attr('data-intro', '<strong>Search into slides</strong><br/>Search for a given term inside your slides.<br/>Use <em>Enter</em> to search forward and <em>Shift+Enter</em> to search backwards.')
+                                                           .attr('data-position', 'top')
+                                                           .attr('data-step', 8);
+                    $('#ppw-talk-title-container .bottom') .attr('data-intro', '<strong>Talk data</strong><br/>Information about your talk, like title, description and authors.')
+                                                           .attr('data-position', 'bottom')
+                                                           .attr('data-step', 9);
+                    $('#ppw-tests')                        .attr('data-intro', '<strong>Tests and plugins</strong><br/>Basic tests come here. Also, plugins can be loaded to add functionalities to Power Polygon and they triggers may be added here.')
+                                                           .attr('data-position', 'top')
+                                                           .attr('data-step', 10);
+                    $('.ppw-menu-start-icon')              .attr('data-intro', '<strong>Done!</strong><br/>Great!<br/>You are good to go and have fun!')
+                                                           .attr('data-position', 'top')
+                                                           .attr('data-step', 11);
+
+                    setTimeout(function(){
+                        var itemsIntroduced= 0;
+
+                        var showIntroToEl= function(step){
+                            switch(step){
+                                case 0:
+                                    _closeMessage();
+                                    break
+                                case 1:
+                                    _showConfiguration();
+                                    break;
+                                case 2:
+                                    _closeMessage();
+                                    break;
+                                case 3:
+                                    _closeMessage();
+                                    break;
+                                case 4:
+                                    $('.introjs-helperLayer').css('width', '70px');
+                                    break;
+                                case 6:
+                                    $('.introjs-helperLayer').css('width', '84px');
+                                    _showGoToComponent();
+                                    break;
+                                case 7:
+                                    _closeMessage();
+                                    //_showSearchBox();
+                                    break;
+                                case 8:
+                                    _closeToolbar();
+                                    break;
+                            }
+                        };
+
+                        _openToolbar();
+                        $('.introjs-nextbutton').live('click keydown', function(evt){
+                            if(!evt.keyCode || evt.keyCode == 13){
+                                itemsIntroduced++;
+                                showIntroToEl(itemsIntroduced);
+                            }
+                        });
+                        $('.introjs-prevbutton').live('click keydown', function(evt){
+                            if(!evt.keyCode || evt.keyCode == 13){
+                                itemsIntroduced--;
+                                showIntroToEl(itemsIntroduced);
+                            }
+                        });
+                        $('.introjs-skipbutton').live('click keydown', function(evt){
+                            if(!evt.keyCode || evt.keyCode == 13){
+                                //if(itemsIntroduced == 10){
+                                    // finished
+                                    _w.localStorage.setItem('ppw-newDesignIntroduction', 1);
+                                //}else{
+                                    // skiped
+                                  //  itemsIntroduced= 0;
+                                    _closeToolbar();
+                                //}
+                            }
+                        });
+                        /*_w.introJs().onexit(function(target){
+                            alert(9);
+                        });
+                        _w.introJs().oncomplete(function(target){
+                            alert(8);
+                        });*/
+                        _w.introJs().start();
+                        $('.introjs-helperLayer').css('top', '+=20px');
+                    }, 3000);
+                }
             });
         }else{
             _setLoadingBarStatus("splash screen not used");
@@ -2885,7 +2970,6 @@ window.PPW = (function ($, _d, console){
             }
 
         }
-
     };
 
     var _updateScreenSizes= function(){
@@ -4553,26 +4637,7 @@ window.PPW = (function ($, _d, console){
      * Creates the default icons on the toolbar
      */
     var _createDefaultIcons= function(){
-        //_createPPWSrcPath('/_images/goto.png')
-        /*
-        <div class="img"><img id="ppw-toolbox-icon" onclick="PPW.openPresentationTool();" title="Open Presentation Tool" /></div>\
-        <div class="img"><img id="ppw-search-icon" onclick="PPW.showSearchBox()" title="Search on slides"/></div>\
-        <div class="img"><img id="ppw-fullscreen-icon" onclick="PPW.enterFullScreen()" title="Go Fullscreen"/></div>\
-        <div class="img"><img id="ppw-camera-icon" onclick="PPW.toggleCamera();" title="Start the camera"/></div>\
-        <div class="img"><img id="ppw-remote-icon" onclick="PPW.enableRemote();" title="No remote server found"/></div>\
-        <div class="img"><img id="ppw-settings-icon" onclick="PPW.showConfiguration();" title="Settings"/></div>-->\
-
-        <span id="ppw-ct-text-small" title="Smaller fonts" onclick="PPW.smallerFonts();">A</span>\
-        <span id="ppw-ct-text-big" title="Bigger fonts" onclick="PPW.biggerFonts();">A</span>\
-                <img id="ppw-ct-thumbs" onclick="PPW.showThumbs();" title="Show thumbnails"/>\
-        <img id="ppw-ct-print" onclick="PPW.print();" title="Print or save as PDF(alt+P)"/>\
-        <div id="ppw-presentation-social-buttons">\
-            <div class="fb-like" data-href="{{likeSrc}}" data-send="false" data-width="450" data-show-faces="false"></div>\
-            <span class="gp-button"><div class="g-plusone" data-size="medium" data-annotation="none" data-href="{{likeSrc}}"></div></span>\
-        </div>\
-
-        */
-
+        
         _createIcon({
             id: 'ppw-toolbox-icon',
             description: "Open the Presentation Tool",
