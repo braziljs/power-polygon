@@ -2726,12 +2726,12 @@ window.PPW = (function ($, _d, console){
         _b= _d.body;
         $b= $(_b);
 
-        if(!localStorage.getItem('ppw-newDesignIntroduction')){
+        if(!_w.localStorage.getItem('ppw-newDesignIntroduction')){
             _settings.useToolBar= true;
             _settings.useSplashScreen= true;
             _loadScript(_createPPWSrcPath('/_scripts/intro.js'), true, function(){_setLoadingBarStatus('IntroJS.js');});
             _loadStyle(_createPPWSrcPath('/_styles/introjs.css'), true, function(){_setLoadingBarStatus('IntroJS.css');}, true);
-            //_conf.loadSteps+= 2;
+            //_w.localStorage.setItem('ppw-newDesignIntroduction', true);
         }
 
         _preparePPW();
