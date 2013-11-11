@@ -1669,3 +1669,18 @@ BODY.remote-controller iframe{
 #ppw-toolbaricon-ppw-remote-icon[rule=online]{
     background-image: url(../_images/remote-conection-status-on.png) !important;
 }
+
+/* OVERWRITING INTROJS */
+.introjs-overlay{
+    z-index: 999999997;
+}
+.introjs-helperLayer{
+    z-index: 9999999996;
+    background-color: rgba(255,255,255,0.5);
+}
+#ppw-toolbar-container.introjs-fixParent{
+    z-index: 9999999995 !important;
+}
+.introjs-tooltip{
+    min-width: 300px;
+}
