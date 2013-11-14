@@ -4687,7 +4687,8 @@ window.PPW = (function ($, _d, console){
             description: "Enable remove control",
             image: false, //_createPPWSrcPath('_images/remote-conection-status-no-server.png'),
             click: _enableRemote
-        }, true);
+        }, true).attr('rule', 'no-server');
+        
         _createIcon({
             id: 'ppw-settings-icon',
             description: "Shows the settings pannel",
