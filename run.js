@@ -283,7 +283,7 @@ Services= (function(){
         io.sockets.on('connection', _socketsEvents);
 
         // just announcing the server initialization...
-        console.log('[PPW] Listening on '+ server.address().port);
+        console.log('[PPW] Listening on '+ server.address()? server.address(): '????');
         if(_token)
             console.log('[PPW] Your token is ' + _token);
 

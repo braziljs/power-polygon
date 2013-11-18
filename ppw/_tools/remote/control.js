@@ -17,6 +17,15 @@ $(document).ready(function(){
         _b= document.body,
         $b= $(_b);
 
+    var _hidePresentation= function(){
+        var iF= $('#presentation-iframe')[0];
+        if(iF.contentWindow){
+            $(this).data('previous-src', iF.contentWindow.location.href);
+            iF.style.display= 'none';
+        }
+        $('#sett-show-presentation')[0].checked= false;
+    };
+
     var getParameterByName= function (name){
         name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
         var regexS = "[\\?&]" + name + "=([^&#]*)";
@@ -191,11 +200,7 @@ $(document).ready(function(){
 
         $('#sett-show-presentation').click(function(){
             if(!this.checked){
-                var iF= $('#presentation-iframe')[0];
-                if(iF.contentWindow){
-                    $(this).data('previous-src', iF.contentWindow.location.href);
-                    iF.style.display= 'none';
-                }
+                _hidePresentation();
             }else{
                 $('#presentation-iframe').show();
             }
@@ -589,9 +594,11 @@ $(document).ready(function(){
 
     var _init= function(){
 
+        _hidePresentation();
+        
         _socket= io.connect(socketServer);
         _socket.emit('listening', talkId);
-
+        
         if(version == 'full'){
             _waitForPPW();
         }else{
