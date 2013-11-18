@@ -316,10 +316,10 @@ window.PPW = (function ($, _d, console){
                   Fork me: <a href='https://github.com/braziljs/power-polygon' target='_blank'>Github</a><br/>\
                   <br/>\
                   <b>Shortcuts(when presentation has started)</b><br/>\
-                  - <b>ALT</b>: Show toolbar<br/>\
-                  - <b>ALT, F</b>: Find in slides<br/>\
-                  - <b>ALT, G</b>: Go to slide<br/>\
-                  - <b>ALT, S</b>: Settings and properties<br/>\
+                  - <b>ESC</b>: Show toolbar<br/>\
+                  - <b>ESC, F</b>: Find in slides<br/>\
+                  - <b>ESC, G</b>: Go to slide<br/>\
+                  - <b>ESC, S</b>: Settings and properties<br/>\
                   - <b>ALT+Space/ALT, T</b>: Show slides thumbnails<br/>\
                   - <b>ALT+P</b>: Open printable version<br/>\
                   - <b>F6, F7, F8, F9, F10</b>: Custom",
@@ -1908,14 +1908,14 @@ window.PPW = (function ($, _d, console){
                     }
                     break;
 
-                case 18: // alt
+                /*case 18: // alt
                     if(_settings.shortcutsEnable
                         && _conf.presentationStarted
                         && !_isEditableTarget(evt.target)){
                         _openToolbar();
                         return _preventDefaultstopPropagation(evt);
                     }
-                    break;
+                    break;*/
                 
                 case 71: // G
                     if(_settings.shortcutsEnable
@@ -1932,16 +1932,28 @@ window.PPW = (function ($, _d, console){
                         _closeMessage();
                         return true;
                     }
-                    _pauseCamera();
+                    if(_conf.showingCamera){
+                        _pauseCamera();
+                        return true;
+                    }
+                    
                     _preventDefaultstopPropagation(evt);
                     if(_conf.currentZoom != 1){
                         _resetViewport();
                         return true;
                     }
+                    
                     if(_conf.inThumbsMode){
                         _goToSlide(_conf.currentSlide);
+                        _closeToolbar();
+                        return true;
                     }
-                    _closeToolbar();
+                    
+                    if(_conf.showingToolBar){
+                        _closeToolbar();
+                    }else{
+                        _openToolbar();
+                    }
                     break;
 
                 case 70: // F
@@ -2526,8 +2538,7 @@ window.PPW = (function ($, _d, console){
             if(tt.replace(/ /g, '').length === 0){
                 tt= i.id;
             }
-            if(i.index == 23)
-                console.log(99999, i);
+            
             msg+= "<li data-slide-id='"+i.index+"' class='ppw-goto-list-item'>";
             msg+= "<span class='ppw-slide-num'>"+ i.index +"</span><span class='ppw-slide-tt'>"+ (tt.substring(0, 28) || 'slide '+i.index)+"</span>";
             msg+= "</li>";
@@ -3247,7 +3258,7 @@ window.PPW = (function ($, _d, console){
             rsz= {},
             dragingTheVideo= function(event){
                 if(dnd.el){
-                    dnd.el.style.left= event.pageX - dnd.offsetX + 'px';
+                    dnd.el.style.left= (event.pageX - dnd.offsetX) + 'px';
                     dnd.el.style.bottom= ((_b.offsetHeight - event.pageY) - (dnd.height - dnd.offsetY)) + 'px';
                 }
             },
@@ -3334,8 +3345,9 @@ window.PPW = (function ($, _d, console){
 
                         dnd.pageX= event.pageX;
                         dnd.pageY= event.pageY;
-                        dnd.offsetX= event.offsetX;
-                        dnd.offsetY= event.offsetY;
+                        
+                        dnd.offsetX= event.offsetX||event.originalEvent.layerX;
+                        dnd.offsetY= event.offsetY||event.originalEvent.layerY;
                         dnd.height= el[0].offsetHeight;
                         dnd.el= el[0];
 
@@ -3401,6 +3413,7 @@ window.PPW = (function ($, _d, console){
         $('#ppw-toolbar-container').removeClass('active');
         _closeMessage();
         _triggerEvent('toolbarClose');
+        _conf.showingToolBar= false;
     };
 
     /**
@@ -4688,6 +4701,13 @@ window.PPW = (function ($, _d, console){
             image: false, //_createPPWSrcPath('_images/remote-conection-status-no-server.png'),
             click: _enableRemote
         }, true).attr('rule', 'no-server');
+        
+        _createIcon({
+            id: 'ppw-help-icon',
+            description: "See tips and useful links",
+            image: _createPPWSrcPath('_images/help-icon.png'),
+            click: _showHelp
+        }, true);
         
         _createIcon({
             id: 'ppw-settings-icon',
