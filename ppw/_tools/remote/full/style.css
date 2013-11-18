@@ -364,16 +364,20 @@ iframe{
 #settings-container{
     background: rgba(0, 0, 0, 0.7);
     color: white;
-    margin-left: 54px;
     position: absolute;
-    left: 100%;
+    right: 0px;
     top: 2%;
-    width: 100%;
+    width: 0px;
     height: 96%;
-    overflow: auto !important;
+    overflow: hidden !important;
+    box-sizing: border-box;
+    white-space: nowrap;
+    border: none !important;
+    opacity: 0;
+    -moz-box-sizing: border-box;
     z-index: 999999;
     padding: 4px;
-    padding-right: 54px;
+    /*margin-left: 54px;*/
     font-size: 1.2em;
     line-height: 30px;
     outline: solid 1px #000;
@@ -407,8 +411,10 @@ iframe{
     margin: 0px;
 }
 .showing-settings #settings-container{
-    left: 0%;
+    /*left: 0%;*/
+    width: 270px;
     display: block;
+    opacity: 1;
 }
 .go-back{
     position: absolute;

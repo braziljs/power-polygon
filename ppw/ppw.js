@@ -180,6 +180,7 @@ window.PPW = (function ($, _d, console){
             currentRotate: 0,
             locked: false,
             zoomMax: 40,
+            showingToolBar: false,
             currentSlide: 0,
             presentationStarted: false,
             inThumbsMode: false,
@@ -313,13 +314,15 @@ window.PPW = (function ($, _d, console){
                   Forum/Discussion group: <a href='https://groups.google.com/forum/#!forum/powerpolygon' target='_blank'>forum/powerpolygon</a><br/>\
                   Documentation: <a href='https://github.com/braziljs/power-polygon/wiki' target='_blank'>wiki</a><br/>\
                   Fork me: <a href='https://github.com/braziljs/power-polygon' target='_blank'>Github</a><br/>\
-                  <br/><br/>\
-                  <b>Shortcuts</b><br/>\
-                  ALT: Go to slide<br/>\
-                  ALT+F: Search into slides<br/>\
-                  ALT+Space: Show slides thumbnails<br/>\
-                  : Applies zoom in and out<br/>\
-                  F6, F7, F8, F9, F10: Custom",
+                  <br/>\
+                  <b>Shortcuts(when presentation has started)</b><br/>\
+                  - <b>ESC</b>: Show toolbar<br/>\
+                  - <b>ESC, F</b>: Find in slides<br/>\
+                  - <b>ESC, G</b>: Go to slide<br/>\
+                  - <b>ESC, S</b>: Settings and properties<br/>\
+                  - <b>ALT+Space/ALT, T</b>: Show slides thumbnails<br/>\
+                  - <b>ALT+P</b>: Open printable version<br/>\
+                  - <b>F6, F7, F8, F9, F10</b>: Custom",
 
             // the loading element
             loading: "<div id='ppw-lock-loading' style='position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; background: #dadada url(/ppw/_images/ppw-gray-bg.png); padding: 10px; font-family: Arial; z-index: 999999999;'>\
@@ -1745,6 +1748,7 @@ window.PPW = (function ($, _d, console){
         if(!_conf.presentationStarted)
             return;
 
+        _closeToolbar();
         _triggerEvent('onbeforeshowthumbs');
 
         _conf.prevStyle= {
@@ -1755,11 +1759,7 @@ window.PPW = (function ($, _d, console){
             position: el.css('position'),
             top: el.css('top'),
             left: el.css('left'),
-            opacity: el.css('opacity')/*,
-            webkitTransform: el.css('webkitTransform'),
-            mozTransform: el.css('mozTransform'),
-            msTransform: el.css('msTransform'),
-            transform: el.css('Transform')*/
+            opacity: el.css('opacity')
         };
         _tmp.scroll= [_b.scrollLeft, _b.scrollTop];
 
@@ -1908,37 +1908,80 @@ window.PPW = (function ($, _d, console){
                     }
                     break;
 
-                case 18: // alt
+                /*case 18: // alt
                     if(_settings.shortcutsEnable
                         && _conf.presentationStarted
                         && !_isEditableTarget(evt.target)){
+                        _openToolbar();
+                        return _preventDefaultstopPropagation(evt);
+                    }
+                    break;*/
+                
+                case 71: // G
+                    if(_settings.shortcutsEnable
+                        && _conf.presentationStarted
+                        && !_isEditableTarget(evt.target)
+                        && (_conf.showingToolBar || evt.altKey)){
                         _showGoToComponent(true);
                         return _preventDefaultstopPropagation(evt);
                     }
                     break;
-
                 case 27: // esc
 
                     if(_conf.showingMessage){
                         _closeMessage();
                         return true;
                     }
-
-                    _pauseCamera();
+                    if(_conf.showingCamera){
+                        _pauseCamera();
+                        return true;
+                    }
+                    
                     _preventDefaultstopPropagation(evt);
                     if(_conf.currentZoom != 1){
                         _resetViewport();
                         return true;
                     }
+                    
                     if(_conf.inThumbsMode){
                         _goToSlide(_conf.currentSlide);
+                        _closeToolbar();
+                        return true;
                     }
-                    _closeToolbar();
+                    
+                    if(_conf.showingToolBar){
+                        _closeToolbar();
+                    }else{
+                        _openToolbar();
+                    }
                     break;
 
                 case 70: // F
-                    if(evt.altKey){
-                        _showSearchBox(true);
+                    if(_settings.shortcutsEnable
+                        && _conf.presentationStarted
+                        && !_isEditableTarget(evt.target)
+                        && (_conf.showingToolBar || evt.altKey)){
+                        _showSearchBox();
+                        return _preventDefaultstopPropagation(evt);
+                    }
+                    break;
+                
+                case 83: // S
+                    if(_settings.shortcutsEnable
+                        && _conf.presentationStarted
+                        && !_isEditableTarget(evt.target)
+                        && (_conf.showingToolBar || evt.altKey)){
+                        _showConfiguration();
+                        return _preventDefaultstopPropagation(evt);
+                    }
+                    break;
+                
+                case 84: // T
+                    if(_settings.shortcutsEnable
+                        && _conf.presentationStarted
+                        && !_isEditableTarget(evt.target)
+                        && (_conf.showingToolBar || evt.altKey)){
+                        _showThumbs();
                         return _preventDefaultstopPropagation(evt);
                     }
                     break;
@@ -1955,7 +1998,6 @@ window.PPW = (function ($, _d, console){
                     if(_settings.shortcutsEnable){
                         if(evt.altKey && _conf.presentationStarted){
                             k= evt.keyCode - 48;
-
                             if(k>=0 && k<10){
                                 _d.getElementById('ppw-go-to-slide').value+= k;
                                 return _preventDefaultstopPropagation(evt);
@@ -1982,27 +2024,6 @@ window.PPW = (function ($, _d, console){
 
             // Manages the gotoslide box and also function keys
             switch(evt.keyCode){
-                case 18: // alt
-                    s= _d.getElementById('ppw-go-to-slide');
-                    if(s){
-                        if(s.value){
-                            s= parseInt(s.value, 10);
-                            if(s <= 0)
-                                s= 1;
-                            _goToSlide(_getValidSlides()[s -1]);
-                            _closeMessage();
-                        }
-                        _preventDefaultstopPropagation(evt);
-                    }
-                    return false;
-                    break;
-
-                case 80: // P
-                    /*if(evt.altKey || evt.ctrlKey){
-                        _print();
-                        return _preventDefaultstopPropagation(evt);
-                    }*/
-                    break;
 
                 case 27: // ESC
                     s= _triggerEvent('ESC_PRESSED');
@@ -2499,6 +2520,10 @@ window.PPW = (function ($, _d, console){
         _applyClonableElements();
     };
 
+    var _stripTags= function(str){
+        return str.replace(/(<([^>]+)>)/ig,"");
+    }
+
     /**
      * Opens the go-to-slide component.
      */
@@ -2509,8 +2534,13 @@ window.PPW = (function ($, _d, console){
 
         msg+= "<div class='ppw-go-to-slides-list'><ul>";
         PPW.getSlides().map(function(i){
+            var tt= _stripTags(i.title.replace(/[\n\r\t]/g, ''));
+            if(tt.replace(/ /g, '').length === 0){
+                tt= i.id;
+            }
+            
             msg+= "<li data-slide-id='"+i.index+"' class='ppw-goto-list-item'>";
-            msg+= "<span class='ppw-slide-num'>"+ i.index +"</span><span class='ppw-slide-tt'>"+ i.title.replace(/[ \n\r\t]/g, '')+"</span>";
+            msg+= "<span class='ppw-slide-num'>"+ i.index +"</span><span class='ppw-slide-tt'>"+ (tt.substring(0, 28) || 'slide '+i.index)+"</span>";
             msg+= "</li>";
         });
         msg+= "</ul></div>";
@@ -2528,6 +2558,7 @@ window.PPW = (function ($, _d, console){
         //if(_conf.showingMessage)
           //  return false;
 
+        _openToolbar();
         _showMessage(msg, false, 'panel', 'Go to Slide');
 
         var list= _d.querySelectorAll('.ppw-go-to-slides-list li'),
@@ -2709,6 +2740,7 @@ window.PPW = (function ($, _d, console){
                 }, 301);
             }
         }
+        _closeMessage();
     };
 
     /**
@@ -3186,8 +3218,10 @@ window.PPW = (function ($, _d, console){
             type= container? container.data('messageType'): 'box';
 
 
-        if(!container)
+        if(!container){
+            _d.activeElement.blur();
             return false;
+        }
 
         if(fn && typeof fn == 'function'){
             try{
@@ -3206,7 +3240,8 @@ window.PPW = (function ($, _d, console){
         container.removeClass('ppw-showing')
                  .data('messageType', false)
                  .data('messageTitle', false);
-
+        
+        _d.activeElement.blur();
     };
 
     /**
@@ -3223,7 +3258,7 @@ window.PPW = (function ($, _d, console){
             rsz= {},
             dragingTheVideo= function(event){
                 if(dnd.el){
-                    dnd.el.style.left= event.pageX - dnd.offsetX + 'px';
+                    dnd.el.style.left= (event.pageX - dnd.offsetX) + 'px';
                     dnd.el.style.bottom= ((_b.offsetHeight - event.pageY) - (dnd.height - dnd.offsetY)) + 'px';
                 }
             },
@@ -3310,8 +3345,9 @@ window.PPW = (function ($, _d, console){
 
                         dnd.pageX= event.pageX;
                         dnd.pageY= event.pageY;
-                        dnd.offsetX= event.offsetX;
-                        dnd.offsetY= event.offsetY;
+                        
+                        dnd.offsetX= event.offsetX||event.originalEvent.layerX;
+                        dnd.offsetY= event.offsetY||event.originalEvent.layerY;
                         dnd.height= el[0].offsetHeight;
                         dnd.el= el[0];
 
@@ -3377,6 +3413,7 @@ window.PPW = (function ($, _d, console){
         $('#ppw-toolbar-container').removeClass('active');
         _closeMessage();
         _triggerEvent('toolbarClose');
+        _conf.showingToolBar= false;
     };
 
     /**
@@ -3384,6 +3421,7 @@ window.PPW = (function ($, _d, console){
      */
     var _openToolbar= function(){
         $('#ppw-toolbar-container').addClass('active');
+        _conf.showingToolBar= true;
         _triggerEvent('toolbarOpen');
     };
 
@@ -4663,6 +4701,13 @@ window.PPW = (function ($, _d, console){
             image: false, //_createPPWSrcPath('_images/remote-conection-status-no-server.png'),
             click: _enableRemote
         }, true).attr('rule', 'no-server');
+        
+        _createIcon({
+            id: 'ppw-help-icon',
+            description: "See tips and useful links",
+            image: _createPPWSrcPath('_images/help-icon.png'),
+            click: _showHelp
+        }, true);
         
         _createIcon({
             id: 'ppw-settings-icon',
