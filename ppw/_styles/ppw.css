@@ -1670,6 +1670,9 @@ BODY.remote-controller iframe{
     background-image: url(../_images/remote-conection-status-on.png) !important;
 }
 
+.hidden-cursor, .hidden-cursor *{
+    cursor: none !important;
+}
 /* OVERWRITING INTROJS */
 .introjs-overlay{
     z-index: 999999997;

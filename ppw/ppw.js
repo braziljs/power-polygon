@@ -805,7 +805,7 @@ window.PPW = (function ($, _d, console){
         if(_settings.shortcutsEnable && !_isInPrintableVersion()){
             _enableFuncKeys();
         }
-
+        
         _triggerEvent('onload', conf);
     };
 
@@ -1831,7 +1831,9 @@ window.PPW = (function ($, _d, console){
     var _bindEvents= function(){
         var t= null,
             k= 0,
-            mouseWheelFn= null;
+            mouseWheelFn= null,
+            noCursor= null,
+            cursorHidden= false;
 
         /**
          * Keyboard events.
@@ -2233,6 +2235,23 @@ window.PPW = (function ($, _d, console){
 
             return _preventDefaultstopPropagation(evt);
         });*/
+                                                                                        
+        var scheduleNoCursor= function(){
+            _w.clearTimeout(noCursor);
+            noCursor= setTimeout(function(){ 
+                cursorHidden= true;
+                $b.addClass('hidden-cursor');
+            }, 2000);
+        };
+        
+        _b.addEventListener('mousemove', function(){
+            if(cursorHidden){
+                cursorHidden= false;
+                $b.removeClass('hidden-cursor');
+            }
+            scheduleNoCursor();
+        });
+                                                                                        
     };
 
     var _mouseWheelZoom= function(event){
