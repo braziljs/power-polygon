@@ -2,9 +2,17 @@
 
 ---
 # Power Polygon
-Power Polygon is the tool that will allow you to create impressive presentations with many different themes and transitions, based in HTML5, CSS3 and JavaScript, running in your browser.<br/>
-You can create a new theme, or customise an existing one. Also, creating new transitions is quite simple!<br/>
-Watch the Video:<br/>
+
+![Cover](http://braziljs.org/img/projects/power-polygon.jpg)
+
+Power Polygon is the tool that will allow you to create impressive presentations with many different themes and transitions, based in HTML5, CSS3 and JavaScript, running in your browser.
+
+> **Maintainer:** [Felipe Moura](https://github.com/felipenmoura)
+
+You can create a new theme, or customise an existing one. Also, creating new transitions is quite simple!
+
+Watch the Video:
+
 <a href="http://www.youtube.com/watch?v=oZIvKOCDvus" target="_blank">
 ![Video - meet Power Polygon](http://i4.ytimg.com/vi/oZIvKOCDvus/mqdefault.jpg)
 </a>
@@ -45,4 +53,5 @@ Check the committers to see the credits for the created themes and transitions!
 Having trouble? Or new ideas? Discuss it with us in the BrazilJS [mail list](https://groups.google.com/forum/?fromgroups#!forum/braziljs-foundation). Also, feel free to propose new issues.
 
 ### Licenses
+
 [List of licenses](https://github.com/braziljs/power-polygon/tree/master/ppw/_licenses)

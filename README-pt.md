@@ -1,9 +1,15 @@
 # Power Polygon
-Power Polygon é uma ferramenta para criação de apresentações HTML5.
-O Power Polygon possui vários temas e transições, todos baseados em HTML5, CSS3 e JavaScript.  <br/>
-Você pode criar um novo tema, ou customizar um tema existente.  <br/>
-Novas transições também podem ser facilmente criadas.<br/>
-Assista ao vídeo:<br/>
+
+![Cover](http://braziljs.org/img/projects/power-polygon.jpg)
+
+Power Polygon é uma ferramenta para criação de apresentações HTML5. O Power Polygon possui vários temas e transições, todos baseados em HTML5, CSS3 e JavaScript.
+
+> **Mantenedor:** [Felipe Moura](https://github.com/felipenmoura)
+
+Você pode criar um novo tema, ou customizar um tema existente. Novas transições também podem ser facilmente criadas.
+
+Assista ao vídeo:
+
 <a href="http://www.youtube.com/watch?v=24k5_wBI9vI" target="_blank">
 ![Video - Conheça Power Polygon](http://i4.ytimg.com/vi/oZIvKOCDvus/mqdefault.jpg)
 </a>
@@ -45,4 +51,5 @@ Veja a lista de committers para ver quem criou temas e transições.
 Tem algum problema ou nova ideia? Entre no nosso [grupo de discussões](https://groups.google.com/forum/?fromgroups#!forum/braziljs-foundation).
 
 ### Licenças
+
 [Lista de licenças](https://github.com/braziljs/power-polygon/tree/master/ppw/_licenses)
