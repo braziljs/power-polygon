@@ -1683,4 +1683,5 @@ BODY.remote-controller iframe{
 }
 .introjs-tooltip{
     min-width: 300px;
+    white-space: normal;
 }
