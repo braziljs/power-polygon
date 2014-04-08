@@ -49,6 +49,8 @@ pre:not(.no-numbers) .ppw-sh-line:before{
     text-align: right;
     background-color: rgba(100, 100, 100, 0.1);
     padding: 2px;
+    height: 100%;
+    line-height: 1.4em;
 }
 
 .ppw-sh-line:hover{
