@@ -13,7 +13,7 @@
       "browser"
   ],
   "dependencies": {
-    "express": "*",
+    "express": "3.6.0",
     "socket.io": "0.9.13",
     "grunt": "*",
     "grunt-contrib-uglify": "*",
