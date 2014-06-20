@@ -9,13 +9,17 @@ var serverConf= {
 }
 
 /* DEFINITIONS */
-var express = require('express')
-  , app = express()
+var app = require('express')()
+  , bodyParser = require('body-parser')
+  , cookieParser = require('cookie-parser')
+  , expressSession = require('express-session')
+  , multipartParser = require('connect-multiparty')
+  , compression = require('compression')
   , fs = require('fs')
   , io = null
   , _token= false
   , server = null
-  , store  = new express.session.MemoryStore
+  , store  = new expressSession.MemoryStore
   , readline = require('readline')
   , sqlite3 = require('sqlite3').verbose()
   , db = null // ':memory:'
@@ -25,14 +29,12 @@ var express = require('express')
          });
 
 /* MIDLEWARES */
-app.use(express.compress());
-app.use(express.cookieParser());
-app.use(express.bodyParser({
-    keepExtensions: true,
-    uploadDir: '/ppw/tmp/',
-    expires: new Date(Date.now() + (120 * 60 * 1000)) // expires in two hours
-}));
-app.use(express.session({
+app.use(compression());
+app.use(cookieParser());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(multipartParser({ uploadDir: '/ppw/tmp/' }));
+app.use(expressSession({
     secret: serverConf.serverSecret,
     store: store
 }));
