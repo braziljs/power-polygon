@@ -1,9 +1,0 @@
-{
-    "name": "thm-simple",
-    "type": "theme",
-    "dependencies": {
-        "css": [
-            "styles/default.css"
-        ]
-    }
-}

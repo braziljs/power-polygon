@@ -1,9 +1,0 @@
-{
-    "name": "thm-felipenmoura",
-    "type": "theme",
-    "dependencies": {
-        "css": [
-            "styles/default.css"
-        ]
-    }
-}
