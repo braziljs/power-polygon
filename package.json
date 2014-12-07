@@ -1,0 +1,35 @@
+{
+  "name": "power-polygon",
+  "description": "The definitive Presentation tool, based on free open web technologies.",
+  "version": "4.0.0-alpha",
+  "author": "Felipe N. Moura<felipenmoura@gmail.com>",
+  "license": "MIT",
+  "repository": "http://github.com/braziljs/power-polygon",
+  "bugs": "https://github.com/ZimpFidelidade/power-polygon/issues",
+  "keywords": [
+    "talk",
+    "presentation",
+    "conference",
+    "html5",
+    "browser"
+  ],
+  "main": "index.js",
+  "scripts": {
+    "start": "index.js",
+    "test": "grunt -v test"
+  },
+  "engines": {
+    "node": "0.10.*"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-check-dependencies": "^0.6.0",
+    "grunt-contrib-jshint": "^0.10.0",
+    "grunt-contrib-nodeunit": "^0.4.1",
+    "grunt-david": "^0.2.0",
+    "grunt-jscs": "^1.0.0",
+    "load-grunt-tasks": "^1.0.0",
+    "time-grunt": "^1.0.0"
+  }
+}
