@@ -1,0 +1,51 @@
+{
+	"requireCurlyBraces": ["if", "else", "for", "while", "do", "try", "catch"],
+	"requireSpaceAfterKeywords": ["else", "do", "switch", "return"],
+	"requireSpaceBeforeBlockStatements": true,
+	"requireParenthesesAroundIIFE": true,
+	"requireSpacesInFunctionExpression": {
+		"beforeOpeningCurlyBrace": true
+	},
+	"disallowSpacesInFunctionExpression": {
+		"beforeOpeningRoundBrace": true
+	},
+	"requireSpacesInAnonymousFunctionExpression": {
+		"beforeOpeningCurlyBrace": true
+	},
+	"disallowSpacesInAnonymousFunctionExpression": {
+		"beforeOpeningRoundBrace": true
+	},
+	"requireSpacesInNamedFunctionExpression": {
+		"beforeOpeningCurlyBrace": true
+	},
+	"disallowSpacesInNamedFunctionExpression": {
+		"beforeOpeningRoundBrace": true
+	},
+	"requireSpacesInFunctionDeclaration": {
+		"beforeOpeningCurlyBrace": true
+	},
+	"disallowSpacesInFunctionDeclaration": {
+		"beforeOpeningRoundBrace": true
+	},
+	"requireMultipleVarDecl": true,
+	"requireBlocksOnNewline": true,
+	"disallowEmptyBlocks": true,
+	"requireSpacesInsideObjectBrackets": "all",
+	"requireSpacesInsideArrayBrackets": "all",
+	"disallowSpaceAfterObjectKeys": true,
+	"requireCommaBeforeLineBreak": true,
+	"disallowSpaceAfterPrefixUnaryOperators": ["++", "--", "+", "-", "~", "!"],
+	"disallowSpaceBeforePostfixUnaryOperators": ["++", "--"],
+	"requireSpaceBeforeBinaryOperators": ["?", "=", "+", "-", "/", "*", "==", "===", "!=", "!==", "<", ">", "<=", ">="],
+	"requireSpaceAfterBinaryOperators": ["?", "=", "+", "-", "/", "*", "==", "===", "!=", "!==", "<", ">", "<=", ">="],
+	"requireCamelCaseOrUpperCaseIdentifiers": true,
+	"disallowKeywords": ["with", "eval"],
+	"disallowMultipleLineBreaks": true,
+	"disallowMixedSpacesAndTabs": true,
+	"disallowTrailingWhitespace": true,
+	"disallowTrailingComma": true,
+	"disallowYodaConditions": true,
+	"requireSpaceAfterLineComment": true,
+	"disallowKeywordsOnNewLine": ["else", "catch"],
+	"excludeFiles": ["node_modules/**"]
+}
