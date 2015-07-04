@@ -31,6 +31,11 @@ Then, to run it, all you gotta do is:
 Done, now, access <a href='http://localhost:8081/'>http://localhost:8081/</a>.
 To create your talk, check the documentation below.
 
+In case you have some trouble installing it due to a `node-gyp` error, try this
+```
+npm install node-gyp -g
+```
+
 ### Documentation
 For detailed information and documentation, please read the wiki:
 [https://github.com/braziljs/power-polygon/wiki](https://github.com/braziljs/power-polygon/wiki/Start)
