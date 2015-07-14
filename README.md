@@ -31,7 +31,7 @@ Then, to run it, all you gotta do is:
 Done, now, access <a href='http://localhost:8081/'>http://localhost:8081/</a>.
 To create your talk, check the documentation below.
 
-In case you have some trouble installing it due to a `node-gyp` error, try this
+In case you have some trouble installing it due to a `node-gyp` error, try this:
 ```
 npm install node-gyp -g
 ```
