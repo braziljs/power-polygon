@@ -15,8 +15,6 @@
   "dependencies": {
     "express": "^4.4.x",
     "socket.io": "^0.9.x",
-    "grunt": "^0.4.x",
-    "grunt-contrib-uglify": "^0.5.x",
     "sqlite3": "^2.2.x",
 
     "body-parser": "^1.4.x",
@@ -24,5 +22,11 @@
     "express-session": "^1.4.x",
     "compression": "^1.0.x",
     "connect-multiparty": "^1.0.x"
-  }
+  },
+    "devDependencies": {
+        "grunt": "*",
+        "grunt-contrib-uglify": "*",
+        "grunt-contrib-jshint": "^0.10.x",
+        "grunt-jscs-checker": "^0.5.x"
+    }
 }
